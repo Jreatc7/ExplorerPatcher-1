@@ -1,4 +1,4 @@
-{GOODLINE_
+{
   "version": "0.2.0",
   "configurations": [
     {
@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/jepst/source/repos/ExplorerPatcher/ep_dwm",
-      "program": "c:/Users/jepst/source/repos/ExplorerPatcher/ep_dwm/build/Debug/outDebug",
+      "cwd": "c:/Users/jepst/source/repos/ExplorerPatcher",
+      "program": "c:/Users/jepst/source/repos/ExplorerPatcher/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

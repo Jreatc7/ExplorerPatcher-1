@@ -11,7 +11,7 @@ DWORD ArchiveMenuThread(ArchiveMenuThreadParams* params)
         return 0;
     }
 
-    WNDCLASS wc = { 0 };
+    WNDCLASS wc = {0};
     wc.style = CS_DBLCLKS;
     wc.lpfnWndProc = params->wndProc;
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
@@ -68,7 +68,7 @@ DWORD ArchiveMenuThread(ArchiveMenuThreadParams* params)
         return 0;
     }
 
-    MSG msg = { 0 };
+    MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
@@ -79,22 +79,22 @@ DWORD ArchiveMenuThread(ArchiveMenuThreadParams* params)
 }
 
 LRESULT CALLBACK ArchiveMenuWndProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    INT64(*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
+    INT64 (*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
         HMENU h1,
         HMENU h2,
         HWND a3,
         unsigned int a4,
         void* data
-        ),
-    void(*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
+    ),
+    void (*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
         HMENU _this,
         HMENU hWnd,
         HWND a3
-        )
+    )
 )
 {
     LRESULT result;
@@ -171,7 +171,7 @@ LRESULT CALLBACK ArchiveMenuWndProc(
                 wsprintf(buffer, EXTRACT_CMD, path_orig, path);
                 //wprintf(L"%s\n%s\n\n", st->lpData, buffer);
             }
-            STARTUPINFO si = { sizeof(si) };
+            STARTUPINFO si = {sizeof(si)};
             PROCESS_INFORMATION pi;
             BOOL b = CreateProcess(
                 NULL,
@@ -192,7 +192,7 @@ LRESULT CALLBACK ArchiveMenuWndProc(
         ShowWindow(hWnd, SW_HIDE);
         return 0;
     }
-    else if (uMsg == WM_CLOSE)
+    if (uMsg == WM_CLOSE)
     {
         return 0;
     }

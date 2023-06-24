@@ -44,7 +44,7 @@ int main(int argc, char** argv)
                 numChRd = getline(&line, &bufsiz, f);
                 continue;
             }
-            else if (state == 1 && !strncmp(line, szEndPattern, strlen(szEndPattern)))
+            if (state == 1 && !strncmp(line, szEndPattern, strlen(szEndPattern)))
             {
                 state = 2;
                 break;

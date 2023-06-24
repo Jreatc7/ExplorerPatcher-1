@@ -1,6 +1,9 @@
 #include "lvt.h"
 
-Windows_UI_Xaml_IDependencyObject* LVT_FindChildByClassName(Windows_UI_Xaml_IDependencyObject* pRootDependencyObject, Windows_UI_Xaml_IVisualTreeHelperStatics* pVisualTreeHelperStatics, LPCWSTR pwszRefName, INT* prevIndex)
+Windows_UI_Xaml_IDependencyObject* LVT_FindChildByClassName(Windows_UI_Xaml_IDependencyObject* pRootDependencyObject,
+                                                            Windows_UI_Xaml_IVisualTreeHelperStatics*
+                                                            pVisualTreeHelperStatics, LPCWSTR pwszRefName,
+                                                            INT* prevIndex)
 {
     if (!pRootDependencyObject)
     {
@@ -16,7 +19,8 @@ Windows_UI_Xaml_IDependencyObject* LVT_FindChildByClassName(Windows_UI_Xaml_IDep
         for (INT32 Index = (prevIndex ? *prevIndex : 0); Index < Count; ++Index)
         {
             Windows_UI_Xaml_IDependencyObject* pChild = NULL;
-            hr = pVisualTreeHelperStatics->lpVtbl->GetChild(pVisualTreeHelperStatics, pRootDependencyObject, Index, &pChild);
+            hr = pVisualTreeHelperStatics->lpVtbl->GetChild(pVisualTreeHelperStatics, pRootDependencyObject, Index,
+                                                            &pChild);
             if (SUCCEEDED(hr))
             {
                 HSTRING hsChild = NULL;
@@ -43,7 +47,9 @@ Windows_UI_Xaml_IDependencyObject* LVT_FindChildByClassName(Windows_UI_Xaml_IDep
     return NULL;
 }
 
-Windows_UI_Xaml_IDependencyObject* LVT_FindChildByName(Windows_UI_Xaml_IDependencyObject* pRootDependencyObject, Windows_UI_Xaml_IVisualTreeHelperStatics* pVisualTreeHelperStatics, LPCWSTR pwszRefName)
+Windows_UI_Xaml_IDependencyObject* LVT_FindChildByName(Windows_UI_Xaml_IDependencyObject* pRootDependencyObject,
+                                                       Windows_UI_Xaml_IVisualTreeHelperStatics*
+                                                       pVisualTreeHelperStatics, LPCWSTR pwszRefName)
 {
     if (!pRootDependencyObject)
     {
@@ -59,7 +65,8 @@ Windows_UI_Xaml_IDependencyObject* LVT_FindChildByName(Windows_UI_Xaml_IDependen
         for (INT32 Index = 0; Index < Count; ++Index)
         {
             Windows_UI_Xaml_IDependencyObject* pChild = NULL;
-            hr = pVisualTreeHelperStatics->lpVtbl->GetChild(pVisualTreeHelperStatics, pRootDependencyObject, Index, &pChild);
+            hr = pVisualTreeHelperStatics->lpVtbl->GetChild(pVisualTreeHelperStatics, pRootDependencyObject, Index,
+                                                            &pChild);
             if (SUCCEEDED(hr))
             {
                 Windows_UI_Xaml_IFrameworkElement* pFrameworkElement = NULL;
@@ -104,10 +111,12 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
     {
         HSTRING_HEADER hshControlsCanvasStatics;
         HSTRING hsControlsCanvasStatics = NULL;
-        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Controls.Canvas", 31, &hshControlsCanvasStatics, &hsControlsCanvasStatics);
+        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Controls.Canvas", 31, &hshControlsCanvasStatics,
+                                          &hsControlsCanvasStatics);
         if (SUCCEEDED(hr) && hsControlsCanvasStatics)
         {
-            hr = RoGetActivationFactory(hsControlsCanvasStatics, &IID_Windows_UI_Xaml_Controls_ICanvasStatics, &pCanvasStatics);
+            hr = RoGetActivationFactory(hsControlsCanvasStatics, &IID_Windows_UI_Xaml_Controls_ICanvasStatics,
+                                        &pCanvasStatics);
             WindowsDeleteString(hsControlsCanvasStatics);
         }
     }
@@ -131,7 +140,8 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                     hr = pWindow->lpVtbl->get_Content(pWindow, &pUIElement);
                     if (SUCCEEDED(hr))
                     {
-                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject, &pRootDependencyObject);
+                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject,
+                                                                &pRootDependencyObject);
 
                         pUIElement->lpVtbl->Release(pUIElement);
                     }
@@ -147,29 +157,37 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
     {
         HSTRING_HEADER hshVisualTreeHelperStatics;
         HSTRING hsVisualTreeHelperStatics = NULL;
-        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics, &hsVisualTreeHelperStatics);
+        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics,
+                                          &hsVisualTreeHelperStatics);
         if (SUCCEEDED(hr) && hsVisualTreeHelperStatics)
         {
             Windows_UI_Xaml_IVisualTreeHelperStatics* pVisualTreeHelperStatics = NULL;
-            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics, &pVisualTreeHelperStatics);
+            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics,
+                                        &pVisualTreeHelperStatics);
             if (SUCCEEDED(hr))
             {
-                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(pRootDependencyObject, pVisualTreeHelperStatics, L"StartUI.StartSizingFrame", NULL);
+                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(
+                    pRootDependencyObject, pVisualTreeHelperStatics, L"StartUI.StartSizingFrame", NULL);
                 if (pStartSizingFrame)
                 {
                     int location = LVT_LOC_NONE;
 
                     Windows_UI_Xaml_Thickness drc;
-                    drc.Left = 0.0; drc.Right = 0.0; drc.Top = 0.0; drc.Bottom = 0.0;
+                    drc.Left = 0.0;
+                    drc.Right = 0.0;
+                    drc.Top = 0.0;
+                    drc.Bottom = 0.0;
                     Windows_UI_Xaml_IUIElement* pIUIElement = NULL;
                     Windows_UI_Xaml_IFrameworkElement* pFrameworkElement = NULL;
-                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement, &pIUIElement);
+                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement,
+                                                              &pIUIElement);
                     if (pIUIElement)
                     {
                         pCanvasStatics->lpVtbl->GetLeft(pCanvasStatics, pIUIElement, &(drc.Left));
                         pCanvasStatics->lpVtbl->GetTop(pCanvasStatics, pIUIElement, &(drc.Top));
                     }
-                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IFrameworkElement, &pFrameworkElement);
+                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IFrameworkElement,
+                                                              &pFrameworkElement);
                     if (pFrameworkElement)
                     {
                         pFrameworkElement->lpVtbl->get_ActualWidth(pFrameworkElement, &(drc.Right));
@@ -178,7 +196,8 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                     UINT dpi = GetDpiForWindow(hWnd);
                     RECT rc;
                     SetRect(&rc, drc.Left, drc.Top, drc.Right, drc.Bottom);
-                    SetRect(&rc, MulDiv(rc.left, dpi, 96), MulDiv(rc.top, dpi, 96), MulDiv(rc.right, dpi, 96), MulDiv(rc.bottom, dpi, 96));
+                    SetRect(&rc, MulDiv(rc.left, dpi, 96), MulDiv(rc.top, dpi, 96), MulDiv(rc.right, dpi, 96),
+                            MulDiv(rc.bottom, dpi, 96));
                     *rect = rc;
                     HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTOPRIMARY);
                     MONITORINFO mi;
@@ -187,7 +206,8 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                     GetMonitorInfoW(hMonitor, &mi);
                     //swprintf(wszDebug, MAX_PATH, L"RECT %d %d %d %d - %d %d %d %d\n", rc.left, rc.top, rc.right, rc.bottom, 0, 0, mi.rcWork.right - mi.rcWork.left, mi.rcWork.bottom - mi.rcWork.top);
                     //OutputDebugStringW(wszDebug);
-                    if (!(rc.left == 0 && rc.top == 0 && abs(mi.rcWork.right - mi.rcWork.left - rc.right) < 5 && abs(mi.rcWork.bottom - mi.rcWork.top - rc.bottom) < 5))
+                    if (!(rc.left == 0 && rc.top == 0 && abs(mi.rcWork.right - mi.rcWork.left - rc.right) < 5 && abs(
+                        mi.rcWork.bottom - mi.rcWork.top - rc.bottom) < 5))
                     {
                         if (rc.left == 0)
                         {
@@ -215,38 +235,47 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                     {
                         pIUIElement->lpVtbl->Release(pIUIElement);
                     }
-                    Windows_UI_Xaml_IDependencyObject* pStartSizingFramePanel = LVT_FindChildByClassName(pStartSizingFrame, pVisualTreeHelperStatics, L"StartUI.StartSizingFramePanel", NULL);
+                    Windows_UI_Xaml_IDependencyObject* pStartSizingFramePanel = LVT_FindChildByClassName(
+                        pStartSizingFrame, pVisualTreeHelperStatics, L"StartUI.StartSizingFramePanel", NULL);
                     if (pStartSizingFramePanel)
                     {
                         // Drop shadow
-                        Windows_UI_Xaml_IDependencyObject* pDropShadow = LVT_FindChildByClassName(pStartSizingFramePanel, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Image", NULL);
+                        Windows_UI_Xaml_IDependencyObject* pDropShadow = LVT_FindChildByClassName(
+                            pStartSizingFramePanel, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Image", NULL);
                         if (pDropShadow)
                         {
                             Windows_UI_Xaml_IUIElement* pIUIElement = NULL;
-                            pDropShadow->lpVtbl->QueryInterface(pDropShadow, &IID_Windows_UI_Xaml_IUIElement, &pIUIElement);
+                            pDropShadow->lpVtbl->QueryInterface(pDropShadow, &IID_Windows_UI_Xaml_IUIElement,
+                                                                &pIUIElement);
                             if (pIUIElement)
                             {
                                 if (dwReceipe)
                                 {
-                                    pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Collapsed);
+                                    pIUIElement->lpVtbl->put_Visibility(
+                                        pIUIElement, Windows_UI_Xaml_Visibility_Collapsed);
                                 }
                                 else
                                 {
-                                    pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Visible);
+                                    pIUIElement->lpVtbl->
+                                                 put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Visible);
                                 }
                                 pIUIElement->lpVtbl->Release(pIUIElement);
                             }
                             pDropShadow->lpVtbl->Release(pDropShadow);
                         }
-                        Windows_UI_Xaml_IDependencyObject* pContentPresenter = LVT_FindChildByClassName(pStartSizingFramePanel, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
+                        Windows_UI_Xaml_IDependencyObject* pContentPresenter = LVT_FindChildByClassName(
+                            pStartSizingFramePanel, pVisualTreeHelperStatics,
+                            L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
                         if (pContentPresenter)
                         {
-                            Windows_UI_Xaml_IDependencyObject* pFrame = LVT_FindChildByClassName(pContentPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Frame", NULL);
+                            Windows_UI_Xaml_IDependencyObject* pFrame = LVT_FindChildByClassName(
+                                pContentPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Frame", NULL);
                             if (pFrame)
                             {
                                 // Main menu padding
                                 Windows_UI_Xaml_Controls_IControl* pIBorder = NULL;
-                                pFrame->lpVtbl->QueryInterface(pFrame, &IID_Windows_UI_Xaml_Controls_IControl, &pIBorder);
+                                pFrame->lpVtbl->QueryInterface(pFrame, &IID_Windows_UI_Xaml_Controls_IControl,
+                                                               &pIBorder);
                                 if (pIBorder)
                                 {
                                     double pad = 12.0;
@@ -285,21 +314,27 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                                     pIBorder->lpVtbl->put_Padding(pIBorder, th);
                                     pIBorder->lpVtbl->Release(pIBorder);
                                 }
-                                Windows_UI_Xaml_IDependencyObject* pContentPresenter2 = LVT_FindChildByClassName(pFrame, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
+                                Windows_UI_Xaml_IDependencyObject* pContentPresenter2 = LVT_FindChildByClassName(
+                                    pFrame, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter",
+                                    NULL);
                                 if (pContentPresenter2)
                                 {
-                                    Windows_UI_Xaml_IDependencyObject* pSplitViewFrame = LVT_FindChildByClassName(pContentPresenter2, pVisualTreeHelperStatics, L"StartUI.SplitViewFrame", NULL);
+                                    Windows_UI_Xaml_IDependencyObject* pSplitViewFrame = LVT_FindChildByClassName(
+                                        pContentPresenter2, pVisualTreeHelperStatics, L"StartUI.SplitViewFrame", NULL);
                                     if (pSplitViewFrame)
                                     {
-                                        Windows_UI_Xaml_IDependencyObject* pRootGrid = LVT_FindChildByName(pSplitViewFrame, pVisualTreeHelperStatics, L"RootGrid");
+                                        Windows_UI_Xaml_IDependencyObject* pRootGrid = LVT_FindChildByName(
+                                            pSplitViewFrame, pVisualTreeHelperStatics, L"RootGrid");
                                         if (pRootGrid)
                                         {
                                             // Main menu corners
-                                            Windows_UI_Xaml_IDependencyObject* pAcrylicBorder = LVT_FindChildByName(pRootGrid, pVisualTreeHelperStatics, L"AcrylicBorder");
+                                            Windows_UI_Xaml_IDependencyObject* pAcrylicBorder = LVT_FindChildByName(
+                                                pRootGrid, pVisualTreeHelperStatics, L"AcrylicBorder");
                                             if (pAcrylicBorder)
                                             {
                                                 Windows_UI_Xaml_Controls_IBorder* pIBorder = NULL;
-                                                pAcrylicBorder->lpVtbl->QueryInterface(pAcrylicBorder, &IID_Windows_UI_Xaml_Controls_IBorder, &pIBorder);
+                                                pAcrylicBorder->lpVtbl->QueryInterface(
+                                                    pAcrylicBorder, &IID_Windows_UI_Xaml_Controls_IBorder, &pIBorder);
                                                 if (pIBorder)
                                                 {
                                                     double pad = 10.0;
@@ -315,10 +350,14 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                                                         }
                                                         else if (location == LVT_LOC_TOPLEFT)
                                                         {
-                                                            cr.BottomLeft = (hWndTaskbar && (dwPos == 2)) ? (dwReceipe ? pad : 0.0) : 0.0;
+                                                            cr.BottomLeft = (hWndTaskbar && (dwPos == 2))
+                                                                                ? (dwReceipe ? pad : 0.0)
+                                                                                : 0.0;
                                                             cr.BottomRight = dwReceipe ? pad : 0.0;
                                                             cr.TopLeft = 0.0;
-                                                            cr.TopRight = (hWndTaskbar && (dwPos != 2)) ? (dwReceipe ? pad : 0.0) : 0.0;
+                                                            cr.TopRight = (hWndTaskbar && (dwPos != 2))
+                                                                              ? (dwReceipe ? pad : 0.0)
+                                                                              : 0.0;
                                                         }
                                                         else if (location == LVT_LOC_TOPRIGHT)
                                                         {
@@ -341,138 +380,360 @@ void LVT_StartUI_EnableRoundedCorners(HWND hWnd, DWORD dwReceipe, DWORD dwPos, H
                                                 pAcrylicBorder->lpVtbl->Release(pAcrylicBorder);
                                             }
                                             // Live tiles corners
-                                            Windows_UI_Xaml_IDependencyObject* pRootContent = LVT_FindChildByName(pRootGrid, pVisualTreeHelperStatics, L"RootContent");
+                                            Windows_UI_Xaml_IDependencyObject* pRootContent = LVT_FindChildByName(
+                                                pRootGrid, pVisualTreeHelperStatics, L"RootContent");
                                             if (pRootContent)
                                             {
-                                                Windows_UI_Xaml_IDependencyObject* pGrid = LVT_FindChildByClassName(pRootContent, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Grid", NULL);
+                                                Windows_UI_Xaml_IDependencyObject* pGrid = LVT_FindChildByClassName(
+                                                    pRootContent, pVisualTreeHelperStatics,
+                                                    L"Windows.UI.Xaml.Controls.Grid", NULL);
                                                 if (pGrid)
                                                 {
-                                                    Windows_UI_Xaml_IDependencyObject* pContentRoot = LVT_FindChildByName(pGrid, pVisualTreeHelperStatics, L"ContentRoot");
+                                                    Windows_UI_Xaml_IDependencyObject* pContentRoot =
+                                                        LVT_FindChildByName(
+                                                            pGrid, pVisualTreeHelperStatics, L"ContentRoot");
                                                     if (pContentRoot)
                                                     {
-                                                        Windows_UI_Xaml_IDependencyObject* pBorder = LVT_FindChildByClassName(pContentRoot, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Border", NULL);
+                                                        Windows_UI_Xaml_IDependencyObject* pBorder =
+                                                            LVT_FindChildByClassName(
+                                                                pContentRoot, pVisualTreeHelperStatics,
+                                                                L"Windows.UI.Xaml.Controls.Border", NULL);
                                                         if (pBorder)
                                                         {
-                                                            Windows_UI_Xaml_IDependencyObject* pContentPaneGrid = LVT_FindChildByName(pBorder, pVisualTreeHelperStatics, L"ContentPaneGrid");
+                                                            Windows_UI_Xaml_IDependencyObject* pContentPaneGrid =
+                                                                LVT_FindChildByName(
+                                                                    pBorder, pVisualTreeHelperStatics,
+                                                                    L"ContentPaneGrid");
                                                             if (pContentPaneGrid)
                                                             {
-                                                                Windows_UI_Xaml_IDependencyObject* pGridPane = LVT_FindChildByName(pContentPaneGrid, pVisualTreeHelperStatics, L"GridPane");
+                                                                Windows_UI_Xaml_IDependencyObject* pGridPane =
+                                                                    LVT_FindChildByName(
+                                                                        pContentPaneGrid, pVisualTreeHelperStatics,
+                                                                        L"GridPane");
                                                                 if (pGridPane)
                                                                 {
-                                                                    Windows_UI_Xaml_IDependencyObject* ppage = LVT_FindChildByName(pGridPane, pVisualTreeHelperStatics, L"page");
+                                                                    Windows_UI_Xaml_IDependencyObject* ppage =
+                                                                        LVT_FindChildByName(
+                                                                            pGridPane, pVisualTreeHelperStatics,
+                                                                            L"page");
                                                                     if (ppage)
                                                                     {
-                                                                        Windows_UI_Xaml_IDependencyObject* pgridRoot = LVT_FindChildByName(ppage, pVisualTreeHelperStatics, L"gridRoot");
+                                                                        Windows_UI_Xaml_IDependencyObject* pgridRoot =
+                                                                            LVT_FindChildByName(
+                                                                                ppage, pVisualTreeHelperStatics,
+                                                                                L"gridRoot");
                                                                         if (pgridRoot)
                                                                         {
-                                                                            Windows_UI_Xaml_IDependencyObject* pgroupItems = LVT_FindChildByName(pgridRoot, pVisualTreeHelperStatics, L"groupItems");
+                                                                            Windows_UI_Xaml_IDependencyObject*
+                                                                                pgroupItems = LVT_FindChildByName(
+                                                                                    pgridRoot, pVisualTreeHelperStatics,
+                                                                                    L"groupItems");
                                                                             if (pgroupItems)
                                                                             {
-                                                                                Windows_UI_Xaml_IDependencyObject* pBorder2 = LVT_FindChildByClassName(pgroupItems, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Border", NULL);
+                                                                                Windows_UI_Xaml_IDependencyObject*
+                                                                                    pBorder2 = LVT_FindChildByClassName(
+                                                                                        pgroupItems,
+                                                                                        pVisualTreeHelperStatics,
+                                                                                        L"Windows.UI.Xaml.Controls.Border",
+                                                                                        NULL);
                                                                                 if (pBorder2)
                                                                                 {
-                                                                                    Windows_UI_Xaml_IDependencyObject* pScrollViewer = LVT_FindChildByName(pBorder2, pVisualTreeHelperStatics, L"ScrollViewer");
+                                                                                    Windows_UI_Xaml_IDependencyObject*
+                                                                                        pScrollViewer =
+                                                                                        LVT_FindChildByName(
+                                                                                            pBorder2,
+                                                                                            pVisualTreeHelperStatics,
+                                                                                            L"ScrollViewer");
                                                                                     if (pScrollViewer)
                                                                                     {
-                                                                                        Windows_UI_Xaml_IDependencyObject* pBorder3 = LVT_FindChildByClassName(pScrollViewer, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Border", NULL);
+                                                                                        Windows_UI_Xaml_IDependencyObject
+                                                                                            * pBorder3 =
+                                                                                                LVT_FindChildByClassName(
+                                                                                                    pScrollViewer,
+                                                                                                    pVisualTreeHelperStatics,
+                                                                                                    L"Windows.UI.Xaml.Controls.Border",
+                                                                                                    NULL);
                                                                                         if (pBorder3)
                                                                                         {
-                                                                                            Windows_UI_Xaml_IDependencyObject* pGrid2 = LVT_FindChildByClassName(pBorder3, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Grid", NULL);
+                                                                                            Windows_UI_Xaml_IDependencyObject
+                                                                                                * pGrid2 =
+                                                                                                    LVT_FindChildByClassName(
+                                                                                                        pBorder3,
+                                                                                                        pVisualTreeHelperStatics,
+                                                                                                        L"Windows.UI.Xaml.Controls.Grid",
+                                                                                                        NULL);
                                                                                             if (pGrid2)
                                                                                             {
-                                                                                                Windows_UI_Xaml_IDependencyObject* pScrollContentPresenter = LVT_FindChildByName(pGrid2, pVisualTreeHelperStatics, L"ScrollContentPresenter");
-                                                                                                if (pScrollContentPresenter)
+                                                                                                Windows_UI_Xaml_IDependencyObject
+                                                                                                    * pScrollContentPresenter
+                                                                                                        = LVT_FindChildByName(
+                                                                                                            pGrid2,
+                                                                                                            pVisualTreeHelperStatics,
+                                                                                                            L"ScrollContentPresenter");
+                                                                                                if (
+                                                                                                    pScrollContentPresenter)
                                                                                                 {
-                                                                                                    Windows_UI_Xaml_IDependencyObject* pItemsPresenter = LVT_FindChildByClassName(pScrollContentPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ItemsPresenter", NULL);
+                                                                                                    Windows_UI_Xaml_IDependencyObject
+                                                                                                        * pItemsPresenter
+                                                                                                            = LVT_FindChildByClassName(
+                                                                                                                pScrollContentPresenter,
+                                                                                                                pVisualTreeHelperStatics,
+                                                                                                                L"Windows.UI.Xaml.Controls.ItemsPresenter",
+                                                                                                                NULL);
                                                                                                     if (pItemsPresenter)
                                                                                                     {
-                                                                                                        Windows_UI_Xaml_IDependencyObject* pTileGrid = LVT_FindChildByClassName(pItemsPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.TileGrid", NULL);
+                                                                                                        Windows_UI_Xaml_IDependencyObject
+                                                                                                            * pTileGrid
+                                                                                                                = LVT_FindChildByClassName(
+                                                                                                                    pItemsPresenter,
+                                                                                                                    pVisualTreeHelperStatics,
+                                                                                                                    L"Windows.UI.Xaml.Controls.TileGrid",
+                                                                                                                    NULL);
                                                                                                         if (pTileGrid)
                                                                                                         {
-                                                                                                            INT iIndex = 0;
-                                                                                                            BOOL bSkipFirst = TRUE;
+                                                                                                            INT iIndex =
+                                                                                                                0;
+                                                                                                            BOOL
+                                                                                                                bSkipFirst
+                                                                                                                    = TRUE;
                                                                                                             while (TRUE)
                                                                                                             {
-                                                                                                                Windows_UI_Xaml_IDependencyObject* pCurrentGroup = LVT_FindChildByClassName(pTileGrid, pVisualTreeHelperStatics, L"StartUI.TileListViewItem", &iIndex);
-                                                                                                                if (!pCurrentGroup)
+                                                                                                                Windows_UI_Xaml_IDependencyObject
+                                                                                                                    * pCurrentGroup
+                                                                                                                        = LVT_FindChildByClassName(
+                                                                                                                            pTileGrid,
+                                                                                                                            pVisualTreeHelperStatics,
+                                                                                                                            L"StartUI.TileListViewItem",
+                                                                                                                            &iIndex);
+                                                                                                                if (!
+                                                                                                                    pCurrentGroup)
                                                                                                                 {
-                                                                                                                    break;
+                                                                                                                    break
+                                                                                                                        ;
                                                                                                                 }
-                                                                                                                if (bSkipFirst)
+                                                                                                                if (
+                                                                                                                    bSkipFirst)
                                                                                                                 {
-                                                                                                                    bSkipFirst = FALSE;
-                                                                                                                    pCurrentGroup->lpVtbl->Release(pCurrentGroup);
-                                                                                                                    continue;
+                                                                                                                    bSkipFirst
+                                                                                                                        = FALSE;
+                                                                                                                    pCurrentGroup
+                                                                                                                        ->
+                                                                                                                        lpVtbl
+                                                                                                                        ->
+                                                                                                                        Release(
+                                                                                                                            pCurrentGroup);
+                                                                                                                    continue
+                                                                                                                        ;
                                                                                                                 }
-                                                                                                                Windows_UI_Xaml_IDependencyObject* pcontentPresenter = LVT_FindChildByName(pCurrentGroup, pVisualTreeHelperStatics, L"contentPresenter");
-                                                                                                                if (pcontentPresenter)
+                                                                                                                Windows_UI_Xaml_IDependencyObject
+                                                                                                                    * pcontentPresenter
+                                                                                                                        = LVT_FindChildByName(
+                                                                                                                            pCurrentGroup,
+                                                                                                                            pVisualTreeHelperStatics,
+                                                                                                                            L"contentPresenter");
+                                                                                                                if (
+                                                                                                                    pcontentPresenter)
                                                                                                                 {
-                                                                                                                    Windows_UI_Xaml_IDependencyObject* pTileGroupViewControl = LVT_FindChildByClassName(pcontentPresenter, pVisualTreeHelperStatics, L"StartUI.TileGroupViewControl", NULL);
-                                                                                                                    if (pTileGroupViewControl)
+                                                                                                                    Windows_UI_Xaml_IDependencyObject
+                                                                                                                        * pTileGroupViewControl
+                                                                                                                            = LVT_FindChildByClassName(
+                                                                                                                                pcontentPresenter,
+                                                                                                                                pVisualTreeHelperStatics,
+                                                                                                                                L"StartUI.TileGroupViewControl",
+                                                                                                                                NULL);
+                                                                                                                    if (
+                                                                                                                        pTileGroupViewControl)
                                                                                                                     {
-                                                                                                                        Windows_UI_Xaml_IDependencyObject* pGrid3 = LVT_FindChildByClassName(pTileGroupViewControl, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Grid", NULL);
-                                                                                                                        if (pGrid3)
+                                                                                                                        Windows_UI_Xaml_IDependencyObject
+                                                                                                                            * pGrid3
+                                                                                                                                = LVT_FindChildByClassName(
+                                                                                                                                    pTileGroupViewControl,
+                                                                                                                                    pVisualTreeHelperStatics,
+                                                                                                                                    L"Windows.UI.Xaml.Controls.Grid",
+                                                                                                                                    NULL);
+                                                                                                                        if
+                                                                                                                        (pGrid3)
                                                                                                                         {
-                                                                                                                            Windows_UI_Xaml_IDependencyObject* pNestedPanel = LVT_FindChildByName(pGrid3, pVisualTreeHelperStatics, L"NestedPanel");
-                                                                                                                            if (pNestedPanel)
+                                                                                                                            Windows_UI_Xaml_IDependencyObject
+                                                                                                                                * pNestedPanel
+                                                                                                                                    = LVT_FindChildByName(
+                                                                                                                                        pGrid3,
+                                                                                                                                        pVisualTreeHelperStatics,
+                                                                                                                                        L"NestedPanel");
+                                                                                                                            if
+                                                                                                                            (pNestedPanel)
                                                                                                                             {
-                                                                                                                                INT jIndex = 0;
-                                                                                                                                while (TRUE)
+                                                                                                                                INT
+                                                                                                                                    jIndex
+                                                                                                                                        = 0;
+                                                                                                                                while
+                                                                                                                                (TRUE)
                                                                                                                                 {
-                                                                                                                                    Windows_UI_Xaml_IDependencyObject* pCurrentTile = LVT_FindChildByClassName(pNestedPanel, pVisualTreeHelperStatics, L"StartUI.TileListViewItem", &jIndex);
-                                                                                                                                    if (!pCurrentTile)
+                                                                                                                                    Windows_UI_Xaml_IDependencyObject
+                                                                                                                                        * pCurrentTile
+                                                                                                                                            = LVT_FindChildByClassName(
+                                                                                                                                                pNestedPanel,
+                                                                                                                                                pVisualTreeHelperStatics,
+                                                                                                                                                L"StartUI.TileListViewItem",
+                                                                                                                                                &jIndex);
+                                                                                                                                    if
+                                                                                                                                    (!
+                                                                                                                                        pCurrentTile)
                                                                                                                                     {
-                                                                                                                                        break;
+                                                                                                                                        break
+                                                                                                                                            ;
                                                                                                                                     }
-                                                                                                                                    Windows_UI_Xaml_IDependencyObject* pcontentPresenter2 = LVT_FindChildByName(pCurrentTile, pVisualTreeHelperStatics, L"contentPresenter");
-                                                                                                                                    if (pcontentPresenter2)
+                                                                                                                                    Windows_UI_Xaml_IDependencyObject
+                                                                                                                                        * pcontentPresenter2
+                                                                                                                                            = LVT_FindChildByName(
+                                                                                                                                                pCurrentTile,
+                                                                                                                                                pVisualTreeHelperStatics,
+                                                                                                                                                L"contentPresenter");
+                                                                                                                                    if
+                                                                                                                                    (pcontentPresenter2)
                                                                                                                                     {
-                                                                                                                                        Windows_UI_Xaml_IDependencyObject* pTileViewControl = LVT_FindChildByClassName(pcontentPresenter2, pVisualTreeHelperStatics, L"StartUI.TileViewControl", NULL);
-                                                                                                                                        if (pTileViewControl)
+                                                                                                                                        Windows_UI_Xaml_IDependencyObject
+                                                                                                                                            * pTileViewControl
+                                                                                                                                                = LVT_FindChildByClassName(
+                                                                                                                                                    pcontentPresenter2,
+                                                                                                                                                    pVisualTreeHelperStatics,
+                                                                                                                                                    L"StartUI.TileViewControl",
+                                                                                                                                                    NULL);
+                                                                                                                                        if
+                                                                                                                                        (pTileViewControl)
                                                                                                                                         {
-                                                                                                                                            Windows_UI_Xaml_Controls_IGrid2* pIGrid2 = NULL;
-                                                                                                                                            pTileViewControl->lpVtbl->QueryInterface(pTileViewControl, &IID_Windows_UI_Xaml_Controls_IGrid2, &pIGrid2);
-                                                                                                                                            if (pIGrid2)
+                                                                                                                                            Windows_UI_Xaml_Controls_IGrid2
+                                                                                                                                                * pIGrid2
+                                                                                                                                                    = NULL;
+                                                                                                                                            pTileViewControl
+                                                                                                                                                ->
+                                                                                                                                                lpVtbl
+                                                                                                                                                ->
+                                                                                                                                                QueryInterface(
+                                                                                                                                                    pTileViewControl,
+                                                                                                                                                    &IID_Windows_UI_Xaml_Controls_IGrid2,
+                                                                                                                                                    &pIGrid2);
+                                                                                                                                            if
+                                                                                                                                            (pIGrid2)
                                                                                                                                             {
-                                                                                                                                                Windows_UI_Xaml_CornerRadius cr;
-                                                                                                                                                cr.BottomLeft = (dwReceipe ? 5.0 : 0.0);
-                                                                                                                                                cr.BottomRight = cr.BottomLeft;
-                                                                                                                                                cr.TopLeft = cr.BottomLeft;
-                                                                                                                                                cr.TopRight = cr.BottomLeft;
-                                                                                                                                                pIGrid2->lpVtbl->put_CornerRadius(pIGrid2, cr);
-                                                                                                                                                pIGrid2->lpVtbl->Release(pIGrid2);
+                                                                                                                                                Windows_UI_Xaml_CornerRadius
+                                                                                                                                                    cr;
+                                                                                                                                                cr
+                                                                                                                                                    .BottomLeft
+                                                                                                                                                    = (
+                                                                                                                                                        dwReceipe
+                                                                                                                                                            ? 5.0
+                                                                                                                                                            : 0.0);
+                                                                                                                                                cr
+                                                                                                                                                    .BottomRight
+                                                                                                                                                    = cr
+                                                                                                                                                    .BottomLeft;
+                                                                                                                                                cr
+                                                                                                                                                    .TopLeft
+                                                                                                                                                    = cr
+                                                                                                                                                    .BottomLeft;
+                                                                                                                                                cr
+                                                                                                                                                    .TopRight
+                                                                                                                                                    = cr
+                                                                                                                                                    .BottomLeft;
+                                                                                                                                                pIGrid2
+                                                                                                                                                    ->
+                                                                                                                                                    lpVtbl
+                                                                                                                                                    ->
+                                                                                                                                                    put_CornerRadius(
+                                                                                                                                                        pIGrid2,
+                                                                                                                                                        cr);
+                                                                                                                                                pIGrid2
+                                                                                                                                                    ->
+                                                                                                                                                    lpVtbl
+                                                                                                                                                    ->
+                                                                                                                                                    Release(
+                                                                                                                                                        pIGrid2);
                                                                                                                                             }
-                                                                                                                                            pTileViewControl->lpVtbl->Release(pTileViewControl);
+                                                                                                                                            pTileViewControl
+                                                                                                                                                ->
+                                                                                                                                                lpVtbl
+                                                                                                                                                ->
+                                                                                                                                                Release(
+                                                                                                                                                    pTileViewControl);
                                                                                                                                         }
-                                                                                                                                        pcontentPresenter2->lpVtbl->Release(pcontentPresenter2);
+                                                                                                                                        pcontentPresenter2
+                                                                                                                                            ->
+                                                                                                                                            lpVtbl
+                                                                                                                                            ->
+                                                                                                                                            Release(
+                                                                                                                                                pcontentPresenter2);
                                                                                                                                     }
-                                                                                                                                    pCurrentTile->lpVtbl->Release(pCurrentTile);
+                                                                                                                                    pCurrentTile
+                                                                                                                                        ->
+                                                                                                                                        lpVtbl
+                                                                                                                                        ->
+                                                                                                                                        Release(
+                                                                                                                                            pCurrentTile);
                                                                                                                                 }
-                                                                                                                                pNestedPanel->lpVtbl->Release(pNestedPanel);
+                                                                                                                                pNestedPanel
+                                                                                                                                    ->
+                                                                                                                                    lpVtbl
+                                                                                                                                    ->
+                                                                                                                                    Release(
+                                                                                                                                        pNestedPanel);
                                                                                                                             }
-                                                                                                                            pGrid3->lpVtbl->Release(pGrid3);
+                                                                                                                            pGrid3
+                                                                                                                                ->
+                                                                                                                                lpVtbl
+                                                                                                                                ->
+                                                                                                                                Release(
+                                                                                                                                    pGrid3);
                                                                                                                         }
-                                                                                                                        pTileGroupViewControl->lpVtbl->Release(pTileGroupViewControl);
+                                                                                                                        pTileGroupViewControl
+                                                                                                                            ->
+                                                                                                                            lpVtbl
+                                                                                                                            ->
+                                                                                                                            Release(
+                                                                                                                                pTileGroupViewControl);
                                                                                                                     }
-                                                                                                                    pcontentPresenter->lpVtbl->Release(pcontentPresenter);
+                                                                                                                    pcontentPresenter
+                                                                                                                        ->
+                                                                                                                        lpVtbl
+                                                                                                                        ->
+                                                                                                                        Release(
+                                                                                                                            pcontentPresenter);
                                                                                                                 }
-                                                                                                                pCurrentGroup->lpVtbl->Release(pCurrentGroup);
+                                                                                                                pCurrentGroup
+                                                                                                                    ->
+                                                                                                                    lpVtbl
+                                                                                                                    ->
+                                                                                                                    Release(
+                                                                                                                        pCurrentGroup);
                                                                                                             }
-                                                                                                            pTileGrid->lpVtbl->Release(pTileGrid);
+                                                                                                            pTileGrid->
+                                                                                                                lpVtbl->
+                                                                                                                Release(
+                                                                                                                    pTileGrid);
                                                                                                         }
-                                                                                                        pItemsPresenter->lpVtbl->Release(pItemsPresenter);
+                                                                                                        pItemsPresenter
+                                                                                                            ->lpVtbl->
+                                                                                                            Release(
+                                                                                                                pItemsPresenter);
                                                                                                     }
-                                                                                                    pScrollContentPresenter->lpVtbl->Release(pScrollContentPresenter);
+                                                                                                    pScrollContentPresenter
+                                                                                                        ->lpVtbl->
+                                                                                                        Release(
+                                                                                                            pScrollContentPresenter);
                                                                                                 }
-                                                                                                pGrid2->lpVtbl->Release(pGrid2);
+                                                                                                pGrid2->lpVtbl->Release(
+                                                                                                    pGrid2);
                                                                                             }
-                                                                                            pBorder3->lpVtbl->Release(pBorder3);
+                                                                                            pBorder3->lpVtbl->Release(
+                                                                                                pBorder3);
                                                                                         }
-                                                                                        pScrollViewer->lpVtbl->Release(pScrollViewer);
+                                                                                        pScrollViewer->lpVtbl->Release(
+                                                                                            pScrollViewer);
                                                                                     }
                                                                                     pBorder2->lpVtbl->Release(pBorder2);
                                                                                 }
-                                                                                pgroupItems->lpVtbl->Release(pgroupItems);
+                                                                                pgroupItems->lpVtbl->Release(
+                                                                                    pgroupItems);
                                                                             }
                                                                             pgridRoot->lpVtbl->Release(pgridRoot);
                                                                         }
@@ -540,7 +801,8 @@ void LVT_StartDocked_120DPIHack(int maxHeight)
                     hr = pWindow->lpVtbl->get_Content(pWindow, &pUIElement);
                     if (SUCCEEDED(hr))
                     {
-                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject, &pRootDependencyObject);
+                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject,
+                                                                &pRootDependencyObject);
 
                         pUIElement->lpVtbl->Release(pUIElement);
                     }
@@ -555,27 +817,37 @@ void LVT_StartDocked_120DPIHack(int maxHeight)
     {
         HSTRING_HEADER hshVisualTreeHelperStatics;
         HSTRING hsVisualTreeHelperStatics = NULL;
-        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics, &hsVisualTreeHelperStatics);
+        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics,
+                                          &hsVisualTreeHelperStatics);
         if (SUCCEEDED(hr) && hsVisualTreeHelperStatics)
         {
             Windows_UI_Xaml_IVisualTreeHelperStatics* pVisualTreeHelperStatics = NULL;
-            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics, &pVisualTreeHelperStatics);
+            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics,
+                                        &pVisualTreeHelperStatics);
             if (SUCCEEDED(hr))
             {
-                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(pRootDependencyObject, pVisualTreeHelperStatics, L"StartDocked.StartSizingFrame", NULL);
+                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(
+                    pRootDependencyObject, pVisualTreeHelperStatics, L"StartDocked.StartSizingFrame", NULL);
                 if (pStartSizingFrame)
                 {
                     Windows_UI_Xaml_IUIElement* pIUIElement = NULL;
-                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement, &pIUIElement);
+                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement,
+                                                              &pIUIElement);
                     if (pIUIElement)
                     {
                         Windows_UI_Xaml_IFrameworkElement* pFrameworkElement = NULL;
-                        pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IFrameworkElement, &pFrameworkElement);
+                        pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame,
+                                                                  &IID_Windows_UI_Xaml_IFrameworkElement,
+                                                                  &pFrameworkElement);
                         if (pFrameworkElement)
                         {
-                            if (!IsWindows11Version22H2Build1413OrHigher()) pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Collapsed);
+                            if (!IsWindows11Version22H2Build1413OrHigher())
+                                pIUIElement->lpVtbl->put_Visibility(
+                                    pIUIElement, Windows_UI_Xaml_Visibility_Collapsed);
                             pFrameworkElement->lpVtbl->put_MaxHeight(pFrameworkElement, maxHeight);
-                            if (!IsWindows11Version22H2Build1413OrHigher()) pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Visible);
+                            if (!IsWindows11Version22H2Build1413OrHigher())
+                                pIUIElement->lpVtbl->put_Visibility(
+                                    pIUIElement, Windows_UI_Xaml_Visibility_Visible);
                             pFrameworkElement->lpVtbl->Release(pFrameworkElement);
                         }
                         pIUIElement->lpVtbl->Release(pIUIElement);
@@ -603,10 +875,12 @@ void LVT_StartDocked_DisableRecommendedSection(HWND hWnd, BOOL bApply, RECT* rec
     {
         HSTRING_HEADER hshControlsCanvasStatics;
         HSTRING hsControlsCanvasStatics = NULL;
-        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Controls.Canvas", 31, &hshControlsCanvasStatics, &hsControlsCanvasStatics);
+        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Controls.Canvas", 31, &hshControlsCanvasStatics,
+                                          &hsControlsCanvasStatics);
         if (SUCCEEDED(hr) && hsControlsCanvasStatics)
         {
-            hr = RoGetActivationFactory(hsControlsCanvasStatics, &IID_Windows_UI_Xaml_Controls_ICanvasStatics, &pCanvasStatics);
+            hr = RoGetActivationFactory(hsControlsCanvasStatics, &IID_Windows_UI_Xaml_Controls_ICanvasStatics,
+                                        &pCanvasStatics);
             WindowsDeleteString(hsControlsCanvasStatics);
         }
     }
@@ -630,7 +904,8 @@ void LVT_StartDocked_DisableRecommendedSection(HWND hWnd, BOOL bApply, RECT* rec
                     hr = pWindow->lpVtbl->get_Content(pWindow, &pUIElement);
                     if (SUCCEEDED(hr))
                     {
-                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject, &pRootDependencyObject);
+                        hr = pUIElement->lpVtbl->QueryInterface(pUIElement, &IID_Windows_UI_Xaml_IDependencyObject,
+                                                                &pRootDependencyObject);
 
                         pUIElement->lpVtbl->Release(pUIElement);
                     }
@@ -646,27 +921,35 @@ void LVT_StartDocked_DisableRecommendedSection(HWND hWnd, BOOL bApply, RECT* rec
     {
         HSTRING_HEADER hshVisualTreeHelperStatics;
         HSTRING hsVisualTreeHelperStatics = NULL;
-        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics, &hsVisualTreeHelperStatics);
+        hr = WindowsCreateStringReference(L"Windows.UI.Xaml.Media.VisualTreeHelper", 38, &hshVisualTreeHelperStatics,
+                                          &hsVisualTreeHelperStatics);
         if (SUCCEEDED(hr) && hsVisualTreeHelperStatics)
         {
             Windows_UI_Xaml_IVisualTreeHelperStatics* pVisualTreeHelperStatics = NULL;
-            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics, &pVisualTreeHelperStatics);
+            hr = RoGetActivationFactory(hsVisualTreeHelperStatics, &IID_Windows_UI_Xaml_IVisualTreeHelperStatics,
+                                        &pVisualTreeHelperStatics);
             if (SUCCEEDED(hr))
             {
-                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(pRootDependencyObject, pVisualTreeHelperStatics, L"StartDocked.StartSizingFrame", NULL);
+                Windows_UI_Xaml_IDependencyObject* pStartSizingFrame = LVT_FindChildByClassName(
+                    pRootDependencyObject, pVisualTreeHelperStatics, L"StartDocked.StartSizingFrame", NULL);
                 if (pStartSizingFrame)
                 {
                     Windows_UI_Xaml_Thickness drc;
-                    drc.Left = 0.0; drc.Right = 0.0; drc.Top = 0.0; drc.Bottom = 0.0;
+                    drc.Left = 0.0;
+                    drc.Right = 0.0;
+                    drc.Top = 0.0;
+                    drc.Bottom = 0.0;
                     Windows_UI_Xaml_IUIElement* pIUIElement = NULL;
                     Windows_UI_Xaml_IFrameworkElement* pFrameworkElement = NULL;
-                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement, &pIUIElement);
+                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IUIElement,
+                                                              &pIUIElement);
                     if (pIUIElement)
                     {
                         pCanvasStatics->lpVtbl->GetLeft(pCanvasStatics, pIUIElement, &(drc.Left));
                         pCanvasStatics->lpVtbl->GetTop(pCanvasStatics, pIUIElement, &(drc.Top));
                     }
-                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IFrameworkElement, &pFrameworkElement);
+                    pStartSizingFrame->lpVtbl->QueryInterface(pStartSizingFrame, &IID_Windows_UI_Xaml_IFrameworkElement,
+                                                              &pFrameworkElement);
                     if (pFrameworkElement)
                     {
                         pFrameworkElement->lpVtbl->get_ActualWidth(pFrameworkElement, &(drc.Right));
@@ -675,12 +958,14 @@ void LVT_StartDocked_DisableRecommendedSection(HWND hWnd, BOOL bApply, RECT* rec
                     UINT dpi = GetDpiForWindow(hWnd);
                     RECT rc;
                     SetRect(&rc, drc.Left, drc.Top, drc.Right, drc.Bottom);
-                    SetRect(&rc, MulDiv(rc.left, dpi, 96), MulDiv(rc.top, dpi, 96), MulDiv(rc.right, dpi, 96), MulDiv(rc.bottom, dpi, 96));
+                    SetRect(&rc, MulDiv(rc.left, dpi, 96), MulDiv(rc.top, dpi, 96), MulDiv(rc.right, dpi, 96),
+                            MulDiv(rc.bottom, dpi, 96));
                     *rect = rc;
                     if (bApply && dpi == 120)
                     {
                         HANDLE hRealThreadHandle = NULL;
-                        DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &hRealThreadHandle, THREAD_SET_CONTEXT, FALSE, 0);
+                        DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(),
+                                        &hRealThreadHandle, THREAD_SET_CONTEXT, FALSE, 0);
                         if (hRealThreadHandle)
                         {
                             QueueUserAPC(LVT_StartDocked_120DPIHack, hRealThreadHandle, 826);
@@ -699,97 +984,163 @@ void LVT_StartDocked_DisableRecommendedSection(HWND hWnd, BOOL bApply, RECT* rec
                     {
                         pIUIElement->lpVtbl->Release(pIUIElement);
                     }
-                    Windows_UI_Xaml_IDependencyObject* pStartSizingFramePanel = LVT_FindChildByClassName(pStartSizingFrame, pVisualTreeHelperStatics, L"StartDocked.StartSizingFramePanel", NULL);
+                    Windows_UI_Xaml_IDependencyObject* pStartSizingFramePanel = LVT_FindChildByClassName(
+                        pStartSizingFrame, pVisualTreeHelperStatics, L"StartDocked.StartSizingFramePanel", NULL);
                     if (pStartSizingFramePanel)
                     {
-                        Windows_UI_Xaml_IDependencyObject* pContentPresenter = LVT_FindChildByClassName(pStartSizingFramePanel, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
+                        Windows_UI_Xaml_IDependencyObject* pContentPresenter = LVT_FindChildByClassName(
+                            pStartSizingFramePanel, pVisualTreeHelperStatics,
+                            L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
                         if (pContentPresenter)
                         {
-                            Windows_UI_Xaml_IDependencyObject* pFrame = LVT_FindChildByClassName(pContentPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Frame", NULL);
+                            Windows_UI_Xaml_IDependencyObject* pFrame = LVT_FindChildByClassName(
+                                pContentPresenter, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.Frame", NULL);
                             if (pFrame)
                             {
-                                Windows_UI_Xaml_IDependencyObject* pContentPresenter2 = LVT_FindChildByClassName(pFrame, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter", NULL);
+                                Windows_UI_Xaml_IDependencyObject* pContentPresenter2 = LVT_FindChildByClassName(
+                                    pFrame, pVisualTreeHelperStatics, L"Windows.UI.Xaml.Controls.ContentPresenter",
+                                    NULL);
                                 if (pContentPresenter2)
                                 {
-                                    Windows_UI_Xaml_IDependencyObject* pLauncherFrame = LVT_FindChildByClassName(pContentPresenter2, pVisualTreeHelperStatics, L"StartDocked.LauncherFrame", NULL);
+                                    Windows_UI_Xaml_IDependencyObject* pLauncherFrame = LVT_FindChildByClassName(
+                                        pContentPresenter2, pVisualTreeHelperStatics, L"StartDocked.LauncherFrame",
+                                        NULL);
                                     if (pLauncherFrame)
                                     {
-                                        Windows_UI_Xaml_IDependencyObject* pRootGrid = LVT_FindChildByName(pLauncherFrame, pVisualTreeHelperStatics, L"RootGrid");
+                                        Windows_UI_Xaml_IDependencyObject* pRootGrid = LVT_FindChildByName(
+                                            pLauncherFrame, pVisualTreeHelperStatics, L"RootGrid");
                                         if (pRootGrid)
                                         {
-                                            Windows_UI_Xaml_IDependencyObject* pRootContent = LVT_FindChildByName(pRootGrid, pVisualTreeHelperStatics, L"RootContent");
+                                            Windows_UI_Xaml_IDependencyObject* pRootContent = LVT_FindChildByName(
+                                                pRootGrid, pVisualTreeHelperStatics, L"RootContent");
                                             if (pRootContent)
                                             {
-                                                Windows_UI_Xaml_IDependencyObject* pMainContent = LVT_FindChildByName(pRootContent, pVisualTreeHelperStatics, L"MainContent");
+                                                Windows_UI_Xaml_IDependencyObject* pMainContent = LVT_FindChildByName(
+                                                    pRootContent, pVisualTreeHelperStatics, L"MainContent");
                                                 if (pMainContent)
                                                 {
                                                     Windows_UI_Xaml_IDependencyObject* pInnerContent = NULL;
-                                                    Windows_UI_Xaml_IDependencyObject* pUndockedRoot = LVT_FindChildByName(pMainContent, pVisualTreeHelperStatics, L"UndockedRoot");
+                                                    Windows_UI_Xaml_IDependencyObject* pUndockedRoot =
+                                                        LVT_FindChildByName(
+                                                            pMainContent, pVisualTreeHelperStatics, L"UndockedRoot");
                                                     if (!pUndockedRoot)
                                                     {
-                                                        pInnerContent = LVT_FindChildByName(pMainContent, pVisualTreeHelperStatics, L"InnerContent");
+                                                        pInnerContent = LVT_FindChildByName(
+                                                            pMainContent, pVisualTreeHelperStatics, L"InnerContent");
                                                         if (pInnerContent)
                                                         {
-                                                            pUndockedRoot = LVT_FindChildByName(pInnerContent, pVisualTreeHelperStatics, L"UndockedRoot");
+                                                            pUndockedRoot = LVT_FindChildByName(
+                                                                pInnerContent, pVisualTreeHelperStatics,
+                                                                L"UndockedRoot");
                                                         }
                                                     }
                                                     if (pUndockedRoot)
                                                     {
-                                                        Windows_UI_Xaml_IDependencyObject* pStartInnerFrame = LVT_FindChildByClassName(pUndockedRoot, pVisualTreeHelperStatics, L"StartMenu.StartInnerFrame", NULL);
+                                                        Windows_UI_Xaml_IDependencyObject* pStartInnerFrame =
+                                                            LVT_FindChildByClassName(
+                                                                pUndockedRoot, pVisualTreeHelperStatics,
+                                                                L"StartMenu.StartInnerFrame", NULL);
                                                         if (pStartInnerFrame)
                                                         {
-                                                            Windows_UI_Xaml_IDependencyObject* pFrameRoot = LVT_FindChildByName(pStartInnerFrame, pVisualTreeHelperStatics, L"FrameRoot");
+                                                            Windows_UI_Xaml_IDependencyObject* pFrameRoot =
+                                                                LVT_FindChildByName(
+                                                                    pStartInnerFrame, pVisualTreeHelperStatics,
+                                                                    L"FrameRoot");
                                                             if (pFrameRoot)
                                                             {
-                                                                Windows_UI_Xaml_IDependencyObject* pTopLevelRoot = LVT_FindChildByName(pFrameRoot, pVisualTreeHelperStatics, L"TopLevelRoot");
+                                                                Windows_UI_Xaml_IDependencyObject* pTopLevelRoot =
+                                                                    LVT_FindChildByName(
+                                                                        pFrameRoot, pVisualTreeHelperStatics,
+                                                                        L"TopLevelRoot");
                                                                 if (pTopLevelRoot)
                                                                 {
-                                                                    Windows_UI_Xaml_IDependencyObject* pStartMenuPinnedList = LVT_FindChildByName(pTopLevelRoot, pVisualTreeHelperStatics, L"StartMenuPinnedList");
+                                                                    Windows_UI_Xaml_IDependencyObject*
+                                                                        pStartMenuPinnedList = LVT_FindChildByName(
+                                                                            pTopLevelRoot, pVisualTreeHelperStatics,
+                                                                            L"StartMenuPinnedList");
                                                                     if (pStartMenuPinnedList)
                                                                     {
-                                                                        Windows_UI_Xaml_IFrameworkElement* pFrameworkElement = NULL;
-                                                                        pStartMenuPinnedList->lpVtbl->QueryInterface(pStartMenuPinnedList, &IID_Windows_UI_Xaml_IFrameworkElement, &pFrameworkElement);
+                                                                        Windows_UI_Xaml_IFrameworkElement*
+                                                                            pFrameworkElement = NULL;
+                                                                        pStartMenuPinnedList->lpVtbl->QueryInterface(
+                                                                            pStartMenuPinnedList,
+                                                                            &IID_Windows_UI_Xaml_IFrameworkElement,
+                                                                            &pFrameworkElement);
                                                                         if (pFrameworkElement)
                                                                         {
-                                                                            static double StartMenuPinnedList_Height = 252.0;
+                                                                            static double StartMenuPinnedList_Height =
+                                                                                252.0;
                                                                             double tempStartMenuPinnedList_Height = 0.0;
-                                                                            if (SUCCEEDED(pFrameworkElement->lpVtbl->get_Height(pFrameworkElement, &tempStartMenuPinnedList_Height)) && tempStartMenuPinnedList_Height != 510.0) StartMenuPinnedList_Height = tempStartMenuPinnedList_Height;
+                                                                            if (SUCCEEDED(
+                                                                                    pFrameworkElement->lpVtbl->
+                                                                                    get_Height(
+                                                                                        pFrameworkElement, &
+                                                                                        tempStartMenuPinnedList_Height))
+                                                                                &&
+                                                                                tempStartMenuPinnedList_Height != 510.0)
+                                                                                StartMenuPinnedList_Height =
+                                                                                    tempStartMenuPinnedList_Height;
 
                                                                             if (bApply)
                                                                             {
-                                                                                pFrameworkElement->lpVtbl->put_Height(pFrameworkElement, 510.0);
+                                                                                pFrameworkElement->lpVtbl->put_Height(
+                                                                                    pFrameworkElement, 510.0);
                                                                             }
                                                                             else
                                                                             {
-                                                                                pFrameworkElement->lpVtbl->put_Height(pFrameworkElement, StartMenuPinnedList_Height);
+                                                                                pFrameworkElement->lpVtbl->put_Height(
+                                                                                    pFrameworkElement,
+                                                                                    StartMenuPinnedList_Height);
                                                                             }
-                                                                            pFrameworkElement->lpVtbl->Release(pFrameworkElement);
+                                                                            pFrameworkElement->lpVtbl->Release(
+                                                                                pFrameworkElement);
                                                                         }
-                                                                        Windows_UI_Xaml_IDependencyObject* pRoot = LVT_FindChildByName(pStartMenuPinnedList, pVisualTreeHelperStatics, L"Root");
+                                                                        Windows_UI_Xaml_IDependencyObject* pRoot =
+                                                                            LVT_FindChildByName(
+                                                                                pStartMenuPinnedList,
+                                                                                pVisualTreeHelperStatics, L"Root");
                                                                         if (pRoot)
                                                                         {
-                                                                            Windows_UI_Xaml_IDependencyObject* pPinnedListPipsPager = LVT_FindChildByName(pRoot, pVisualTreeHelperStatics, L"PinnedListPipsPager");
+                                                                            Windows_UI_Xaml_IDependencyObject*
+                                                                                pPinnedListPipsPager =
+                                                                                LVT_FindChildByName(
+                                                                                    pRoot, pVisualTreeHelperStatics,
+                                                                                    L"PinnedListPipsPager");
                                                                             if (pPinnedListPipsPager)
                                                                             {
-                                                                                Windows_UI_Xaml_IUIElement* pIUIElement = NULL;
-                                                                                pPinnedListPipsPager->lpVtbl->QueryInterface(pPinnedListPipsPager, &IID_Windows_UI_Xaml_IUIElement, &pIUIElement);
+                                                                                Windows_UI_Xaml_IUIElement* pIUIElement
+                                                                                    = NULL;
+                                                                                pPinnedListPipsPager->lpVtbl->
+                                                                                    QueryInterface(
+                                                                                        pPinnedListPipsPager,
+                                                                                        &IID_Windows_UI_Xaml_IUIElement,
+                                                                                        &pIUIElement);
                                                                                 if (pIUIElement)
                                                                                 {
                                                                                     if (bApply)
                                                                                     {
-                                                                                        pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Collapsed);
+                                                                                        pIUIElement->lpVtbl->
+                                                                                            put_Visibility(
+                                                                                                pIUIElement,
+                                                                                                Windows_UI_Xaml_Visibility_Collapsed);
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        pIUIElement->lpVtbl->put_Visibility(pIUIElement, Windows_UI_Xaml_Visibility_Visible);
+                                                                                        pIUIElement->lpVtbl->
+                                                                                            put_Visibility(
+                                                                                                pIUIElement,
+                                                                                                Windows_UI_Xaml_Visibility_Visible);
                                                                                     }
-                                                                                    pIUIElement->lpVtbl->Release(pIUIElement);
+                                                                                    pIUIElement->lpVtbl->Release(
+                                                                                        pIUIElement);
                                                                                 }
-                                                                                pPinnedListPipsPager->lpVtbl->Release(pPinnedListPipsPager);
+                                                                                pPinnedListPipsPager->lpVtbl->Release(
+                                                                                    pPinnedListPipsPager);
                                                                             }
                                                                             pRoot->lpVtbl->Release(pRoot);
                                                                         }
-                                                                        pStartMenuPinnedList->lpVtbl->Release(pStartMenuPinnedList);
+                                                                        pStartMenuPinnedList->lpVtbl->Release(
+                                                                            pStartMenuPinnedList);
                                                                     }
                                                                     pTopLevelRoot->lpVtbl->Release(pTopLevelRoot);
                                                                 }

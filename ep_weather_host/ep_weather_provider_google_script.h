@@ -4,7 +4,8 @@
 // many thanks to https://stackoverflow.com/questions/23202966/google-weather-widget-on-my-website
 #define EP_WEATHER_PROVIDER_GOOGLE_SCRIPT_LEN 30000
 
-LPCWSTR ep_weather_provider_google_script10 = L"var final_im = 0; function ep_weather_part0() { return \"run_part_0\"; }; ep_weather_part0();";
+LPCWSTR ep_weather_provider_google_script10 =
+    L"var final_im = 0; function ep_weather_part0() { return \"run_part_0\"; }; ep_weather_part0();";
 
 // reference: https://github.com/Triggertrap/sun-js
 LPCWSTR ep_weather_provider_google_script00 = L"\

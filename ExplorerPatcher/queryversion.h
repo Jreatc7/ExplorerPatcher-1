@@ -3,7 +3,8 @@
 #include <Windows.h>
 #pragma comment(lib, "Version.lib")
 
-inline void QueryVersionInfo(HMODULE hModule, WORD Resource, DWORD* dwLeftMost, DWORD* dwSecondLeft, DWORD* dwSecondRight, DWORD* dwRightMost)
+inline void QueryVersionInfo(HMODULE hModule, WORD Resource, DWORD* dwLeftMost, DWORD* dwSecondLeft,
+                             DWORD* dwSecondRight, DWORD* dwRightMost)
 {
     HRSRC hResInfo;
     DWORD dwSize;

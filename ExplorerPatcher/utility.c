@@ -11,11 +11,13 @@ INT64 STDMETHODCALLTYPE nimpl4_1(INT64 a1, DWORD* a2)
     *a2 = 1;
     return 0;
 }
+
 INT64 STDMETHODCALLTYPE nimpl4_0(INT64 a1, DWORD* a2)
 {
     *a2 = 0;
     return 0;
 }
+
 __int64 STDMETHODCALLTYPE nimpl2(__int64 a1, uintptr_t* a2)
 {
     __int64 v2; // rax
@@ -27,14 +29,17 @@ __int64 STDMETHODCALLTYPE nimpl2(__int64 a1, uintptr_t* a2)
     *a2 = v2;
     return 0i64;
 }
+
 ULONG STDMETHODCALLTYPE nimpl3()
 {
     return 1;
 }
+
 HRESULT STDMETHODCALLTYPE nimpl()
 {
     return E_NOTIMPL;
 }
+
 HRESULT STDMETHODCALLTYPE nimpl1(__int64 a1, uintptr_t* a2, uintptr_t* a3)
 {
     __int64 v4 = a1; // rcx
@@ -45,6 +50,7 @@ HRESULT STDMETHODCALLTYPE nimpl1(__int64 a1, uintptr_t* a2, uintptr_t* a3)
     *a3 = v4;
     return S_OK;
 }
+
 HRESULT STDMETHODCALLTYPE nimpl1_2(__int64 a1, uintptr_t* a2, uintptr_t* a3)
 {
     __int64 v4 = a1 - sizeof(__int64); // rcx
@@ -55,6 +61,7 @@ HRESULT STDMETHODCALLTYPE nimpl1_2(__int64 a1, uintptr_t* a2, uintptr_t* a3)
     *a3 = v4;
     return S_OK;
 }
+
 HRESULT STDMETHODCALLTYPE nimpl1_3(__int64 a1, uintptr_t* a2, uintptr_t* a3)
 {
     __int64 v4 = a1 - 2 * sizeof(__int64); // rcx
@@ -65,11 +72,13 @@ HRESULT STDMETHODCALLTYPE nimpl1_3(__int64 a1, uintptr_t* a2, uintptr_t* a3)
     *a3 = v4;
     return S_OK;
 }
+
 __int64 STDMETHODCALLTYPE nimpl4(__int64 a1, __int64 a2, __int64 a3, BYTE* a4)
 {
     *a4 = 0;
     return 0i64;
 }
+
 const IActivationFactoryVtbl _IActivationFactoryVtbl = {
     .QueryInterface = nimpl1,
     .AddRef = nimpl3,
@@ -104,21 +113,21 @@ const IActivationFactoryAA XamlExtensionsFactory = {
 };
 #pragma endregion
 
-void printf_guid(GUID guid) 
+void printf_guid(GUID guid)
 {
     printf("Guid = {%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}\n",
-        guid.Data1, guid.Data2, guid.Data3,
-        guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
-        guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+           guid.Data1, guid.Data2, guid.Data3,
+           guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+           guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
 }
 
-LRESULT CALLBACK BalloonWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
+LRESULT CALLBACK BalloonWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (msg == WM_CREATE)
     {
         LPCREATESTRUCT lpCs = lParam;
 
-        NOTIFYICONDATA ni = { 0 };
+        NOTIFYICONDATA ni = {0};
         ni.cbSize = sizeof(ni);
         ni.hWnd = hWnd;
         ni.uID = 1;
@@ -134,10 +143,7 @@ LRESULT CALLBACK BalloonWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         exit(0);
     }
-    else
-    {
-        return DefWindowProc(hWnd, msg, wParam, lParam);
-    }
+    return DefWindowProc(hWnd, msg, wParam, lParam);
     return 0;
 }
 
@@ -165,31 +171,34 @@ __declspec(dllexport) CALLBACK ZZTestBalloon(HWND hWnd, HINSTANCE hInstance, LPS
     wc.lpszClassName = L"ExplorerPatcherBalloon";
     wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 
-    if (!RegisterClassEx(&wc)) {
+    if (!RegisterClassEx(&wc))
+    {
         return 0;
     }
 
     hwnd = CreateWindowEx(0, L"ExplorerPatcherBalloon", L"",
-        0, 0, 0, 0, 0,
-        HWND_MESSAGE, NULL, hInstance, lpwszCmdLine);
+                          0, 0, 0, 0, 0,
+                          HWND_MESSAGE, NULL, hInstance, lpwszCmdLine);
 
-    while (GetMessage(&msg, NULL, 0, 0) > 0) {
+    while (GetMessage(&msg, NULL, 0, 0) > 0)
+    {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 }
 
 const wchar_t TestToastXML[] =
-L"<toast scenario=\"reminder\" "
-L"activationType=\"protocol\" launch=\"https://github.com/valinet/ExplorerPatcher\" duration=\"%s\">\r\n"
-L"	<visual>\r\n"
-L"		<binding template=\"ToastGeneric\">\r\n"
-L"			<text><![CDATA[%s]]></text>\r\n"
-L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
-L"		</binding>\r\n"
-L"	</visual>\r\n"
-L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
-L"</toast>\r\n";
+    L"<toast scenario=\"reminder\" "
+    L"activationType=\"protocol\" launch=\"https://github.com/valinet/ExplorerPatcher\" duration=\"%s\">\r\n"
+    L"	<visual>\r\n"
+    L"		<binding template=\"ToastGeneric\">\r\n"
+    L"			<text><![CDATA[%s]]></text>\r\n"
+    L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
+    L"		</binding>\r\n"
+    L"	</visual>\r\n"
+    L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
+    L"</toast>\r\n";
+
 __declspec(dllexport) CALLBACK ZZTestToast(HWND hWnd, HINSTANCE hInstance, LPSTR lpszCmdLine, int nCmdShow)
 {
     TCHAR* lpwszCmdLine = calloc((strlen(lpszCmdLine) + 1), sizeof(TCHAR));
@@ -238,7 +247,7 @@ __declspec(dllexport) CALLBACK ZZLaunchExplorer(HWND hWnd, HINSTANCE hInstance, 
     TCHAR wszExplorerPath[MAX_PATH + 1];
     GetWindowsDirectory(wszExplorerPath, MAX_PATH + 1);
     wcscat_s(wszExplorerPath, MAX_PATH + 1, L"\\explorer.exe");
-    STARTUPINFO si = { sizeof(si) };
+    STARTUPINFO si = {sizeof(si)};
     PROCESS_INFORMATION pi;
     BOOL b = CreateProcess(
         NULL,
@@ -278,7 +287,8 @@ __declspec(dllexport) CALLBACK ZZRestartExplorer(HWND hWnd, HINSTANCE hInstance,
 void* ReadFromFile(wchar_t* wszFileName, DWORD* dwSize)
 {
     void* ok = NULL;
-    HANDLE hImage = CreateFileW(wszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hImage = CreateFileW(wszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+                                NULL);
     if (hImage)
     {
         LARGE_INTEGER dwFileSize;
@@ -317,12 +327,12 @@ int ComputeFileHash(LPCWSTR filename, LPSTR hash, DWORD dwHash)
     // Logic to check usage goes here.
 
     hFile = CreateFile(filename,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        FILE_FLAG_SEQUENTIAL_SCAN,
-        NULL);
+                       GENERIC_READ,
+                       FILE_SHARE_READ,
+                       NULL,
+                       OPEN_EXISTING,
+                       FILE_FLAG_SEQUENTIAL_SCAN,
+                       NULL);
 
     if (INVALID_HANDLE_VALUE == hFile)
     {
@@ -349,10 +359,10 @@ int ComputeFileHash(LPCWSTR filename, LPSTR hash, DWORD dwHash)
 
     // Get handle to the crypto provider
     if (!CryptAcquireContext(&hProv,
-        NULL,
-        NULL,
-        PROV_RSA_FULL,
-        CRYPT_VERIFYCONTEXT))
+                             NULL,
+                             NULL,
+                             PROV_RSA_FULL,
+                             CRYPT_VERIFYCONTEXT))
     {
         dwStatus = GetLastError();
         CloseHandle(hFile);
@@ -431,7 +441,8 @@ int ComputeFileHash2(HMODULE hModule, LPCWSTR filename, LPSTR hash, DWORD dwHash
     DWORD dwRightMost = 0;
     QueryVersionInfo(hModule, VS_VERSION_INFO, &dwLeftMost, &dwSecondLeft, &dwSecondRight, &dwRightMost);
 
-    sprintf_s(hash, 33, "%d.%d.%d.%d.", dwLeftMost == 22621 ? 22622 : dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
+    sprintf_s(hash, 33, "%d.%d.%d.%d.", dwLeftMost == 22621 ? 22622 : dwLeftMost, dwSecondLeft, dwSecondRight,
+              dwRightMost);
 
     char real_hash[33];
     ComputeFileHash(filename, real_hash, 33);
@@ -503,21 +514,21 @@ BOOL SystemShutdown(BOOL reboot)
     // Get a token for this process. 
 
     if (!OpenProcessToken(GetCurrentProcess(),
-        TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-        return(FALSE);
+                          TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
+        return (FALSE);
 
     // Get the LUID for the shutdown privilege. 
 
     LookupPrivilegeValue(NULL, SE_SHUTDOWN_NAME,
-        &tkp.Privileges[0].Luid);
+                         &tkp.Privileges[0].Luid);
 
-    tkp.PrivilegeCount = 1;  // one privilege to set    
+    tkp.PrivilegeCount = 1; // one privilege to set    
     tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
     // Get the shutdown privilege for this process. 
 
     AdjustTokenPrivileges(hToken, FALSE, &tkp, 0,
-        (PTOKEN_PRIVILEGES)NULL, 0);
+                          NULL, 0);
 
     if (GetLastError() != ERROR_SUCCESS)
         return FALSE;
@@ -525,9 +536,9 @@ BOOL SystemShutdown(BOOL reboot)
     // Shut down the system and force all applications to close. 
 
     if (!ExitWindowsEx((reboot ? EWX_REBOOT : EWX_SHUTDOWN) | EWX_FORCE,
-        SHTDN_REASON_MAJOR_OPERATINGSYSTEM |
-        SHTDN_REASON_MINOR_UPGRADE |
-        SHTDN_REASON_FLAG_PLANNED))
+                       SHTDN_REASON_MAJOR_OPERATINGSYSTEM |
+                       SHTDN_REASON_MINOR_UPGRADE |
+                       SHTDN_REASON_FLAG_PLANNED))
         return FALSE;
 
     //shutdown was successful
@@ -632,7 +643,7 @@ HRESULT ShellExecuteFromExplorer(
             spdispShell->lpVtbl->QueryInterface(spdispShell, &IID_IShellDispatch2, &spdispShell2);
             if (spdispShell2)
             {
-                BSTR a_pszFile = pszFile ? SysAllocString(pszFile): SysAllocString(L"");
+                BSTR a_pszFile = pszFile ? SysAllocString(pszFile) : SysAllocString(L"");
                 VARIANT a_pszParameters, a_pszDirectory, a_pszOperation, a_nShowCmd;
                 ZeroMemory(&a_pszParameters, sizeof(VARIANT));
                 ZeroMemory(&a_pszDirectory, sizeof(VARIANT));
@@ -646,7 +657,8 @@ HRESULT ShellExecuteFromExplorer(
                 a_pszOperation.bstrVal = pszOperation ? SysAllocString(pszOperation) : SysAllocString(L"");
                 a_nShowCmd.vt = VT_INT;
                 a_nShowCmd.intVal = nShowCmd;
-                hr = spdispShell2->lpVtbl->ShellExecuteW(spdispShell2, a_pszFile, a_pszParameters, a_pszDirectory, a_pszOperation, a_nShowCmd);
+                hr = spdispShell2->lpVtbl->ShellExecuteW(spdispShell2, a_pszFile, a_pszParameters, a_pszDirectory,
+                                                         a_pszOperation, a_nShowCmd);
                 if (a_pszOperation.bstrVal)
                 {
                     SysFreeString(a_pszOperation.bstrVal);
@@ -716,8 +728,10 @@ LSTATUS RegisterDWMService(DWORD dwDesiredState, DWORD dwOverride)
         wszArgumentsRegister,
         MAX_PATH * 10,
         L"/c \""
-        L"\"%s\" create " _T(EP_DWM_SERVICENAME) L" binPath= \"\\\"%s\\\" %s\" DisplayName= \"ExplorerPatcher Desktop Window Manager Service\" start= auto & "
-        L"\"%s\" description " _T(EP_DWM_SERVICENAME) L" \"Service for managing aspects related to the Desktop Window Manager.\" & "
+        L"\"%s\" create " _T(EP_DWM_SERVICENAME)
+        L" binPath= \"\\\"%s\\\" %s\" DisplayName= \"ExplorerPatcher Desktop Window Manager Service\" start= auto & "
+        L"\"%s\" description " _T(EP_DWM_SERVICENAME)
+        L" \"Service for managing aspects related to the Desktop Window Manager.\" & "
         L"\"%s\" %s " _T(EP_DWM_SERVICENAME)
         L"\"",
         wszSCPath,
@@ -776,7 +790,7 @@ LSTATUS RegisterDWMService(DWORD dwDesiredState, DWORD dwOverride)
             return FALSE;
         }
     }
-    SHELLEXECUTEINFO ShExecInfo = { 0 };
+    SHELLEXECUTEINFO ShExecInfo = {0};
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
     ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
     ShExecInfo.hwnd = NULL;
@@ -803,16 +817,20 @@ char* StrReplaceAllA(const char* s, const char* oldW, const char* newW, int* dwN
     int newWlen = strlen(newW);
     int oldWlen = strlen(oldW);
 
-    for (i = 0; s[i] != '\0'; i++) {
-        if (strstr(&s[i], oldW) == &s[i]) {
+    for (i = 0; s[i] != '\0'; i++)
+    {
+        if (strstr(&s[i], oldW) == &s[i])
+        {
             cnt++;
             i += oldWlen - 1;
         }
     }
     result = (char*)malloc(i + cnt * (newWlen - oldWlen) + 1);
     i = 0;
-    while (*s) {
-        if (strstr(s, oldW) == s) {
+    while (*s)
+    {
+        if (strstr(s, oldW) == s)
+        {
             strcpy_s(&result[i], strlen(newW) + 1, newW);
             i += newWlen;
             s += oldWlen;
@@ -833,16 +851,20 @@ WCHAR* StrReplaceAllW(const WCHAR* s, const WCHAR* oldW, const WCHAR* newW, int*
     int newWlen = wcslen(newW);
     int oldWlen = wcslen(oldW);
 
-    for (i = 0; s[i] != L'\0'; i++) {
-        if (wcsstr(&s[i], oldW) == &s[i]) {
+    for (i = 0; s[i] != L'\0'; i++)
+    {
+        if (wcsstr(&s[i], oldW) == &s[i])
+        {
             cnt++;
             i += oldWlen - 1;
         }
     }
     result = (WCHAR*)malloc((i + cnt * (newWlen - oldWlen) + 1) * sizeof(WCHAR));
     i = 0;
-    while (*s) {
-        if (wcsstr(s, oldW) == s) {
+    while (*s)
+    {
+        if (wcsstr(s, oldW) == s)
+        {
             wcscpy_s(&result[i], newWlen + 1, newW);
             i += newWlen;
             s += oldWlen;
@@ -859,21 +881,21 @@ HWND InputBox_HWND;
 
 HRESULT getEngineGuid(LPCTSTR extension, GUID* guidBuffer)
 {
-    wchar_t   buffer[100];
-    HKEY      hk;
-    DWORD     size;
-    HKEY      subKey;
-    DWORD     type;
+    wchar_t buffer[100];
+    HKEY hk;
+    DWORD size;
+    HKEY subKey;
+    DWORD type;
 
     // See if this file extension is associated
     // with an ActiveX script engine
     if (!RegOpenKeyEx(HKEY_CLASSES_ROOT, extension, 0,
-        KEY_QUERY_VALUE | KEY_READ, &hk))
+                      KEY_QUERY_VALUE | KEY_READ, &hk))
     {
         type = REG_SZ;
         size = sizeof(buffer);
         size = RegQueryValueEx(hk, 0, 0, &type,
-            (LPBYTE)&buffer[0], &size);
+                               (LPBYTE)&buffer[0], &size);
         RegCloseKey(hk);
         if (!size)
         {
@@ -882,17 +904,17 @@ HRESULT getEngineGuid(LPCTSTR extension, GUID* guidBuffer)
             // we can use it to look up the engine's GUID
 
             // Open HKEY_CLASSES_ROOT\{LanguageName}
-        again:   size = sizeof(buffer);
-            if (!RegOpenKeyEx(HKEY_CLASSES_ROOT, (LPCTSTR)&buffer[0], 0,
-                KEY_QUERY_VALUE | KEY_READ, &hk))
+        again: size = sizeof(buffer);
+            if (!RegOpenKeyEx(HKEY_CLASSES_ROOT, &buffer[0], 0,
+                              KEY_QUERY_VALUE | KEY_READ, &hk))
             {
                 // Read the GUID (in string format)
                 // into buffer[] by querying the value of CLSID
                 if (!RegOpenKeyEx(hk, L"CLSID", 0,
-                    KEY_QUERY_VALUE | KEY_READ, &subKey))
+                                  KEY_QUERY_VALUE | KEY_READ, &subKey))
                 {
                     size = RegQueryValueExW(subKey, 0, 0, &type,
-                        (LPBYTE)&buffer[0], &size);
+                                            (LPBYTE)&buffer[0], &size);
                     RegCloseKey(subKey);
                 }
                 else if (extension)
@@ -901,10 +923,10 @@ HRESULT getEngineGuid(LPCTSTR extension, GUID* guidBuffer)
                     // key under here that contains
                     // the real language name
                     if (!RegOpenKeyEx(hk, L"ScriptEngine", 0,
-                        KEY_QUERY_VALUE | KEY_READ, &subKey))
+                                      KEY_QUERY_VALUE | KEY_READ, &subKey))
                     {
                         size = RegQueryValueEx(subKey, 0, 0, &type,
-                            (LPBYTE)&buffer[0], &size);
+                                               (LPBYTE)&buffer[0], &size);
                         RegCloseKey(subKey);
                         if (!size)
                         {
@@ -924,14 +946,14 @@ HRESULT getEngineGuid(LPCTSTR extension, GUID* guidBuffer)
                 // and put it in caller's guidBuffer
                 if ((size = CLSIDFromString(&buffer[0], guidBuffer)))
                 {
-                    return(E_FAIL);
+                    return (E_FAIL);
                 }
-                return(size);
+                return (size);
             }
         }
     }
 
-    return(E_FAIL);
+    return (E_FAIL);
 }
 
 ULONG STDMETHODCALLTYPE ep_static_AddRefRelease(void* _this)
@@ -948,7 +970,7 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_QueryInterface(void* _this, REFIID r
     else
     {
         *ppv = 0;
-        return(E_NOINTERFACE);
+        return (E_NOINTERFACE);
     }
     return S_OK;
 }
@@ -964,7 +986,8 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_GetLCID(void* _this, LCID* plcid)
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE IActiveScriptSite_GetItemInfo(void* _this, LPCOLESTR pstrName, DWORD dwReturnMask, IUnknown** ppiunkItem, ITypeInfo** ppti)
+HRESULT STDMETHODCALLTYPE IActiveScriptSite_GetItemInfo(void* _this, LPCOLESTR pstrName, DWORD dwReturnMask,
+                                                        IUnknown** ppiunkItem, ITypeInfo** ppti)
 {
     return TYPE_E_ELEMENTNOTFOUND;
 }
@@ -975,7 +998,8 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_GetDocVersionString(void* _this, BST
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnScriptTerminate(void* _this, const void* pvarResult, const EXCEPINFO* pexcepinfo)
+HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnScriptTerminate(void* _this, const void* pvarResult,
+                                                              const EXCEPINFO* pexcepinfo)
 {
     return S_OK;
 }
@@ -987,10 +1011,10 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnStateChange(void* _this, SCRIPTSTA
 
 HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnScriptError(void* _this, IActiveScriptError* scriptError)
 {
-    ULONG        lineNumber;
-    BSTR         desc;
-    EXCEPINFO    ei;
-    OLECHAR      wszOutput[1024];
+    ULONG lineNumber;
+    BSTR desc;
+    EXCEPINFO ei;
+    OLECHAR wszOutput[1024];
 
     // Call GetSourcePosition() to retrieve the line # where
     // the error occurred in the script
@@ -1008,7 +1032,7 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnScriptError(void* _this, IActiveSc
 
     // Format the message we'll display to the user
     wsprintfW(&wszOutput[0], L"%s\nLine %u: %s\n%s", ei.bstrSource,
-        lineNumber + 1, ei.bstrDescription, desc ? desc : "");
+              lineNumber + 1, ei.bstrDescription, desc ? desc : "");
 
     // Free what we got from the IActiveScriptError functions
     SysFreeString(desc);
@@ -1018,9 +1042,9 @@ HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnScriptError(void* _this, IActiveSc
 
     // Display the message
     MessageBoxW(0, &wszOutput[0], L"Error",
-        MB_SETFOREGROUND | MB_OK | MB_ICONEXCLAMATION);
+                MB_SETFOREGROUND | MB_OK | MB_ICONEXCLAMATION);
 
-    return(S_OK);
+    return (S_OK);
 }
 
 HRESULT STDMETHODCALLTYPE IActiveScriptSite_OnEnterScript(void* _this)
@@ -1078,23 +1102,30 @@ static const CSimpleScriptSite CSimpleScriptSite_Instance = {
 };
 
 static BOOL HideInput = FALSE;
-static LRESULT CALLBACK InputBoxProc(int nCode, WPARAM wParam, LPARAM lParam) {
+
+static LRESULT CALLBACK InputBoxProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
     if (nCode < HC_ACTION)
         return CallNextHookEx(0, nCode, wParam, lParam);
-    if (nCode = HCBT_ACTIVATE) {
-        if (HideInput == TRUE) {
+    if (nCode = HCBT_ACTIVATE)
+    {
+        if (HideInput == TRUE)
+        {
             HWND TextBox = FindWindowExA((HWND)wParam, NULL, "Edit", NULL);
             SendDlgItemMessageW((HWND)wParam, GetDlgCtrlID(TextBox), EM_SETPASSWORDCHAR, L'\x25cf', 0);
         }
     }
-    if (nCode = HCBT_CREATEWND) {
+    if (nCode = HCBT_CREATEWND)
+    {
         if (!(GetWindowLongPtr((HWND)wParam, GWL_STYLE) & WS_CHILD))
-            SetWindowLongPtr((HWND)wParam, GWL_EXSTYLE, GetWindowLongPtr((HWND)wParam, GWL_EXSTYLE) | WS_EX_DLGMODALFRAME);
+            SetWindowLongPtr((HWND)wParam, GWL_EXSTYLE,
+                             GetWindowLongPtr((HWND)wParam, GWL_EXSTYLE) | WS_EX_DLGMODALFRAME);
     }
     return CallNextHookEx(0, nCode, wParam, lParam);
 }
 
-HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle, LPCWSTR wszDefault, LPWSTR wszAnswer, DWORD cbAnswer, BOOL* bCancelled)
+HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle, LPCWSTR wszDefault, LPWSTR wszAnswer,
+                 DWORD cbAnswer, BOOL* bCancelled)
 {
     HRESULT hr = S_OK;
 
@@ -1129,8 +1160,8 @@ HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle,
 
     IActiveScript* pActiveScript = NULL;
     hr = CoCreateInstance(FAILED(hr) ? &CLSID_VBScript : &guidBuffer, 0, CLSCTX_ALL,
-        &IID_IActiveScript,
-        (void**)&pActiveScript);
+                          &IID_IActiveScript,
+                          (void**)&pActiveScript);
     if (SUCCEEDED(hr) && pActiveScript)
     {
         hr = pActiveScript->lpVtbl->SetScriptSite(pActiveScript, &CSimpleScriptSite_Instance);
@@ -1143,12 +1174,15 @@ HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle,
                 hr = pActiveScriptParse->lpVtbl->InitNew(pActiveScriptParse);
                 if (SUCCEEDED(hr))
                 {
-                    LPWSTR wszEvaluation = malloc(sizeof(WCHAR) * (cchPromptSafe + cchTitleSafe + cchDefaultSafe + 100));
+                    LPWSTR wszEvaluation =
+                        malloc(sizeof(WCHAR) * (cchPromptSafe + cchTitleSafe + cchDefaultSafe + 100));
                     if (wszEvaluation)
                     {
-                        swprintf_s(wszEvaluation, cchPromptSafe + cchTitleSafe + cchDefaultSafe + 100, L"InputBox(\"%s\", \"%s\", \"%s\")", wszPromptSafe, wszTitleSafe, wszDefaultSafe);
+                        swprintf_s(wszEvaluation, cchPromptSafe + cchTitleSafe + cchDefaultSafe + 100,
+                                   L"InputBox(\"%s\", \"%s\", \"%s\")", wszPromptSafe, wszTitleSafe, wszDefaultSafe);
                         DWORD cchEvaluation2 = 0;
-                        LPWSTR wszEvaluation2 = StrReplaceAllW(wszEvaluation, L"\n", L"\" + vbNewLine + \"", &cchEvaluation2);
+                        LPWSTR wszEvaluation2 = StrReplaceAllW(wszEvaluation, L"\n", L"\" + vbNewLine + \"",
+                                                               &cchEvaluation2);
                         if (wszEvaluation2)
                         {
                             EXCEPINFO ei;
@@ -1171,7 +1205,9 @@ HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle,
                             VariantInit(&result);
 
                             HideInput = bPassword;
-                            hr = pActiveScriptParse->lpVtbl->ParseScriptText(pActiveScriptParse, wszEvaluation2, NULL, NULL, NULL, 0, 0, SCRIPTTEXT_ISEXPRESSION, &result, &ei);
+                            hr = pActiveScriptParse->lpVtbl->ParseScriptText(
+                                pActiveScriptParse, wszEvaluation2, NULL, NULL, NULL, 0, 0, SCRIPTTEXT_ISEXPRESSION,
+                                &result, &ei);
 
                             *bCancelled = (result.vt == VT_EMPTY);
 
@@ -1223,6 +1259,7 @@ HHOOK PleaseWaitHook = NULL;
 HWND PleaseWaitHWND = NULL;
 void* PleaseWaitCallbackData = NULL;
 BOOL (*PleaseWaitCallbackFunc)(void* data) = NULL;
+
 BOOL PleaseWait_UpdateTimeout(int timeout)
 {
     if (PleaseWaitHWND)
@@ -1279,7 +1316,9 @@ LRESULT CALLBACK PleaseWait_HookProc(int code, WPARAM wParam, LPARAM lParam)
         SetWindowLongPtrW(PleaseWaitHWND, GWL_STYLE, style & ~WS_SYSMENU);
         RECT rc;
         GetWindowRect(PleaseWaitHWND, &rc);
-        SetWindowPos(PleaseWaitHWND, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top - MulDiv(50, GetDpiForWindow(PleaseWaitHWND), 96), SWP_NOMOVE | SWP_FRAMECHANGED);
+        SetWindowPos(PleaseWaitHWND, NULL, 0, 0, rc.right - rc.left,
+                     rc.bottom - rc.top - MulDiv(50, GetDpiForWindow(PleaseWaitHWND), 96),
+                     SWP_NOMOVE | SWP_FRAMECHANGED);
         SetTimer(PleaseWaitHWND, 'EPPW', PleaseWaitTimeout, PleaseWait_TimerProc);
         UnhookWindowsHookEx(PleaseWaitHook);
         PleaseWaitHook = NULL;
@@ -1441,7 +1480,8 @@ BOOL IsConnectedToInternet()
     if (SUCCEEDED(hr))
     {
         INetworkListManager* pNetworkListManager;
-        hr = CoCreateInstance(&CLSID_NetworkListManager, NULL, CLSCTX_ALL, &IID_NetworkListManager, (LPVOID*)&pNetworkListManager);
+        hr = CoCreateInstance(&CLSID_NetworkListManager, NULL, CLSCTX_ALL, &IID_NetworkListManager,
+                              (LPVOID*)&pNetworkListManager);
         if (SUCCEEDED(hr))
         {
             NLM_CONNECTIVITY nlmConnectivity = NLM_CONNECTIVITY_DISCONNECTED;
@@ -1454,9 +1494,11 @@ BOOL IsConnectedToInternet()
                 else
                     connectedStatus = FALSE;
             }
-            if (isConnected == VARIANT_FALSE && SUCCEEDED(pNetworkListManager->lpVtbl->GetConnectivity(pNetworkListManager, &nlmConnectivity)))
+            if (isConnected == VARIANT_FALSE && SUCCEEDED(
+                pNetworkListManager->lpVtbl->GetConnectivity(pNetworkListManager, &nlmConnectivity)))
             {
-                if (nlmConnectivity & (NLM_CONNECTIVITY_IPV4_LOCALNETWORK | NLM_CONNECTIVITY_IPV4_SUBNET | NLM_CONNECTIVITY_IPV6_LOCALNETWORK | NLM_CONNECTIVITY_IPV6_SUBNET))
+                if (nlmConnectivity & (NLM_CONNECTIVITY_IPV4_LOCALNETWORK | NLM_CONNECTIVITY_IPV4_SUBNET |
+                    NLM_CONNECTIVITY_IPV6_LOCALNETWORK | NLM_CONNECTIVITY_IPV6_SUBNET))
                 {
                     connectedStatus = 2;
                 }
@@ -1476,12 +1518,16 @@ BOOL DoesOSBuildSupportSpotlight()
 BOOL IsSpotlightEnabled()
 {
     HKEY hKey = NULL;
-    BOOL bRet = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2CC5CA98-6485-489A-920E-B3E88A6CCCE3}", 0, KEY_READ, &hKey) == ERROR_SUCCESS;
+    BOOL bRet = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2CC5CA98-6485-489A-920E-B3E88A6CCCE3}", 0,
+                              KEY_READ, &hKey) == ERROR_SUCCESS;
     if (bRet) RegCloseKey(hKey);
     return bRet;
 }
 
-const int spop_insertmenu_ops[] = { SPOP_INSERTMENU_OPEN, SPOP_INSERTMENU_NEXTPIC, 0, SPOP_INSERTMENU_LIKE, SPOP_INSERTMENU_DISLIKE };
+const int spop_insertmenu_ops[] = {
+    SPOP_INSERTMENU_OPEN, SPOP_INSERTMENU_NEXTPIC, 0, SPOP_INSERTMENU_LIKE, SPOP_INSERTMENU_DISLIKE
+};
+
 void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
 {
     HRESULT hr = S_OK;
@@ -1499,14 +1545,16 @@ void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
                 HMENU hMenu2 = CreatePopupMenu();
                 if (hMenu2)
                 {
-                    if (SUCCEEDED(hr = pcm->lpVtbl->QueryContextMenu(pcm, hMenu2, 0, SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST, CMF_NORMAL)))
+                    if (SUCCEEDED(
+                        hr = pcm->lpVtbl->QueryContextMenu(pcm, hMenu2, 0, SCRATCH_QCM_FIRST, SCRATCH_QCM_LAST,
+                            CMF_NORMAL)))
                     {
                         if (dwOp == SPOP_OPENMENU)
                         {
                             int iCmd = TrackPopupMenuEx(hMenu2, TPM_RETURNCMD, pPt->x, pPt->y, hWnd, NULL);
                             if (iCmd > 0)
                             {
-                                CMINVOKECOMMANDINFOEX info = { 0 };
+                                CMINVOKECOMMANDINFOEX info = {0};
                                 info.cbSize = sizeof(info);
                                 info.fMask = CMIC_MASK_UNICODE | CMIC_MASK_PTINVOKE;
                                 info.hwnd = hWnd;
@@ -1523,29 +1571,44 @@ void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
                             int i = ARRAYSIZE(spop_insertmenu_ops) - 1;
                             while (1)
                             {
-                                if (i == -1 ? ((dwOp & SPOP_INSERTMENU_INFOTIP1) || (dwOp & SPOP_INSERTMENU_INFOTIP2)) : (dwOp & spop_insertmenu_ops[i]))
+                                if (i == -1
+                                        ? ((dwOp & SPOP_INSERTMENU_INFOTIP1) || (dwOp & SPOP_INSERTMENU_INFOTIP2))
+                                        : (dwOp & spop_insertmenu_ops[i]))
                                 {
                                     mii.cbSize = sizeof(MENUITEMINFOW);
                                     mii.fMask = MIIM_FTYPE | MIIM_STRING;
                                     mii.cch = 0;
                                     mii.dwTypeData = NULL;
-                                    if (i <= 0 ?
-                                        (i == 0 ?
-                                            !RegQueryValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}", NULL, &mii.cch) :
-                                            !RegGetValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}", L"InfoTip", RRF_RT_REG_SZ, NULL, NULL, &mii.cch)
-                                            ) :
-                                        GetMenuItemInfoW(hMenu2, i, TRUE, &mii))
+                                    if (i <= 0
+                                            ? (i == 0
+                                                   ? !RegQueryValueW(
+                                                       HKEY_CURRENT_USER,
+                                                       L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}",
+                                                       NULL, &mii.cch)
+                                                   : !RegGetValueW(
+                                                       HKEY_CURRENT_USER,
+                                                       L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}",
+                                                       L"InfoTip", RRF_RT_REG_SZ, NULL, NULL, &mii.cch)
+                                            )
+                                            : GetMenuItemInfoW(hMenu2, i, TRUE, &mii))
                                     {
                                         WCHAR* buf = malloc(++mii.cch * sizeof(WCHAR));
                                         if (buf)
                                         {
                                             mii.dwTypeData = buf;
-                                            if (i <= 0 ?
-                                                (i == 0 ?
-                                                    !RegQueryValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}", mii.dwTypeData, &mii.cch) :
-                                                    !RegGetValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}", L"InfoTip", RRF_RT_REG_SZ, NULL, mii.dwTypeData, &mii.cch)
-                                                    ) :
-                                                GetMenuItemInfoW(hMenu2, i, TRUE, &mii))
+                                            if (i <= 0
+                                                    ? (i == 0
+                                                           ? !RegQueryValueW(
+                                                               HKEY_CURRENT_USER,
+                                                               L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}",
+                                                               mii.dwTypeData, &mii.cch)
+                                                           : !RegGetValueW(
+                                                               HKEY_CURRENT_USER,
+                                                               L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}",
+                                                               L"InfoTip", RRF_RT_REG_SZ, NULL, mii.dwTypeData,
+                                                               &mii.cch)
+                                                    )
+                                                    : GetMenuItemInfoW(hMenu2, i, TRUE, &mii))
                                             {
                                                 if (i == -1)
                                                 {
@@ -1576,7 +1639,8 @@ void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
                                                         mii.dwTypeData = pCInit;
                                                     }
                                                 }
-                                                mii.fMask = MIIM_ID | MIIM_STRING | MIIM_DATA | (i == -1 ? MIIM_STATE : 0);
+                                                mii.fMask = MIIM_ID | MIIM_STRING | MIIM_DATA | (
+                                                    i == -1 ? MIIM_STATE : 0);
                                                 mii.wID = 3999 + i;
                                                 mii.dwItemData = SPOP_CLICKMENU_FIRST + i;
                                                 mii.fType = MFT_STRING;
@@ -1605,7 +1669,7 @@ void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
                             mii.fMask = MIIM_ID;
                             if (GetMenuItemInfoW(hMenu2, dwOp - SPOP_CLICKMENU_FIRST, TRUE, &mii))
                             {
-                                CMINVOKECOMMANDINFOEX info = { 0 };
+                                CMINVOKECOMMANDINFOEX info = {0};
                                 info.cbSize = sizeof(info);
                                 info.fMask = CMIC_MASK_UNICODE;
                                 info.hwnd = hWnd;
@@ -1628,7 +1692,9 @@ void SpotlightHelper(DWORD dwOp, HWND hWnd, HMENU hMenu, LPPOINT pPt)
 
 BOOL ExtractMonitorByIndex(HMONITOR hMonitor, HDC hDC, LPRECT lpRect, MonitorOverrideData* mod)
 {
-    POINT pt; pt.x = 0; pt.y = 0;
+    POINT pt;
+    pt.x = 0;
+    pt.y = 0;
     if (MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) == hMonitor)
     {
         return TRUE;

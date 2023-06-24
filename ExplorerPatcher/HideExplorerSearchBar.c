@@ -44,7 +44,7 @@ VOID HideExplorerSearchBar(HWND hWnd)
     HWND band = NULL, rebar = NULL;
     band = FindChildWindow(
         hWnd,
-        (wchar_t*)L"TravelBand"
+        L"TravelBand"
     );
     if (!band)
     {
@@ -110,7 +110,7 @@ LRESULT CALLBACK HideExplorerSearchBarSubClass(
     }
     else if (uMsg == WM_DESTROY)
     {
-        RemoveWindowSubclass(hWnd, HideExplorerSearchBarSubClass, (UINT_PTR)HideExplorerSearchBarSubClass);
+        RemoveWindowSubclass(hWnd, HideExplorerSearchBarSubClass, HideExplorerSearchBarSubClass);
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }

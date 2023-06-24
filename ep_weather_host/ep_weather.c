@@ -6,11 +6,11 @@ HMODULE epw_hModule;
 DWORD epw_OutstandingObjects = 0;
 DWORD epw_LockCount = 0;
 
-void(*RefreshImmersiveColorPolicyState)();
-void(*SetPreferredAppMode)(INT64 bAllowDark);
-void(*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
-BOOL(*ShouldAppsUseDarkMode)();
-BOOL(*ShouldSystemUseDarkMode)();
+void (*RefreshImmersiveColorPolicyState)();
+void (*SetPreferredAppMode)(INT64 bAllowDark);
+void (*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
+BOOL (*ShouldAppsUseDarkMode)();
+BOOL (*ShouldSystemUseDarkMode)();
 
 #ifdef _WIN64
 #pragma comment(linker, "/export:DllRegisterServer=_DllRegisterServer")
@@ -260,7 +260,7 @@ HRESULT WINAPI _DllUnregisterServer()
 #endif
 HRESULT WINAPI _DllCanUnloadNow()
 {
-    return((epw_OutstandingObjects | epw_LockCount) ? S_FALSE : S_OK);
+    return ((epw_OutstandingObjects | epw_LockCount) ? S_FALSE : S_OK);
 }
 
 #ifdef _WIN64
@@ -270,11 +270,11 @@ HRESULT WINAPI _DllCanUnloadNow()
 #endif
 HRESULT WINAPI _DllGetClassObject(
     REFCLSID objGuid,
-    REFIID   factoryGuid,
+    REFIID factoryGuid,
     LPVOID* factoryHandle
 )
 {
-    HRESULT  hr;
+    HRESULT hr;
     if (IsEqualCLSID(objGuid, &CLSID_EPWeather))
     {
         hr = ClassFactory->lpVtbl->QueryInterface(
@@ -289,13 +289,13 @@ HRESULT WINAPI _DllGetClassObject(
         hr = CLASS_E_CLASSNOTAVAILABLE;
     }
 
-    return(hr);
+    return (hr);
 }
 
 BOOL WINAPI DllMain(
     _In_ HINSTANCE hinstDLL,
-    _In_ DWORD     fdwReason,
-    _In_ LPVOID    lpvReserved
+    _In_ DWORD fdwReason,
+    _In_ LPVOID lpvReserved
 )
 {
     switch (fdwReason)

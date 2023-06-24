@@ -41,7 +41,8 @@ inline BOOL IsDwmExtendFrameIntoClientAreaBrokenInThisBuild()
     {
         return FALSE;
     }
-    if ((global_rovi.dwBuildNumber >= 21996 && global_rovi.dwBuildNumber < 22000) || (global_rovi.dwBuildNumber == 22000 && (global_ubr >= 1 && global_ubr <= 51)))
+    if ((global_rovi.dwBuildNumber >= 21996 && global_rovi.dwBuildNumber < 22000) || (global_rovi.dwBuildNumber == 22000
+        && (global_ubr >= 1 && global_ubr <= 51)))
     {
         return TRUE;
     }

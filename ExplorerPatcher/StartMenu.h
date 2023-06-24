@@ -19,33 +19,33 @@ extern DWORD bMonitorOverride;
 extern DWORD bOpenAtLogon;
 
 DEFINE_GUID(SID_IImmersiveMonitorService,
-    0x47094e3a,
-    0x0cf2, 0x430f, 0x80, 0x6f,
-    0xcf, 0x9e, 0x4f, 0x0f, 0x12, 0xdd
+            0x47094e3a,
+            0x0cf2, 0x430f, 0x80, 0x6f,
+            0xcf, 0x9e, 0x4f, 0x0f, 0x12, 0xdd
 );
 
 DEFINE_GUID(IID_IImmersiveMonitorService,
-    0x4d4c1e64,
-    0xe410, 0x4faa, 0xba, 0xfa,
-    0x59, 0xca, 0x06, 0x9b, 0xfe, 0xc2
+            0x4d4c1e64,
+            0xe410, 0x4faa, 0xba, 0xfa,
+            0x59, 0xca, 0x06, 0x9b, 0xfe, 0xc2
 );
 
 DEFINE_GUID(SID_ImmersiveLauncher,
-    0x6f86e01c,
-    0xc649, 0x4d61, 0xbe, 0x23,
-    0xf1, 0x32, 0x2d, 0xde, 0xca, 0x9d
+            0x6f86e01c,
+            0xc649, 0x4d61, 0xbe, 0x23,
+            0xf1, 0x32, 0x2d, 0xde, 0xca, 0x9d
 );
 
 DEFINE_GUID(IID_IImmersiveLauncher10RS,
-    0xd8d60399,
-    0xa0f1, 0xf987, 0x55, 0x51,
-    0x32, 0x1f, 0xd1, 0xb4, 0x98, 0x64
+            0xd8d60399,
+            0xa0f1, 0xf987, 0x55, 0x51,
+            0x32, 0x1f, 0xd1, 0xb4, 0x98, 0x64
 );
 
 DEFINE_GUID(IID_WindowsUdk_UI_Shell_ITaskbarSettings6,
-    0x5CBF9899,
-    0x3E66, 0x5556, 0xA1, 0x31,
-    0x1E, 0x3E, 0xE8, 0x14, 0x85, 0x90
+            0x5CBF9899,
+            0x3E66, 0x5556, 0xA1, 0x31,
+            0x1E, 0x3E, 0xE8, 0x14, 0x85, 0x90
 );
 
 typedef interface IImmersiveMonitorService IImmersiveMonitorService;
@@ -54,64 +54,64 @@ typedef struct IImmersiveMonitorServiceVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         IImmersiveMonitorService* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         IImmersiveMonitorService* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetCount)(
+    HRESULT (STDMETHODCALLTYPE* GetCount)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetConnectedCount)(
+    HRESULT (STDMETHODCALLTYPE* GetConnectedCount)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetAt)(
+    HRESULT (STDMETHODCALLTYPE* GetAt)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetFromHandle)(
+    HRESULT (STDMETHODCALLTYPE* GetFromHandle)(
         IImmersiveMonitorService* This,
         /* [in] */ HMONITOR hMonitor,
-        _COM_Outptr_  IUnknown** ppvObject);
+        _COM_Outptr_ IUnknown** ppvObject);
 
-    HRESULT(STDMETHODCALLTYPE* GetFromIdentity)(
+    HRESULT (STDMETHODCALLTYPE* GetFromIdentity)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetImmersiveProxyMonitor)(
+    HRESULT (STDMETHODCALLTYPE* GetImmersiveProxyMonitor)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* QueryService)(
+    HRESULT (STDMETHODCALLTYPE* QueryService)(
         IImmersiveMonitorService* This,
         HMONITOR hMonitor,
         GUID*,
         GUID*,
         void** ppvObject
-        );
+    );
 
-    HRESULT(STDMETHODCALLTYPE* QueryServiceByIdentity)(
+    HRESULT (STDMETHODCALLTYPE* QueryServiceByIdentity)(
         IImmersiveMonitorService* This);
 
-    HRESULT(STDMETHODCALLTYPE* QueryServiceFromWindow)(
+    HRESULT (STDMETHODCALLTYPE* QueryServiceFromWindow)(
         IImmersiveMonitorService* This,
         HWND hWnd,
         GUID* a3,
         GUID* a4,
         void** ppvObject
-        );
+    );
 
-    HRESULT(STDMETHODCALLTYPE* QueryServiceFromPoint)(
+    HRESULT (STDMETHODCALLTYPE* QueryServiceFromPoint)(
         IImmersiveMonitorService* This,
         POINT pt,
         GUID* a3,
         GUID* a4,
         void** ppvObject
-        );
+    );
 
     END_INTERFACE
 } IImmersiveMonitorServiceVtbl;
@@ -127,47 +127,47 @@ typedef struct IImmersiveLauncher10RSVtbl
 {
     BEGIN_INTERFACE
 
-        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-            IImmersiveLauncher10RS* This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */
-            _COM_Outptr_  void** ppvObject);
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
+        IImmersiveLauncher10RS* This,
+        /* [in] */ REFIID riid,
+        /* [annotation][iid_is][out] */
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         IImmersiveLauncher10RS* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* ShowStartView)(
+    HRESULT (STDMETHODCALLTYPE* ShowStartView)(
         IImmersiveLauncher10RS* This,
         /* [in] */ int method,
         /* [in] */ int flags);
 
-    HRESULT(STDMETHODCALLTYPE* Dismiss)(
+    HRESULT (STDMETHODCALLTYPE* Dismiss)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* method5)(
+    HRESULT (STDMETHODCALLTYPE* method5)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* method6)(
+    HRESULT (STDMETHODCALLTYPE* method6)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* IsVisible)(
+    HRESULT (STDMETHODCALLTYPE* IsVisible)(
         IImmersiveLauncher10RS* This,
         /* [in] */ BOOL* ret);
 
-    HRESULT(STDMETHODCALLTYPE* method8)(
+    HRESULT (STDMETHODCALLTYPE* method8)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* method9)(
+    HRESULT (STDMETHODCALLTYPE* method9)(
         IImmersiveLauncher10RS* This);
 
-    HRESULT(STDMETHODCALLTYPE* ConnectToMonitor)(
+    HRESULT (STDMETHODCALLTYPE* ConnectToMonitor)(
         IImmersiveLauncher10RS* This,
         /* [in] */ IUnknown* monitor);
 
-    HRESULT(STDMETHODCALLTYPE* GetMonitor)(
+    HRESULT (STDMETHODCALLTYPE* GetMonitor)(
         IImmersiveLauncher10RS* This,
         /* [in] */ IUnknown** monitor);
 
@@ -180,9 +180,9 @@ interface IImmersiveLauncher10RS
 };
 
 DEFINE_GUID(IID_ILauncherTipContextMenu,
-    0xb8c1db5f,
-    0xcbb3, 0x48bc, 0xaf, 0xd9,
-    0xce, 0x6b, 0x88, 0x0c, 0x79, 0xed
+            0xb8c1db5f,
+            0xcbb3, 0x48bc, 0xaf, 0xd9,
+            0xce, 0x6b, 0x88, 0x0c, 0x79, 0xed
 );
 
 typedef interface ILauncherTipContextMenu ILauncherTipContextMenu;
@@ -191,19 +191,19 @@ typedef struct ILauncherTipContextMenuVtbl
 {
     BEGIN_INTERFACE
 
-        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-            ILauncherTipContextMenu* This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */
-            _COM_Outptr_  void** ppvObject);
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
+        ILauncherTipContextMenu* This,
+        /* [in] */ REFIID riid,
+        /* [annotation][iid_is][out] */
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         ILauncherTipContextMenu* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         ILauncherTipContextMenu* This);
 
-    HRESULT(STDMETHODCALLTYPE* ShowLauncherTipContextMenu)(
+    HRESULT (STDMETHODCALLTYPE* ShowLauncherTipContextMenu)(
         ILauncherTipContextMenu* This,
         /* [in] */ POINT* pt);
 
@@ -238,47 +238,48 @@ typedef struct _HookStartMenuParams
     wchar_t wszModulePath[MAX_PATH];
     FARPROC proc;
 } HookStartMenuParams;
+
 DWORD WINAPI HookStartMenu(HookStartMenuParams* params);
 
 typedef interface WindowsUdk_UI_Shell_TaskbarLayoutStatics WindowsUdk_UI_Shell_TaskbarLayoutStatics;
 typedef interface WindowsUdk_UI_Shell_TaskbarLayoutManager WindowsUdk_UI_Shell_TaskbarLayoutManager;
 
 DEFINE_GUID(IID_WindowsUdk_UI_Shell_TaskbarLayoutStatics,
-    0x4472FE8B,
-    0xF3B1, 0x5CC9, 0x81, 0xc1,
-    0x76, 0xf8, 0xc3, 0x38, 0x8a, 0xab
+            0x4472FE8B,
+            0xF3B1, 0x5CC9, 0x81, 0xc1,
+            0x76, 0xf8, 0xc3, 0x38, 0x8a, 0xab
 );
 
 typedef struct WindowsUdk_UI_Shell_TaskbarLayoutStaticsVtbl // : IInspectableVtbl
 {
     BEGIN_INTERFACE
 
-        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-            __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
-            /* [in] */ __RPC__in REFIID riid,
-            /* [annotation][iid_is][out] */
-            _COM_Outptr_  void** ppvObject);
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
+        __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
+        /* [in] */ __RPC__in REFIID riid,
+        /* [annotation][iid_is][out] */
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetIids)(
+    HRESULT (STDMETHODCALLTYPE* GetIids)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
         /* [out] */ __RPC__out ULONG* iidCount,
         /* [size_is][size_is][out] */ __RPC__deref_out_ecount_full_opt(*iidCount) IID** iids);
 
-    HRESULT(STDMETHODCALLTYPE* GetRuntimeClassName)(
+    HRESULT (STDMETHODCALLTYPE* GetRuntimeClassName)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
         /* [out] */ __RPC__deref_out_opt HSTRING* className);
 
-    HRESULT(STDMETHODCALLTYPE* GetTrustLevel)(
+    HRESULT (STDMETHODCALLTYPE* GetTrustLevel)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
         /* [out] */ __RPC__out TrustLevel* trustLevel);
 
-    HRESULT(STDMETHODCALLTYPE* get_Current)(
+    HRESULT (STDMETHODCALLTYPE* get_Current)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutStatics* This,
         /* [out] */ __RPC__out void** _instanceof_winrt_WindowsUdk_UI_Shell_implementation_TaskbarLayout);
 
@@ -291,61 +292,61 @@ interface WindowsUdk_UI_Shell_TaskbarLayoutStatics // : IInspectable
 };
 
 DEFINE_GUID(IID_WindowsUdk_UI_Shell_ITaskbarLayoutManager,
-    0x4FB10D7C4,
-    0x4F7F, 0x5DE5, 0xA5, 0x28,
-    0x7e, 0xfe, 0xf4, 0x18, 0xaa, 0x48
+            0x4FB10D7C4,
+            0x4F7F, 0x5DE5, 0xA5, 0x28,
+            0x7e, 0xfe, 0xf4, 0x18, 0xaa, 0x48
 );
 
 typedef struct WindowsUdk_UI_Shell_TaskbarLayoutManagerVtbl // : IInspectableVtbl
 {
     BEGIN_INTERFACE
 
-        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-            __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
-            /* [in] */ __RPC__in REFIID riid,
-            /* [annotation][iid_is][out] */
-            _COM_Outptr_  void** ppvObject);
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
+        __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
+        /* [in] */ __RPC__in REFIID riid,
+        /* [annotation][iid_is][out] */
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetIids)(
+    HRESULT (STDMETHODCALLTYPE* GetIids)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         /* [out] */ __RPC__out ULONG* iidCount,
         /* [size_is][size_is][out] */ __RPC__deref_out_ecount_full_opt(*iidCount) IID** iids);
 
-    HRESULT(STDMETHODCALLTYPE* GetRuntimeClassName)(
+    HRESULT (STDMETHODCALLTYPE* GetRuntimeClassName)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         /* [out] */ __RPC__deref_out_opt HSTRING* className);
 
-    HRESULT(STDMETHODCALLTYPE* GetTrustLevel)(
+    HRESULT (STDMETHODCALLTYPE* GetTrustLevel)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         /* [out] */ __RPC__out TrustLevel* trustLevel);
 
-    HRESULT(STDMETHODCALLTYPE* ReportMonitorAdded)(
+    HRESULT (STDMETHODCALLTYPE* ReportMonitorAdded)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         __RPC__in HMONITOR hMonitor,
         __RPC__in void* _instance_of_winrt_WindowsUdk_UI_Shell_ITaskbarSettings,
         __RPC__in LPRECT _unknown_lpGeometry);
 
-    HRESULT(STDMETHODCALLTYPE* ReportMonitorRemoved)(
+    HRESULT (STDMETHODCALLTYPE* ReportMonitorRemoved)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         __RPC__in HMONITOR hMonitor);
 
-    HRESULT(STDMETHODCALLTYPE* ReportMonitorChanged)(
+    HRESULT (STDMETHODCALLTYPE* ReportMonitorChanged)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         __RPC__in HMONITOR hMonitor,
         __RPC__in LPRECT _unknown_lpGeometry);
 
-    HRESULT(STDMETHODCALLTYPE* ReportSettingsForMonitor)(
+    HRESULT (STDMETHODCALLTYPE* ReportSettingsForMonitor)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         __RPC__in HMONITOR hMonitor,
         __RPC__in void* _instance_of_winrt_WindowsUdk_UI_Shell_ITaskbarSettings);
 
-    HRESULT(STDMETHODCALLTYPE* ReportShellViewButtonBounds)(
+    HRESULT (STDMETHODCALLTYPE* ReportShellViewButtonBounds)(
         __RPC__in WindowsUdk_UI_Shell_TaskbarLayoutManager* This,
         __RPC__in HMONITOR hMonitor,
         __RPC__in void* _instanceof_winrt_WindowsUdk_UI_Shell_Bamo_ShellViewButtonBounds);

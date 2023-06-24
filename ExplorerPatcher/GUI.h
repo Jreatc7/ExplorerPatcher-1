@@ -62,41 +62,42 @@ extern HMODULE hModule;
 #define GUI_TIMER_READ_REPEAT_SELECTION_TIMEOUT 1000
 #define GUI_TIMER_REFRESH_FOR_PEOPLEBAND 2
 #define GUI_TIMER_REFRESH_FOR_PEOPLEBAND_TIMEOUT 1000
+
 typedef struct _GUI
 {
-	POINT location;
-	SIZE size;
-	RECT padding;
-	UINT sidebarWidth;
-	HBRUSH hBackgroundBrush;
-	HTHEME hTheme;
-	POINT dpi;
-	MARGINS extent;
-	UINT tabOrder;
-	DWORD bCalcExtent;
-	SIZE_T section;
-	DWORD dwStatusbarY;
-	HICON hIcon;
-	RECT border_thickness;
-	UINT GUI_CAPTION_LINE_HEIGHT;
-	long long LeftClickTime;
-	long long LastClickTime;
-	HMODULE hExplorerFrame;
-	void* pAccPropServices;
-	HWND hAccLabel;
-	BOOL bShouldAnnounceSelected;
-	WCHAR sectionNames[20][20];
-	BOOL bRebuildIfTabOrderIsEmpty;
-	int dwPageLocation;
-	DWORD last_section;
+    POINT location;
+    SIZE size;
+    RECT padding;
+    UINT sidebarWidth;
+    HBRUSH hBackgroundBrush;
+    HTHEME hTheme;
+    POINT dpi;
+    MARGINS extent;
+    UINT tabOrder;
+    DWORD bCalcExtent;
+    SIZE_T section;
+    DWORD dwStatusbarY;
+    HICON hIcon;
+    RECT border_thickness;
+    UINT GUI_CAPTION_LINE_HEIGHT;
+    long long LeftClickTime;
+    long long LastClickTime;
+    HMODULE hExplorerFrame;
+    void* pAccPropServices;
+    HWND hAccLabel;
+    BOOL bShouldAnnounceSelected;
+    WCHAR sectionNames[20][20];
+    BOOL bRebuildIfTabOrderIsEmpty;
+    int dwPageLocation;
+    DWORD last_section;
 } GUI;
 
 static HRESULT GUI_AboutProc(
-	HWND hwnd,
-	UINT uNotification,
-	WPARAM wParam,
-	LPARAM lParam,
-	LONG_PTR lpRefData
+    HWND hwnd,
+    UINT uNotification,
+    WPARAM wParam,
+    LPARAM lParam,
+    LONG_PTR lpRefData
 );
 
 static BOOL GUI_Build(HDC hDC, HWND hWnd);

@@ -75,7 +75,8 @@ LRESULT CALLBACK OpenStartOnCurentMonitorThreadHook(
     if (code == HC_ACTION && wParam)
     {
         MSG* msg = (MSG*)lParam;
-        if (GetSystemMetrics(SM_CMONITORS) >= 2 && msg->message == WM_SYSCOMMAND && (msg->wParam & 0xFFF0) == SC_TASKLIST)
+        if (GetSystemMetrics(SM_CMONITORS) >= 2 && msg->message == WM_SYSCOMMAND && (msg->wParam & 0xFFF0) ==
+            SC_TASKLIST)
         {
             printf("Position Start\n");
             if (bMonitorOverride == 1)
@@ -121,7 +122,9 @@ LRESULT CALLBACK OpenStartOnCurentMonitorThreadHook(
                 EnumDisplayMonitors(NULL, NULL, ExtractMonitorByIndex, &mod);
                 if (mod.hMonitor == NULL)
                 {
-                    POINT pt; pt.x = 0; pt.y = 0;
+                    POINT pt;
+                    pt.x = 0;
+                    pt.y = 0;
                     monitor = MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
                 }
                 else
@@ -172,7 +175,7 @@ DWORD OpenStartOnCurentMonitorThread(OpenStartOnCurentMonitorThreadParams* unuse
         progThread
     );
     printf("Progman hook: %d\n", g_ProgHook);
-    MSG msg = { 0 };
+    MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
@@ -235,7 +238,8 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
 
     TCHAR wszKnownPath[MAX_PATH];
     GetWindowsDirectoryW(wszKnownPath, MAX_PATH);
-    wcscat_s(wszKnownPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe");
+    wcscat_s(wszKnownPath, MAX_PATH,
+             L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe");
 
     while (TRUE)
     {
@@ -287,13 +291,11 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
                         {
                             break;
                         }
-                        else
-                        {
-                            CloseHandle(hProcess);
-                            hProcess = NULL;
-                        }
+                        CloseHandle(hProcess);
+                        hProcess = NULL;
                     }
-                } while (Process32Next(hSnapshot, &pe32) == TRUE);
+                }
+                while (Process32Next(hSnapshot, &pe32) == TRUE);
             }
             if (hSnapshot)
             {
@@ -303,12 +305,9 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
             {
                 break;
             }
-            else
-            {
-                retry++;
-                if (retry > 20) return 0;
-                Sleep(params->dwTimeout);
-            }
+            retry++;
+            if (retry > 20) return 0;
+            Sleep(params->dwTimeout);
         }
         printf("[StartMenu] Process found.\n");
         LPVOID lpRemotePath = VirtualAllocEx(
@@ -328,7 +327,7 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
         if (!WriteProcessMemory(
             hProcess,
             lpRemotePath,
-            (void*)params->wszModulePath,
+            params->wszModulePath,
             MAX_PATH,
             NULL
         ))
@@ -349,7 +348,7 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
             //// 0x48, 0x89, 0x4c, 0x24, 0x10,
             // int 3
             //0xcc,
-            
+
             // sub rsp, 28h
             0x48, 0x83, 0xec, 0x28,
             // mov rcx, 1111111111111111h; placeholder for DLL path
@@ -398,7 +397,8 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
         pattern = 0x2222222222222222;
         *(LPVOID*)(memmem(shellcode, sizeof(shellcode), &pattern, sizeof(uintptr_t))) = LoadLibraryW;
         pattern = 0x4444444444444444;
-        *(LPVOID*)(memmem(shellcode, sizeof(shellcode), &pattern, sizeof(uintptr_t))) = ((uintptr_t)params->proc - (uintptr_t)params->hModule);
+        *(LPVOID*)(memmem(shellcode, sizeof(shellcode), &pattern, sizeof(uintptr_t))) = ((uintptr_t)params->proc - (
+            uintptr_t)params->hModule);
         pattern = 0x5555555555555555;
         *(LPVOID*)(memmem(shellcode, sizeof(shellcode), &pattern, sizeof(uintptr_t))) = GetLastError;
 
@@ -467,12 +467,14 @@ DWORD WINAPI HookStartMenu(HookStartMenuParams* params)
     }
 }
 
-static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented(void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings)
+static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented(
+    void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings)
 {
     return E_NOTIMPL;
 }
 
-static ULONG STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease(void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings)
+static ULONG STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease(
+    void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings)
 {
     return 1;
 }
@@ -486,7 +488,8 @@ static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings6_GetEffect
     return 0;
 }
 
-static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6Vtbl[41] = { // : IInspectableVtbl
+static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6Vtbl[41] = {
+    // : IInspectableVtbl
     WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented,
     WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease,
     WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease,
@@ -529,15 +532,21 @@ static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6Vtbl[41] = { // : I
     WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented,
     WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented
 };
+
 typedef struct instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6 // : IInspectable
 {
     void* lpVtbl;
 } WindowsUdk_UI_Shell_ITaskbarSettings6;
-static const WindowsUdk_UI_Shell_ITaskbarSettings6 instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6 = { instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6Vtbl };
 
-static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_QueryInterface(void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings, REFIID riid, void** ppv)
+static const WindowsUdk_UI_Shell_ITaskbarSettings6 instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6 = {
+    instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6Vtbl
+};
+
+static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_QueryInterface(
+    void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettings, REFIID riid, void** ppv)
 {
-    if (IsEqualIID(riid, &IID_WindowsUdk_UI_Shell_ITaskbarSettings6)) {
+    if (IsEqualIID(riid, &IID_WindowsUdk_UI_Shell_ITaskbarSettings6))
+    {
         *ppv = &instanceof_WindowsUdk_UI_Shell_ITaskbarSettings6;
         return S_OK;
     }
@@ -589,7 +598,8 @@ static HRESULT STDMETHODCALLTYPE WindowsUdk_UI_Shell_ITaskbarSettings_GetSearchM
     return 0;
 }
 
-static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[41] = { // : IInspectableVtbl
+static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[41] = {
+    // : IInspectableVtbl
     WindowsUdk_UI_Shell_ITaskbarSettings_QueryInterface,
     WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease,
     WindowsUdk_UI_Shell_ITaskbarSettings_AddRefRelease,
@@ -632,11 +642,15 @@ static void* instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[41] = { // : II
     WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented,
     WindowsUdk_UI_Shell_ITaskbarSettings_NotImplemented
 };
+
 typedef struct instanceof_WindowsUdk_UI_Shell_ITaskbarSettings // : IInspectable
 {
     void* lpVtbl;
 } WindowsUdk_UI_Shell_ITaskbarSettings;
-static const WindowsUdk_UI_Shell_ITaskbarSettings instanceof_WindowsUdk_UI_Shell_ITaskbarSettings = { instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl };
+
+static const WindowsUdk_UI_Shell_ITaskbarSettings instanceof_WindowsUdk_UI_Shell_ITaskbarSettings = {
+    instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl
+};
 
 BOOL NeedsRo_PositionStartMenuForMonitor(
     HMONITOR hMonitor,
@@ -702,13 +716,17 @@ BOOL NeedsRo_PositionStartMenuForMonitor(
         // registry: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsRuntime\ActivatableClassId\WindowsUdk.UI.Shell.TaskbarLayout
         if (data->location)
         {
-            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[6] = WindowsUdk_UI_Shell_ITaskbarSettings_GetAlignment_Center;
-            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[10] = WindowsUdk_UI_Shell_ITaskbarSettings_GetLocation_Center;
+            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[6] =
+                WindowsUdk_UI_Shell_ITaskbarSettings_GetAlignment_Center;
+            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[10] =
+                WindowsUdk_UI_Shell_ITaskbarSettings_GetLocation_Center;
         }
         else
         {
-            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[6] = WindowsUdk_UI_Shell_ITaskbarSettings_GetAlignment_Left;
-            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[10] = WindowsUdk_UI_Shell_ITaskbarSettings_GetLocation_Left;
+            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[6] =
+                WindowsUdk_UI_Shell_ITaskbarSettings_GetAlignment_Left;
+            instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[10] =
+                WindowsUdk_UI_Shell_ITaskbarSettings_GetLocation_Left;
         }
         instanceof_WindowsUdk_UI_Shell_ITaskbarSettingsVtbl[14] = WindowsUdk_UI_Shell_ITaskbarSettings_GetSearchMode;
 
@@ -776,7 +794,7 @@ DWORD GetStartMenuPosition(FARPROC SHRegGetValueFromHKCUHKLMFunc)
         SRRF_RT_REG_DWORD,
         NULL,
         &dwTaskbarAl,
-        (LPDWORD)(&dwSize)
+        &dwSize
     ) != ERROR_SUCCESS)
     {
         dwTaskbarAl = 1;

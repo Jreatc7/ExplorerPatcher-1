@@ -199,10 +199,12 @@ BOOL IsUpdateAvailableHelper(
                 ) && dwRead == DOSMODE_OFFSET + UPDATES_HASH_SIZE)
                 {
 #ifdef UPDATES_VERBOSE_OUTPUT
-                    printf("[Updates] Hash of remote file is \"%s\" (%s).\n", DOSMODE_OFFSET + hash, (hash[0] == 0x4D && hash[1] == 0x5A) ? "valid" : "invalid");
+                    printf("[Updates] Hash of remote file is \"%s\" (%s).\n", DOSMODE_OFFSET + hash,
+                           (hash[0] == 0x4D && hash[1] == 0x5A) ? "valid" : "invalid");
 #endif
                     BOOL bOldType = TRUE;
-                    char *szLeftMost = NULL, *szSecondLeft = NULL, *szSecondRight = NULL, *szRightMost = NULL, *szRealHash = NULL;
+                    char *szLeftMost = NULL, *szSecondLeft = NULL, *szSecondRight = NULL, *szRightMost = NULL, *
+                             szRealHash = NULL;
                     if (hModule)
                     {
                         if (hash[0] == 0x4D && hash[1] == 0x5A)
@@ -229,7 +231,9 @@ BOOL IsUpdateAvailableHelper(
                                                 *szRealHash = 0;
                                                 szRealHash++;
                                                 DWORD dwRemoteLeftMost = atoi(szLeftMost);
-                                                if (pLeftMost) *pLeftMost = dwRemoteLeftMost - ((dwRemoteLeftMost == 22622 && szRealHash[0] != '!') ? 1 : 0);
+                                                if (pLeftMost)
+                                                    *pLeftMost = dwRemoteLeftMost - (
+                                                        (dwRemoteLeftMost == 22622 && szRealHash[0] != '!') ? 1 : 0);
                                                 DWORD dwRemoteSecondLeft = atoi(szSecondLeft);
                                                 if (pSecondLeft) *pSecondLeft = dwRemoteSecondLeft;
                                                 DWORD dwRemoteSecondRight = atoi(szSecondRight);
@@ -243,8 +247,10 @@ BOOL IsUpdateAvailableHelper(
                                                 BOOL bExtractedFromHash = FALSE;
                                                 CHAR hashCopy[100];
                                                 strcpy_s(hashCopy, 100, szCheckAgainst);
-                                                char* szLocalLeftMost = NULL, *szLocalSecondLeft = NULL, *szLocalSecondRight = NULL, *szLocalRightMost = NULL, *szLocalRealHash = NULL;
-                                                if (strchr(hashCopy, '.')) 
+                                                char *szLocalLeftMost = NULL, *szLocalSecondLeft = NULL, *
+                                                         szLocalSecondRight = NULL, *szLocalRightMost = NULL, *
+                                                         szLocalRealHash = NULL;
+                                                if (strchr(hashCopy, '.'))
                                                 {
                                                     szLocalLeftMost = hashCopy;
                                                     if (szLocalSecondLeft = strchr(szLocalLeftMost, '.'))
@@ -270,16 +276,21 @@ BOOL IsUpdateAvailableHelper(
                                                                     dwLocalSecondRight = atoi(szLocalSecondRight);
                                                                     dwLocalRightMost = atoi(szLocalRightMost);
 #ifdef UPDATES_VERBOSE_OUTPUT
-                                                                    printf("[Updates] Local version obtained from hash is %d.%d.%d.%d.\n", dwLocalLeftMost, dwLocalSecondLeft, dwLocalSecondRight, dwLocalRightMost);
+                                                                    printf(
+                                                                        "[Updates] Local version obtained from hash is %d.%d.%d.%d.\n",
+                                                                        dwLocalLeftMost, dwLocalSecondLeft,
+                                                                        dwLocalSecondRight, dwLocalRightMost);
 #endif
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
-                                                if (!bExtractedFromHash) 
+                                                if (!bExtractedFromHash)
                                                 {
-                                                    QueryVersionInfo(hModule, VS_VERSION_INFO, &dwLocalLeftMost, &dwLocalSecondLeft, &dwLocalSecondRight, &dwLocalRightMost);
+                                                    QueryVersionInfo(hModule, VS_VERSION_INFO, &dwLocalLeftMost,
+                                                                     &dwLocalSecondLeft, &dwLocalSecondRight,
+                                                                     &dwLocalRightMost);
                                                 }
 
                                                 int res = 0;
@@ -328,7 +339,9 @@ BOOL IsUpdateAvailableHelper(
                                                     }
                                                 }
                                                 DWORD dwAllowDowngrades = FALSE, dwSize = sizeof(DWORD);
-                                                RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"UpdateAllowDowngrades", RRF_RT_DWORD, NULL, &dwAllowDowngrades, &dwSize);
+                                                RegGetValueW(
+                                                    HKEY_CURRENT_USER, _T(REGPATH), L"UpdateAllowDowngrades",
+                                                    RRF_RT_DWORD, NULL, &dwAllowDowngrades, &dwSize);
                                                 if ((res == 1 && dwAllowDowngrades) || res == -1)
                                                 {
                                                     bIsUpdateAvailable = TRUE;
@@ -428,7 +441,7 @@ BOOL IsUpdateAvailableHelper(
                             L"wb"
                         ) && f)
                         {
-                            BYTE* buffer = (BYTE*)malloc(UPDATES_BUFSIZ);
+                            BYTE* buffer = malloc(UPDATES_BUFSIZ);
                             if (buffer != NULL)
                             {
                                 DWORD dwRead = 0;
@@ -486,7 +499,8 @@ BOOL IsUpdateAvailableHelper(
 
                             BOOL bHasErrored = FALSE;
                             BOOL bIsUACEnabled = FALSE;
-                            DWORD(*CheckElevationEnabled)(BOOL*) = GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "CheckElevationEnabled");
+                            DWORD (*CheckElevationEnabled)(BOOL*) = GetProcAddress(
+                                GetModuleHandleW(L"kernel32.dll"), "CheckElevationEnabled");
                             if (CheckElevationEnabled) CheckElevationEnabled(&bIsUACEnabled);
                             DWORD dwData = FALSE, dwSize = sizeof(DWORD);
                             RegGetValueW(
@@ -511,11 +525,11 @@ BOOL IsUpdateAvailableHelper(
                                     {
                                         if (!GetTokenInformation(hMyToken, TokenUser, ptu, dwSize, &dwSize))
                                         {
-                                            LocalFree((HLOCAL)ptu);
+                                            LocalFree(ptu);
                                             return FALSE;
                                         }
                                         ConvertSidToStringSidW(ptu->User.Sid, &wszSID);
-                                        LocalFree((HLOCAL)ptu);
+                                        LocalFree(ptu);
                                     }
                                 }
                                 CloseHandle(hMyToken);
@@ -524,14 +538,20 @@ BOOL IsUpdateAvailableHelper(
                             DWORD bIsBuiltInAdministratorInApprovalMode = FALSE;
                             BOOL bIsBuiltInAdministratorAccount =
                                 IsUserAnAdmin() &&
-                                lnSID && !_wcsnicmp(wszSID, L"S-1-5-", 6) && wszSID[lnSID - 4] == L'-' && wszSID[lnSID - 3] == L'5' && wszSID[lnSID - 2] == L'0' && wszSID[lnSID - 1] == L'0';
+                                lnSID && !_wcsnicmp(wszSID, L"S-1-5-", 6) && wszSID[lnSID - 4] == L'-' && wszSID[lnSID -
+                                    3] == L'5' && wszSID[lnSID - 2] == L'0' && wszSID[lnSID - 1] == L'0';
                             if (bIsBuiltInAdministratorAccount)
                             {
                                 DWORD dwSSize = sizeof(DWORD);
-                                RegGetValueW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System", L"FilterAdministratorToken", RRF_RT_DWORD, NULL, &bIsBuiltInAdministratorInApprovalMode, &dwSSize);
+                                RegGetValueW(
+                                    HKEY_LOCAL_MACHINE,
+                                    L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+                                    L"FilterAdministratorToken", RRF_RT_DWORD, NULL,
+                                    &bIsBuiltInAdministratorInApprovalMode, &dwSSize);
                             }
                             LocalFree(wszSID);
-                            if (!bIsUACEnabled || !dwData || (bIsBuiltInAdministratorAccount && !bIsBuiltInAdministratorInApprovalMode))
+                            if (!bIsUACEnabled || !dwData || (bIsBuiltInAdministratorAccount && !
+                                bIsBuiltInAdministratorInApprovalMode))
                             {
                                 WCHAR wszURL2[MAX_PATH];
                                 ZeroMemory(wszURL2, MAX_PATH * sizeof(WCHAR));
@@ -545,7 +565,9 @@ BOOL IsUpdateAvailableHelper(
                                 );
 
                                 WCHAR wszMsg[500];
-                                swprintf_s(wszMsg, 500, L"Would you like to install an update for " _T(PRODUCT_NAME) L"?\n\nDownloaded from:\n%s", wszURL2);
+                                swprintf_s(wszMsg, 500,
+                                           L"Would you like to install an update for " _T(PRODUCT_NAME)
+                                           L"?\n\nDownloaded from:\n%s", wszURL2);
                                 if (MessageBoxW(
                                     FindWindowW(L"ExplorerPatcher_GUI_" _T(EP_CLSID), NULL),
                                     wszMsg,
@@ -558,7 +580,7 @@ BOOL IsUpdateAvailableHelper(
                                 }
                             }
 
-                            SHELLEXECUTEINFO ShExecInfo = { 0 };
+                            SHELLEXECUTEINFO ShExecInfo = {0};
                             ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
                             ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
                             ShExecInfo.hwnd = NULL;
@@ -576,14 +598,16 @@ BOOL IsUpdateAvailableHelper(
                                 {
                                     bIsUpdateAvailable = TRUE;
 #ifdef UPDATES_VERBOSE_OUTPUT
-                                    printf("[Updates] Update successful, File Explorer will probably restart momentarly.\n");
+                                    printf(
+                                        "[Updates] Update successful, File Explorer will probably restart momentarly.\n");
 #endif
                                 }
                                 else
                                 {
                                     SetLastError(dwExitCode);
 #ifdef UPDATES_VERBOSE_OUTPUT
-                                    printf("[Updates] Update failed because the following error has occured: %d.\n", dwExitCode);
+                                    printf("[Updates] Update failed because the following error has occured: %d.\n",
+                                           dwExitCode);
 #endif
                                 }
                                 CloseHandle(ShExecInfo.hProcess);
@@ -600,7 +624,8 @@ BOOL IsUpdateAvailableHelper(
                                 else
                                 {
 #ifdef UPDATES_VERBOSE_OUTPUT
-                                    printf("[Updates] Update failed because the following error has occured: %d.\n", GetLastError());
+                                    printf("[Updates] Update failed because the following error has occured: %d.\n",
+                                           GetLastError());
 #endif
                                 }
                             }
@@ -628,8 +653,9 @@ BOOL IsUpdateAvailableHelper(
     return bIsUpdateAvailable;
 }
 
-BOOL IsUpdateAvailable(LPCWSTR wszDataStore, char* szCheckAgainst, BOOL* lpFail, WCHAR* wszInfoURL, DWORD dwInfoURLLen, HMODULE hModule,
-    DWORD* pLeftMost, DWORD* pSecondLeft, DWORD* pSecondRight, DWORD* pRightMost
+BOOL IsUpdateAvailable(LPCWSTR wszDataStore, char* szCheckAgainst, BOOL* lpFail, WCHAR* wszInfoURL, DWORD dwInfoURLLen,
+                       HMODULE hModule,
+                       DWORD* pLeftMost, DWORD* pSecondLeft, DWORD* pSecondRight, DWORD* pRightMost
 )
 {
     HKEY hKey = NULL;
@@ -735,11 +761,11 @@ BOOL IsUpdateAvailable(LPCWSTR wszDataStore, char* szCheckAgainst, BOOL* lpFail,
     printf("[Updates] Update URL: %s\n", szUpdateURL);
 #endif
     return IsUpdateAvailableHelper(
-        szUpdateURL, 
-        szCheckAgainst, 
-        dwUpdateTimeout, 
+        szUpdateURL,
+        szCheckAgainst,
+        dwUpdateTimeout,
         lpFail,
-        NULL, NULL, NULL, 
+        NULL, NULL, NULL,
         bUpdatePreferStaging,
         wszInfoURL,
         dwInfoURLLen,
@@ -841,9 +867,9 @@ BOOL UpdateProduct(
     printf("[Updates] Update URL: %s\n", szUpdateURL);
 #endif
     return IsUpdateAvailableHelper(
-        szUpdateURL, 
-        NULL, 
-        dwUpdateTimeout, 
+        szUpdateURL,
+        NULL,
+        dwUpdateTimeout,
         NULL,
         notifier,
         notifFactory,
@@ -919,8 +945,8 @@ BOOL InstallUpdatesIfAvailable(
     __x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* notifier,
     __x_ABI_CWindows_CUI_CNotifications_CIToastNotificationFactory* notifFactory,
     __x_ABI_CWindows_CUI_CNotifications_CIToastNotification** toast,
-    DWORD dwOperation, 
-    DWORD bAllocConsole, 
+    DWORD dwOperation,
+    DWORD bAllocConsole,
     DWORD dwUpdatePolicy
 )
 {
@@ -940,21 +966,22 @@ BOOL InstallUpdatesIfAvailable(
         {
         default:
         case UPDATE_POLICY_AUTO:
-        {
-            dwUpdatePolicy = UPDATE_POLICY_AUTO;
-            printf("[Updates] Configured update policy on this system: \"Install updates automatically\".\n");
-            break;
-        }
+            {
+                dwUpdatePolicy = UPDATE_POLICY_AUTO;
+                printf("[Updates] Configured update policy on this system: \"Install updates automatically\".\n");
+                break;
+            }
         case UPDATE_POLICY_NOTIFY:
-        {
-            printf("[Updates] Configured update policy on this system: \"Check for updates but let me choose whether to download and install them\".\n");
-            break;
-        }
+            {
+                printf(
+                    "[Updates] Configured update policy on this system: \"Check for updates but let me choose whether to download and install them\".\n");
+                break;
+            }
         case UPDATE_POLICY_MANUAL:
-        {
-            printf("[Updates] Configured update policy on this system: \"Manually check for updates\".\n");
-            break;
-        }
+            {
+                printf("[Updates] Configured update policy on this system: \"Manually check for updates\".\n");
+                break;
+            }
         }
     }
 
@@ -1038,11 +1065,16 @@ BOOL InstallUpdatesIfAvailable(
     ComputeFileHash2(hModule, dllName, hash, 100);
 
     BOOL bFail = FALSE;
-    dwLeftMost = 0; dwSecondLeft = 0; dwSecondRight = 0; dwRightMost = 0;
-    if (IsUpdateAvailable(_T(REGPATH), hash, &bFail, wszInfoURL, MAX_PATH, hModule, &dwLeftMost, &dwSecondLeft, &dwSecondRight, &dwRightMost))
+    dwLeftMost = 0;
+    dwSecondLeft = 0;
+    dwSecondRight = 0;
+    dwRightMost = 0;
+    if (IsUpdateAvailable(_T(REGPATH), hash, &bFail, wszInfoURL, MAX_PATH, hModule, &dwLeftMost, &dwSecondLeft,
+                          &dwSecondRight, &dwRightMost))
     {
         printf("[Updates] An update is available.\n");
-        if ((dwOperation == UPDATES_OP_DEFAULT && dwUpdatePolicy == UPDATE_POLICY_AUTO) || (dwOperation == UPDATES_OP_INSTALL))
+        if ((dwOperation == UPDATES_OP_DEFAULT && dwUpdatePolicy == UPDATE_POLICY_AUTO) || (dwOperation ==
+            UPDATES_OP_INSTALL))
         {
             __x_ABI_CWindows_CData_CXml_CDom_CIXmlDocument* inputXml = NULL;
             BOOL bOk = UpdateProduct(_T(REGPATH), notifier, notifFactory, toast, hModule);
@@ -1052,7 +1084,8 @@ BOOL InstallUpdatesIfAvailable(
                 {
                     const wchar_t text[] =
                         L"<toast scenario=\"reminder\" "
-                        L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL) L"\" duration=\"short\">\r\n"
+                        L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL)
+                        L"\" duration=\"short\">\r\n"
                         L"	<visual>\r\n"
                         L"		<binding template=\"ToastGeneric\">\r\n"
                         L"			<text><![CDATA[Update failed]]></text>\r\n"
@@ -1095,7 +1128,8 @@ BOOL InstallUpdatesIfAvailable(
                 }
             }
         }
-        else if ((dwOperation == UPDATES_OP_DEFAULT && dwUpdatePolicy == UPDATE_POLICY_NOTIFY) || (dwOperation == UPDATES_OP_CHECK))
+        else if ((dwOperation == UPDATES_OP_DEFAULT && dwUpdatePolicy == UPDATE_POLICY_NOTIFY) || (dwOperation ==
+            UPDATES_OP_CHECK))
         {
             const wchar_t text[] =
                 L"<toast scenario=\"reminder\" "
@@ -1116,7 +1150,8 @@ BOOL InstallUpdatesIfAvailable(
             else
             {
                 WCHAR wszVersionInfo[100];
-                swprintf_s(wszVersionInfo, 100, L"Version %d.%d.%d.%d is", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
+                swprintf_s(wszVersionInfo, 100, L"Version %d.%d.%d.%d is", dwLeftMost, dwSecondLeft, dwSecondRight,
+                           dwRightMost);
                 swprintf_s(buf, TOAST_BUFSIZ, text, wszInfoURL, wszVersionInfo);
             }
             __x_ABI_CWindows_CData_CXml_CDom_CIXmlDocument* inputXml = NULL;
@@ -1151,71 +1186,68 @@ BOOL InstallUpdatesIfAvailable(
 
         return TRUE;
     }
+    if (bFail)
+    {
+        printf("[Updates] Unable to check for updates because the remote server is unavailable.\n");
+    }
     else
     {
-        if (bFail)
-        {
-            printf("[Updates] Unable to check for updates because the remote server is unavailable.\n");
-        }
-        else
-        {
-            printf("[Updates] No updates are available.\n");
-        }
-        if (dwOperation == UPDATES_OP_CHECK || dwOperation == UPDATES_OP_INSTALL)
-        {
-            const wchar_t text[] =
-                L"<toast scenario=\"reminder\" "
-                L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL) L"\" duration=\"short\">\r\n"
-                L"	<visual>\r\n"
-                L"		<binding template=\"ToastGeneric\">\r\n"
-                L"			<text><![CDATA[No updates are available]]></text>\r\n"
-                L"			<text><![CDATA[Please check back later.]]></text>\r\n"
-                L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
-                L"		</binding>\r\n"
-                L"	</visual>\r\n"
-                L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
-                L"</toast>\r\n";
-            const wchar_t text2[] =
-                L"<toast scenario=\"reminder\" "
-                L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL) L"\" duration=\"short\">\r\n"
-                L"	<visual>\r\n"
-                L"		<binding template=\"ToastGeneric\">\r\n"
-                L"			<text><![CDATA[Unable to check for updates]]></text>\r\n"
-                L"			<text><![CDATA[Make sure that you are connected to the Internet and that the remote server is online.]]></text>\r\n"
-                L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
-                L"		</binding>\r\n"
-                L"	</visual>\r\n"
-                L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
-                L"</toast>\r\n";
-            __x_ABI_CWindows_CData_CXml_CDom_CIXmlDocument* inputXml = NULL;
-            String2IXMLDocument(
-                bFail ? text2 : text,
-                wcslen(bFail ? text2 : text),
-                &inputXml,
-                NULL
-            );
-            if (*toast)
-            {
-                if (notifier)
-                {
-                    notifier->lpVtbl->Hide(notifier, *toast);
-                }
-                (*toast)->lpVtbl->Release((*toast));
-                (*toast) = NULL;
-            }
-            if (notifFactory)
-            {
-                notifFactory->lpVtbl->CreateToastNotification(notifFactory, inputXml, toast);
-            }
-            if ((*toast) && notifier)
-            {
-                notifier->lpVtbl->Show(notifier, *toast);
-            }
-            if (inputXml)
-            {
-                inputXml->lpVtbl->Release(inputXml);
-            }
-        }
-        return FALSE;
+        printf("[Updates] No updates are available.\n");
     }
+    if (dwOperation == UPDATES_OP_CHECK || dwOperation == UPDATES_OP_INSTALL)
+    {
+        const wchar_t text[] =
+            L"<toast scenario=\"reminder\" "
+            L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL) L"\" duration=\"short\">\r\n"
+            L"	<visual>\r\n"
+            L"		<binding template=\"ToastGeneric\">\r\n"
+            L"			<text><![CDATA[No updates are available]]></text>\r\n"
+            L"			<text><![CDATA[Please check back later.]]></text>\r\n"
+            L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
+            L"		</binding>\r\n"
+            L"	</visual>\r\n"
+            L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
+            L"</toast>\r\n";
+        const wchar_t text2[] =
+            L"<toast scenario=\"reminder\" "
+            L"activationType=\"protocol\" launch=\"" _T(UPDATES_RELEASE_INFO_URL) L"\" duration=\"short\">\r\n"
+            L"	<visual>\r\n"
+            L"		<binding template=\"ToastGeneric\">\r\n"
+            L"			<text><![CDATA[Unable to check for updates]]></text>\r\n"
+            L"			<text><![CDATA[Make sure that you are connected to the Internet and that the remote server is online.]]></text>\r\n"
+            L"			<text placement=\"attribution\"><![CDATA[ExplorerPatcher]]></text>\r\n"
+            L"		</binding>\r\n"
+            L"	</visual>\r\n"
+            L"	<audio src=\"ms-winsoundevent:Notification.Default\" loop=\"false\" silent=\"false\"/>\r\n"
+            L"</toast>\r\n";
+        __x_ABI_CWindows_CData_CXml_CDom_CIXmlDocument* inputXml = NULL;
+        String2IXMLDocument(
+            bFail ? text2 : text,
+            wcslen(bFail ? text2 : text),
+            &inputXml,
+            NULL
+        );
+        if (*toast)
+        {
+            if (notifier)
+            {
+                notifier->lpVtbl->Hide(notifier, *toast);
+            }
+            (*toast)->lpVtbl->Release((*toast));
+            (*toast) = NULL;
+        }
+        if (notifFactory)
+        {
+            notifFactory->lpVtbl->CreateToastNotification(notifFactory, inputXml, toast);
+        }
+        if ((*toast) && notifier)
+        {
+            notifier->lpVtbl->Show(notifier, *toast);
+        }
+        if (inputXml)
+        {
+            inputXml->lpVtbl->Release(inputXml);
+        }
+    }
+    return FALSE;
 }

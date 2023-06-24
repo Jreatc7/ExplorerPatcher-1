@@ -28,28 +28,28 @@
 #define WM_MSG_GUI_SECTION_GET 1
 
 DEFINE_GUID(CLSID_ImmersiveShell,
-    0xc2f03a33,
-    0x21f5, 0x47fa, 0xb4, 0xbb,
-    0x15, 0x63, 0x62, 0xa2, 0xf2, 0x39
+            0xc2f03a33,
+            0x21f5, 0x47fa, 0xb4, 0xbb,
+            0x15, 0x63, 0x62, 0xa2, 0xf2, 0x39
 );
 
 DEFINE_GUID(IID_OpenControlPanel,
-    0xD11AD862,
-    0x66De, 0x4DF4, 0xBf, 0x6C,
-    0x1F, 0x56, 0x21, 0x99, 0x6A, 0xF1
+            0xD11AD862,
+            0x66De, 0x4DF4, 0xBf, 0x6C,
+            0x1F, 0x56, 0x21, 0x99, 0x6A, 0xF1
 );
 
 DEFINE_GUID(CLSID_VBScript,
-    0xB54F3741, 
-    0x5B07, 0x11CF, 0xA4, 0xB0, 
-    0x00, 0xAA, 0x00, 0x4A, 0x55, 0xE8
+            0xB54F3741,
+            0x5B07, 0x11CF, 0xA4, 0xB0,
+            0x00, 0xAA, 0x00, 0x4A, 0x55, 0xE8
 );
 
 DEFINE_GUID(CLSID_NetworkListManager,
-    0xDCB00C01, 0x570F, 0x4A9B, 0x8D, 0x69, 0x19, 0x9F, 0xDB, 0xA5, 0x72, 0x3B);
+            0xDCB00C01, 0x570F, 0x4A9B, 0x8D, 0x69, 0x19, 0x9F, 0xDB, 0xA5, 0x72, 0x3B);
 
 DEFINE_GUID(IID_NetworkListManager,
-    0xDCB00000, 0x570F, 0x4A9B, 0x8D, 0x69, 0x19, 0x9F, 0xDB, 0xA5, 0x72, 0x3B);
+            0xDCB00000, 0x570F, 0x4A9B, 0x8D, 0x69, 0x19, 0x9F, 0xDB, 0xA5, 0x72, 0x3B);
 
 typedef struct _StuckRectsData
 {
@@ -82,12 +82,14 @@ HRESULT STDMETHODCALLTYPE nimpl1(__int64 a1, uintptr_t* a2, uintptr_t* a3);
 HRESULT STDMETHODCALLTYPE nimpl1_2(__int64 a1, uintptr_t* a2, uintptr_t* a3);
 HRESULT STDMETHODCALLTYPE nimpl1_3(__int64 a1, uintptr_t* a2, uintptr_t* a3);
 __int64 STDMETHODCALLTYPE nimpl4(__int64 a1, __int64 a2, __int64 a3, BYTE* a4);
+
 typedef struct _IActivationFactoryAA
 {
     CONST_VTBL struct IActivationFactoryVtbl* lpVtbl;
     struct IActivationFactoryVtbl* lpVtbl2;
     struct IActivationFactoryVtbl* lpVtbl3;
 } IActivationFactoryAA;
+
 extern const IActivationFactoryAA XamlExtensionsFactory;
 #pragma endregion
 
@@ -191,7 +193,7 @@ inline LSTATUS SHRegGetValueFromHKCUHKLMWithOpt(
     return lRes;
 }
 
-static HWND(WINAPI* CreateWindowInBand)(
+static HWND (WINAPI* CreateWindowInBand)(
     _In_ DWORD dwExStyle,
     _In_opt_ ATOM atom,
     _In_opt_ LPCWSTR lpWindowName,
@@ -205,23 +207,23 @@ static HWND(WINAPI* CreateWindowInBand)(
     _In_opt_ HINSTANCE hInstance,
     _In_opt_ LPVOID lpParam,
     DWORD band
-    );
+);
 
-BOOL(WINAPI* GetWindowBand)(HWND hWnd, PDWORD pdwBand);
+BOOL (WINAPI* GetWindowBand)(HWND hWnd, PDWORD pdwBand);
 
-BOOL(WINAPI* SetWindowBand)(HWND hWnd, HWND hwndInsertAfter, DWORD dwBand);
+BOOL (WINAPI* SetWindowBand)(HWND hWnd, HWND hwndInsertAfter, DWORD dwBand);
 
-INT64(*SetWindowCompositionAttribute)(HWND, void*);
+INT64 (*SetWindowCompositionAttribute)(HWND, void*);
 
-static void(*SetPreferredAppMode)(INT64 bAllowDark);
+static void (*SetPreferredAppMode)(INT64 bAllowDark);
 
-static void(*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
+static void (*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
 
-static BOOL(*ShouldAppsUseDarkMode)();
+static BOOL (*ShouldAppsUseDarkMode)();
 
-static BOOL(*ShouldSystemUseDarkMode)();
+static BOOL (*ShouldSystemUseDarkMode)();
 
-static void(*GetThemeName)(void*, void*, void*);
+static void (*GetThemeName)(void*, void*, void*);
 
 static BOOL AppsShouldUseDarkMode() { return TRUE; }
 
@@ -241,7 +243,8 @@ char* StrReplaceAllA(const char* s, const char* oldW, const char* newW, int* dwN
 
 WCHAR* StrReplaceAllW(const WCHAR* s, const WCHAR* oldW, const WCHAR* newW, int* dwNewSize);
 
-HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle, LPCWSTR wszDefault, LPWSTR wszAnswer, DWORD cbAnswer, BOOL* bCancelled);
+HRESULT InputBox(BOOL bPassword, HWND hWnd, LPCWSTR wszPrompt, LPCWSTR wszTitle, LPCWSTR wszDefault, LPWSTR wszAnswer,
+                 DWORD cbAnswer, BOOL* bCancelled);
 
 inline BOOL IsHighContrast()
 {
@@ -257,9 +260,11 @@ inline BOOL IsHighContrast()
 static inline WCHAR* rand_string(WCHAR* str, size_t size)
 {
     const WCHAR charset[] = L"abcdefghijklmnopqrstuvwxyz";
-    if (size) {
+    if (size)
+    {
         --size;
-        for (size_t n = 0; n < size; n++) {
+        for (size_t n = 0; n < size; n++)
+        {
             int key = rand() % (int)((sizeof(charset) / sizeof(WCHAR)) - 1);
             str[n] = charset[key];
         }
@@ -268,17 +273,17 @@ static inline WCHAR* rand_string(WCHAR* str, size_t size)
     return str;
 }
 
-inline long long milliseconds_now() {
+inline long long milliseconds_now()
+{
     LARGE_INTEGER s_frequency;
     BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
-    if (s_use_qpc) {
+    if (s_use_qpc)
+    {
         LARGE_INTEGER now;
         QueryPerformanceCounter(&now);
         return (1000LL * now.QuadPart) / s_frequency.QuadPart;
     }
-    else {
-        return GetTickCount();
-    }
+    return GetTickCount();
 }
 
 inline BOOL IsAppRunningAsAdminMode()
@@ -306,7 +311,6 @@ inline BOOL IsAppRunningAsAdminMode()
     if (!CheckTokenMembership(NULL, pAdministratorsGroup, &fIsRunAsAdmin))
     {
         dwError = GetLastError();
-        goto Cleanup;
     }
 
 Cleanup:
@@ -338,7 +342,7 @@ inline RM_UNIQUE_PROCESS GetExplorerApplication()
     DWORD pid = 0;
     GetWindowThreadProcessId(hwnd, &pid);
 
-    RM_UNIQUE_PROCESS out = { 0, { -1, -1 } };
+    RM_UNIQUE_PROCESS out = {0, {-1, -1}};
     DWORD bytesReturned;
     WCHAR imageName[MAX_PATH]; // process image name buffer
     DWORD processIds[2048]; // max 2048 processes (more than enough)
@@ -376,7 +380,7 @@ inline void BeginExplorerRestart()
 {
     if (RmStartSession(&RmSession, 0, RmSessionKey) == ERROR_SUCCESS)
     {
-        RM_UNIQUE_PROCESS rgApplications[] = { GetExplorerApplication() };
+        RM_UNIQUE_PROCESS rgApplications[] = {GetExplorerApplication()};
         RmRegisterResources(RmSession, 0, 0, 1, rgApplications, 0, 0);
 
         DWORD rebootReason;
@@ -391,6 +395,7 @@ inline void BeginExplorerRestart()
         }
     }
 }
+
 // restarts the explorer
 inline void FinishExplorerRestart()
 {
@@ -461,7 +466,6 @@ inline void StartExplorerWithDelay(int delay, HANDLE userToken)
 
 inline void StartExplorer()
 {
-
     /*PROCESSENTRY32 pe32 = {0};
     pe32.dwSize = sizeof(PROCESSENTRY32);
     HANDLE hSnapshot = CreateToolhelp32Snapshot(

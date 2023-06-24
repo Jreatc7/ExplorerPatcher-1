@@ -14,28 +14,28 @@
 
 inline BOOL TaskbarCenter_IsTaskbarHorizontal(HWND hWnd)
 {
-	__int64 v1;
-	__int64 result;
-	v1 = *((__int64*)GetWindowLongPtrW(hWnd, 0) + 13);
-	result = 1i64;
-	if (v1)
-		return (*(__int64(__fastcall**)(__int64))(*(__int64*)v1 + 96))(v1);
-	return result;
+    __int64 v1;
+    __int64 result;
+    v1 = *((__int64*)GetWindowLongPtrW(hWnd, 0) + 13);
+    result = 1i64;
+    if (v1)
+        return (*(__int64(__fastcall**)(__int64))(*(__int64*)v1 + 96))(v1);
+    return result;
 }
 
 inline BOOL TaskbarCenter_ShouldCenter(DWORD dwSetting)
 {
-	return (dwSetting & 0b001);
+    return (dwSetting & 0b001);
 }
 
 inline BOOL TaskbarCenter_ShouldStartBeCentered(DWORD dwSetting)
 {
-	return (dwSetting & 0b010);
+    return (dwSetting & 0b010);
 }
 
 inline BOOL TaskbarCenter_ShouldLeftAlignWhenSpaceConstrained(DWORD dwSetting)
 {
-	return (dwSetting & 0b100);
+    return (dwSetting & 0b100);
 }
 
 BOOL TaskbarCenter_GetClientRectHook(HWND hWnd, LPRECT lpRect);

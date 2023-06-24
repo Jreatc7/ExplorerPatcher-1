@@ -20,5 +20,7 @@
         }
       ]
     }
-  ]
+  ],
+  "node": { "entrypoint": "true" },
+  "slug": 1
 }

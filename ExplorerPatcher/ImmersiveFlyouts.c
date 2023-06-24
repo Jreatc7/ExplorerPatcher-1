@@ -26,7 +26,7 @@ void InvokeActionCenter()
             HSTRING hstring = NULL;
             hr = WindowsCreateStringReference(
                 L"Windows.Internal.ShellExperience.ControlCenter",
-                (UINT32)(sizeof(L"Windows.Internal.ShellExperience.ControlCenter") / sizeof(wchar_t) - 1),
+                sizeofL"Windows.Internal.ShellExperience.ControlCenter" / sizeof(wchar_t) - 1,
                 &hstringHeader,
                 &hstring
             );
@@ -41,7 +41,8 @@ void InvokeActionCenter()
                 if (pIntf)
                 {
                     IActionCenterOrControlCenterExperienceManager* pControlCenterExperienceManager = NULL;
-                    pIntf->lpVtbl->QueryInterface(pIntf, &IID_ControlCenterExperienceManager, &pControlCenterExperienceManager);
+                    pIntf->lpVtbl->QueryInterface(pIntf, &IID_ControlCenterExperienceManager,
+                                                  &pControlCenterExperienceManager);
                     if (pControlCenterExperienceManager)
                     {
                         pControlCenterExperienceManager->lpVtbl->HotKeyInvoked(pControlCenterExperienceManager, 0);
@@ -115,10 +116,15 @@ void InvokeFlyout(BOOL bAction, DWORD dwWhich)
                     IExperienceManager* pExperienceManager = NULL;
                     pIntf->lpVtbl->QueryInterface(
                         pIntf,
-                        dwWhich == INVOKE_FLYOUT_NETWORK ? &IID_NetworkFlyoutExperienceManager :
-                        (dwWhich == INVOKE_FLYOUT_CLOCK ? &IID_TrayClockFlyoutExperienceManager :
-                            (dwWhich == INVOKE_FLYOUT_BATTERY ? &IID_TrayBatteryFlyoutExperienceManager :
-                                (dwWhich == INVOKE_FLYOUT_SOUND ? &IID_TrayMtcUvcFlyoutExperienceManager : &IID_IUnknown))),
+                        dwWhich == INVOKE_FLYOUT_NETWORK
+                            ? &IID_NetworkFlyoutExperienceManager
+                            : (dwWhich == INVOKE_FLYOUT_CLOCK
+                                   ? &IID_TrayClockFlyoutExperienceManager
+                                   : (dwWhich == INVOKE_FLYOUT_BATTERY
+                                          ? &IID_TrayBatteryFlyoutExperienceManager
+                                          : (dwWhich == INVOKE_FLYOUT_SOUND
+                                                 ? &IID_TrayMtcUvcFlyoutExperienceManager
+                                                 : &IID_IUnknown))),
                         &pExperienceManager
                     );
                     if (pExperienceManager)
@@ -135,7 +141,6 @@ void InvokeFlyout(BOOL bAction, DWORD dwWhich)
                         }
                         pExperienceManager->lpVtbl->Release(pExperienceManager);
                     }
-
                 }
                 WindowsDeleteString(hstring);
             }

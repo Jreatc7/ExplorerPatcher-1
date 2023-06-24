@@ -5,11 +5,11 @@
 #include "../ExplorerPatcher/queryversion.h"
 #include "../ExplorerPatcher/osutility.h"
 
-extern void(*RefreshImmersiveColorPolicyState)();
-extern void(*SetPreferredAppMode)(INT64 bAllowDark);
-extern void(*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
-extern BOOL(*ShouldAppsUseDarkMode)();
-extern BOOL(*ShouldSystemUseDarkMode)();
+extern void (*RefreshImmersiveColorPolicyState)();
+extern void (*SetPreferredAppMode)(INT64 bAllowDark);
+extern void (*AllowDarkModeForWindow)(HWND hWnd, INT64 bAllowDark);
+extern BOOL (*ShouldAppsUseDarkMode)();
+extern BOOL (*ShouldSystemUseDarkMode)();
 
 inline BOOL IsColorSchemeChangeMessage(LPARAM lParam)
 {

@@ -10,21 +10,21 @@
 #define EXTRACT_CMD L"\"C:\\Program Files\\7-Zip\\7zG.exe\" x -o\"%s\" -spe %s"
 
 DEFINE_GUID(__uuidof_TaskbarList,
-    0x56FDF344,
-    0xFD6D, 0x11d0, 0x95, 0x8A,
-    0x00, 0x60, 0x97, 0xC9, 0xA0, 0x90
+            0x56FDF344,
+            0xFD6D, 0x11d0, 0x95, 0x8A,
+            0x00, 0x60, 0x97, 0xC9, 0xA0, 0x90
 );
 DEFINE_GUID(__uuidof_ITaskbarList,
-    0x56FDF342,
-    0xFD6D, 0x11d0, 0x95, 0x8A,
-    0x00, 0x60, 0x97, 0xC9, 0xA0, 0x90
+            0x56FDF342,
+            0xFD6D, 0x11d0, 0x95, 0x8A,
+            0x00, 0x60, 0x97, 0xC9, 0xA0, 0x90
 );
 
 typedef struct _ArchiveMenuThreadParams
 {
     HWND* hWnd;
-	WNDPROC wndProc;
-    HWND(WINAPI* CreateWindowInBand)(
+    WNDPROC wndProc;
+    HWND (WINAPI* CreateWindowInBand)(
         _In_ DWORD dwExStyle,
         _In_opt_ ATOM atom,
         _In_opt_ LPCWSTR lpWindowName,
@@ -38,27 +38,28 @@ typedef struct _ArchiveMenuThreadParams
         _In_opt_ HINSTANCE hInstance,
         _In_opt_ LPVOID lpParam,
         DWORD band
-        );
+    );
 } ArchiveMenuThreadParams;
+
 DWORD ArchiveMenuThread(ArchiveMenuThreadParams* params);
 
 LRESULT CALLBACK ArchiveMenuWndProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    INT64(*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
+    INT64 (*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
         HMENU h1,
         HMENU h2,
         HWND a3,
         unsigned int a4,
         void* data
-        ),
-    void(*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
+    ),
+    void (*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
         HMENU _this,
         HMENU hWnd,
         HWND a3
-        )
+    )
 );
 
 #endif

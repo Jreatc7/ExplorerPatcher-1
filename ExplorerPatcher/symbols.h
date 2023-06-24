@@ -19,6 +19,8 @@
 #define TWINUI_PCSHELL_SB_6 "CLauncherTipContextMenu::ShowLauncherTipContextMenu"
 #define TWINUI_PCSHELL_SB_7 "IsUndockedAssetAvailable"
 #define TWINUI_PCSHELL_SB_8 "winrt::Windows::Internal::Shell::implementation::MeetAndChatManager::OnMessage" // should be always last
+
+
 #define TWINUI_PCSHELL_SB_LAST TWINUI_PCSHELL_SB_8
 #define TWINUI_PCSHELL_SB_CNT 9
 #define STARTDOCKED_SB_NAME "StartDocked"
@@ -45,6 +47,7 @@ typedef struct _DownloadSymbolsParams
     HMODULE hModule;
     BOOL bVerbose;
 } DownloadSymbolsParams;
+
 DWORD DownloadSymbols(DownloadSymbolsParams* params);
 
 BOOL LoadSymbols(symbols_addr* symbols_PTRS, HMODULE hModule);

@@ -147,7 +147,6 @@ BOOL SetupUninstallEntry(BOOL bInstall, WCHAR* wszPath)
 
     if (bInstall)
     {
-
         if (!dwLastError)
         {
             dwLastError = RegCreateKeyExW(
@@ -236,7 +235,8 @@ BOOL SetupUninstallEntry(BOOL bInstall, WCHAR* wszPath)
                         DWORD dwSecondRight = 0;
                         DWORD dwRightMost = 0;
 
-                        QueryVersionInfo(hEP, VS_VERSION_INFO, &dwLeftMost, &dwSecondLeft, &dwSecondRight, &dwRightMost);
+                        QueryVersionInfo(hEP, VS_VERSION_INFO, &dwLeftMost, &dwSecondLeft, &dwSecondRight,
+                                         &dwRightMost);
 
                         WCHAR wszBuf[30];
                         swprintf_s(wszBuf, 30, L"%d.%d.%d.%d", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
@@ -314,8 +314,8 @@ BOOL SetupUninstallEntry(BOOL bInstall, WCHAR* wszPath)
                 RegCloseKey(hKey);
             }
         }
-     }
-     return !dwLastError;
+    }
+    return !dwLastError;
 }
 
 BOOL InstallResource(BOOL bInstall, HMODULE hModule, int res, WCHAR* wszPath)
@@ -349,60 +349,57 @@ BOOL InstallResource(BOOL bInstall, HMODULE hModule, int res, WCHAR* wszPath)
         }
         return TRUE;
     }
-    else
+    HRSRC hRscr = FindResource(
+        hModule,
+        MAKEINTRESOURCE(res),
+        RT_RCDATA
+    );
+    if (!hRscr)
     {
-        HRSRC hRscr = FindResource(
-            hModule,
-            MAKEINTRESOURCE(res),
-            RT_RCDATA
-        );
-        if (!hRscr)
-        {
-            return FALSE;
-        }
-        HGLOBAL hgRscr = LoadResource(
-            hModule,
-            hRscr
-        );
-        if (!hgRscr)
-        {
-            return FALSE;
-        }
-        void* pRscr = LockResource(hgRscr);
-        DWORD cbRscr = SizeofResource(
-            hModule,
-            hRscr
-        );
-        if (bInstall)
-        {
-            HANDLE hFile = CreateFileW(
-                wszPath,
-                GENERIC_WRITE,
-                0,
-                NULL,
-                CREATE_ALWAYS,
-                FILE_ATTRIBUTE_NORMAL,
-                NULL
-            );
-            if (!hFile)
-            {
-                return FALSE;
-            }
-            DWORD dwNumberOfBytesWritten = 0;
-            if (!WriteFile(
-                hFile,
-                pRscr,
-                cbRscr,
-                &dwNumberOfBytesWritten,
-                NULL
-            ))
-            {
-                return FALSE;
-            }
-            CloseHandle(hFile);
-        }
-        return TRUE;
+        return FALSE;
     }
+    HGLOBAL hgRscr = LoadResource(
+        hModule,
+        hRscr
+    );
+    if (!hgRscr)
+    {
+        return FALSE;
+    }
+    void* pRscr = LockResource(hgRscr);
+    DWORD cbRscr = SizeofResource(
+        hModule,
+        hRscr
+    );
+    if (bInstall)
+    {
+        HANDLE hFile = CreateFileW(
+            wszPath,
+            GENERIC_WRITE,
+            0,
+            NULL,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL
+        );
+        if (!hFile)
+        {
+            return FALSE;
+        }
+        DWORD dwNumberOfBytesWritten = 0;
+        if (!WriteFile(
+            hFile,
+            pRscr,
+            cbRscr,
+            &dwNumberOfBytesWritten,
+            NULL
+        ))
+        {
+            return FALSE;
+        }
+        CloseHandle(hFile);
+    }
+    return TRUE;
 }
 
 int WINAPI wWinMain(
@@ -578,18 +575,22 @@ int WINAPI wWinMain(
     }
 
     DWORD bIsUndockingDisabled = FALSE, dwSize = sizeof(DWORD);
-    RegGetValueW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell\\Update\\Packages", L"UndockingDisabled", RRF_RT_DWORD, NULL, &bIsUndockingDisabled, &dwSize);
+    RegGetValueW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell\\Update\\Packages",
+                 L"UndockingDisabled", RRF_RT_DWORD, NULL, &bIsUndockingDisabled, &dwSize);
     if (bIsUndockingDisabled)
     {
         if (MessageBoxW(
             NULL,
-            bInstall ? L"In order to install, you will be automatically signed out of Windows. The software will be ready for use when you sign back in.\n\nDo you want to continue?"
-                     : L"To complete the uninstallation, you will be automatically signed out of Windows.\n\nDo you want to continue?",
+            bInstall
+                ? L"In order to install, you will be automatically signed out of Windows. The software will be ready for use when you sign back in.\n\nDo you want to continue?"
+                : L"To complete the uninstallation, you will be automatically signed out of Windows.\n\nDo you want to continue?",
             _T(PRODUCT_NAME),
             MB_YESNO | MB_DEFBUTTON1 | MB_ICONQUESTION
         ) == IDYES)
         {
-            RegDeleteKeyValueW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell\\Update\\Packages", L"UndockingDisabled");
+            RegDeleteKeyValueW(
+                HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Shell\\Update\\Packages",
+                L"UndockingDisabled");
         }
         else
         {
@@ -615,34 +616,39 @@ int WINAPI wWinMain(
             if (explorerProcessId != 0)
             {
                 HANDLE explorerProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, explorerProcessId);
-                if (explorerProcess != NULL) 
+                if (explorerProcess != NULL)
                 {
                     OpenProcessToken(explorerProcess, TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, &userToken);
                     CloseHandle(explorerProcess);
                 }
-                if (userToken) 
+                if (userToken)
                 {
                     HANDLE myToken = INVALID_HANDLE_VALUE;
-                    OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, &myToken);
-                    if (myToken != INVALID_HANDLE_VALUE) 
+                    OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY,
+                                     &myToken);
+                    if (myToken != INVALID_HANDLE_VALUE)
                     {
                         DWORD cbSizeNeeded = 0;
                         SetLastError(0);
-                        if (!GetTokenInformation(userToken, TokenUser, NULL, 0, &cbSizeNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                        if (!GetTokenInformation(userToken, TokenUser, NULL, 0, &cbSizeNeeded) && GetLastError() ==
+                            ERROR_INSUFFICIENT_BUFFER)
                         {
                             TOKEN_USER* userTokenInfo = malloc(cbSizeNeeded);
-                            if (userTokenInfo) 
+                            if (userTokenInfo)
                             {
-                                if (GetTokenInformation(userToken, TokenUser, userTokenInfo, cbSizeNeeded, &cbSizeNeeded))
+                                if (GetTokenInformation(userToken, TokenUser, userTokenInfo, cbSizeNeeded,
+                                                        &cbSizeNeeded))
                                 {
                                     cbSizeNeeded = 0;
                                     SetLastError(0);
-                                    if (!GetTokenInformation(myToken, TokenUser, NULL, 0, &cbSizeNeeded) && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+                                    if (!GetTokenInformation(myToken, TokenUser, NULL, 0, &cbSizeNeeded) &&
+                                        GetLastError() == ERROR_INSUFFICIENT_BUFFER)
                                     {
                                         TOKEN_USER* myTokenInfo = malloc(cbSizeNeeded);
                                         if (myTokenInfo)
                                         {
-                                            if (GetTokenInformation(myToken, TokenUser, myTokenInfo, cbSizeNeeded, &cbSizeNeeded))
+                                            if (GetTokenInformation(myToken, TokenUser, myTokenInfo, cbSizeNeeded,
+                                                                    &cbSizeNeeded))
                                             {
                                                 if (EqualSid(userTokenInfo->User.Sid, myTokenInfo->User.Sid))
                                                 {
@@ -733,7 +739,7 @@ int WINAPI wWinMain(
         WCHAR wszSCPath[MAX_PATH];
         GetSystemDirectoryW(wszSCPath, MAX_PATH);
         wcscat_s(wszSCPath, MAX_PATH, L"\\sc.exe");
-        SHELLEXECUTEINFO ShExecInfo = { 0 };
+        SHELLEXECUTEINFO ShExecInfo = {0};
         ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
         ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
         ShExecInfo.hwnd = NULL;
@@ -916,7 +922,8 @@ int WINAPI wWinMain(
         }
         if (bOk && rovi.dwBuildNumber >= 18362)
         {
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\dxgi.dll");
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\dxgi.dll");
             bOk = InstallResource(bInstall, hInstance, IDR_EP_AMD64, wszPath);
         }
         if (bOk)
@@ -925,7 +932,8 @@ int WINAPI wWinMain(
         }
         if (bOk && IsWindows11())
         {
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\wincorlib.dll");
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\wincorlib.dll");
             bOk = InstallResource(bInstall, hInstance, IDR_EP_STARTMENU, wszPath);
         }
         if (bOk)
@@ -934,7 +942,8 @@ int WINAPI wWinMain(
         }
         if (bOk && IsWindows11())
         {
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\wincorlib_orig.dll");
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\wincorlib_orig.dll");
             bOk = InstallResource(FALSE, hInstance, 0, wszPath); // Delete
         }
         if (bOk && IsWindows11())
@@ -950,50 +959,67 @@ int WINAPI wWinMain(
         if (bOk && IsWindows11())
         {
             GetWindowsDirectoryW(wszPath, MAX_PATH);
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\AppResolverLegacy.dll");
-            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "BAD744C69B92BBD508D3950B41822683") && IsConnectedToInternet() == TRUE)
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\AppResolverLegacy.dll");
+            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "BAD744C69B92BBD508D3950B41822683") &&
+                IsConnectedToInternet() == TRUE)
             {
-                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8148997/AppResolverLegacy.dll.txt", 10 * 1024 * 1024, wszPath);
+                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8148997/AppResolverLegacy.dll.txt",
+                             10 * 1024 * 1024, wszPath);
             }
         }
         if (bOk && IsWindows11())
         {
             GetWindowsDirectoryW(wszPath, MAX_PATH);
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartTileDataLegacy.dll");
-            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "aa36a082e3b33297b6930eea6e98f8cf") && IsConnectedToInternet() == TRUE)
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartTileDataLegacy.dll");
+            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "aa36a082e3b33297b6930eea6e98f8cf") &&
+                IsConnectedToInternet() == TRUE)
             {
-                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136435/StartTileDataLegacy.pri.txt", 10 * 1024 * 1024, wszPath);
+                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136435/StartTileDataLegacy.pri.txt",
+                             10 * 1024 * 1024, wszPath);
             }
         }
         if (bOk && IsWindows11())
         {
             GetWindowsDirectoryW(wszPath, MAX_PATH);
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
-            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "95b41e1a2661501036198d8225aaa605") && IsConnectedToInternet() == TRUE)
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
+            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "95b41e1a2661501036198d8225aaa605") &&
+                IsConnectedToInternet() == TRUE)
             {
-                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136442/Windows.UI.ShellCommon.pri.txt", 10 * 1024 * 1024, wszPath);
+                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136442/Windows.UI.ShellCommon.pri.txt",
+                             10 * 1024 * 1024, wszPath);
             }
         }
         if (bOk && IsWindows11())
         {
             GetWindowsDirectoryW(wszPath, MAX_PATH);
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\en-US");
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\en-US");
             CreateDirectoryW(wszPath, NULL);
             wcscat_s(wszPath, MAX_PATH, L"\\StartTileDataLegacy.dll.mui");
-            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "0ed61f384c39116f424eb2fa6b3b9ef8") && IsConnectedToInternet() == TRUE)
+            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "0ed61f384c39116f424eb2fa6b3b9ef8") &&
+                IsConnectedToInternet() == TRUE)
             {
-                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136433/StartTileDataLegacy.dll.mui.txt", 10 * 1024 * 1024, wszPath);
+                DownloadFile(
+                    L"https://github.com/valinet/ExplorerPatcher/files/8136433/StartTileDataLegacy.dll.mui.txt",
+                    10 * 1024 * 1024, wszPath);
             }
         }
         if (bOk && IsWindows11())
         {
             GetWindowsDirectoryW(wszPath, MAX_PATH);
-            wcscat_s(wszPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\pris2");
+            wcscat_s(wszPath, MAX_PATH,
+                     L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\pris2");
             CreateDirectoryW(wszPath, NULL);
             wcscat_s(wszPath, MAX_PATH, L"\\Windows.UI.ShellCommon.en-US.pri");
-            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "12d7b85cd1b995698b23e5d41fab60ec") && IsConnectedToInternet() == TRUE)
+            if (ShouldDownloadOrDelete(bInstall, hInstance, wszPath, "12d7b85cd1b995698b23e5d41fab60ec") &&
+                IsConnectedToInternet() == TRUE)
             {
-                DownloadFile(L"https://github.com/valinet/ExplorerPatcher/files/8136451/Windows.UI.ShellCommon.en-US.pri.txt", 10 * 1024 * 1024, wszPath);
+                DownloadFile(
+                    L"https://github.com/valinet/ExplorerPatcher/files/8136451/Windows.UI.ShellCommon.en-US.pri.txt",
+                    10 * 1024 * 1024, wszPath);
             }
         }
         if (bOk)
@@ -1119,12 +1145,14 @@ int WINAPI wWinMain(
         if (bOk && bInstall)
         {
             HKEY hKey = NULL;
-            RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hKey, NULL);
+            RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer", 0, NULL,
+                            REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hKey, NULL);
             if (hKey && hKey != INVALID_HANDLE_VALUE)
             {
                 RegCloseKey(hKey);
             }
-            RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hKey, NULL);
+            RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer", 0,
+                            NULL, REG_OPTION_NON_VOLATILE, KEY_READ, NULL, &hKey, NULL);
             if (hKey && hKey != INVALID_HANDLE_VALUE)
             {
                 RegCloseKey(hKey);
@@ -1243,5 +1271,5 @@ int WINAPI wWinMain(
         if (userToken != INVALID_HANDLE_VALUE) CloseHandle(userToken);
     }
 
-	return GetLastError();
+    return GetLastError();
 }

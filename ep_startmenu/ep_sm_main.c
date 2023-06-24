@@ -6,10 +6,11 @@
 HMODULE hModule = NULL;
 HMODULE hOrig = NULL;
 wchar_t* (*pGetCmdArguments)(int*) = NULL;
-SRWLOCK lockInstanced = { .Ptr = SRWLOCK_INIT };
+SRWLOCK lockInstanced = {.Ptr = SRWLOCK_INIT};
 BOOL bInstanced = FALSE;
 
-BOOL start_GetProductInfo(DWORD dwOSMajorVersion, DWORD dwOSMinorVersion, DWORD dwSpMajorVersion, DWORD dwSpMinorVersion, PDWORD pdwReturnedProductType)
+BOOL start_GetProductInfo(DWORD dwOSMajorVersion, DWORD dwOSMinorVersion, DWORD dwSpMajorVersion,
+                          DWORD dwSpMinorVersion, PDWORD pdwReturnedProductType)
 {
     *pdwReturnedProductType = 119;
     return TRUE;
@@ -18,10 +19,12 @@ BOOL start_GetProductInfo(DWORD dwOSMajorVersion, DWORD dwOSMinorVersion, DWORD 
 void Init()
 {
     DWORD dwStartShowClassicMode = 0, dwSize = sizeof(DWORD);
-    RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"Start_ShowClassicMode", RRF_RT_DWORD, NULL, &dwStartShowClassicMode, &dwSize);
+    RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                 L"Start_ShowClassicMode", RRF_RT_DWORD, NULL, &dwStartShowClassicMode, &dwSize);
     if (dwStartShowClassicMode)
     {
-        VnPatchIAT(GetModuleHandleW(NULL), "api-ms-win-core-sysinfo-l1-2-0.dll", "GetProductInfo", start_GetProductInfo);
+        VnPatchIAT(GetModuleHandleW(NULL), "api-ms-win-core-sysinfo-l1-2-0.dll", "GetProductInfo",
+                   start_GetProductInfo);
     }
     HMODULE hMod;
     GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, hModule, &hMod);
@@ -52,8 +55,8 @@ wchar_t* GetCmdArguments(int* a1)
 
 BOOL WINAPI DllMain(
     _In_ HINSTANCE hinstDLL,
-    _In_ DWORD     fdwReason,
-    _In_ LPVOID    lpvReserved
+    _In_ DWORD fdwReason,
+    _In_ LPVOID lpvReserved
 )
 {
     switch (fdwReason)

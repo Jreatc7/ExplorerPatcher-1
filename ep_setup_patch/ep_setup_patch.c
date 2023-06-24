@@ -8,7 +8,7 @@ int WINAPI wWinMain(
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nShowCmd
-) 
+)
 {
     WCHAR wszPath[MAX_PATH];
     GetModuleFileNameW(GetModuleHandle(NULL), wszPath, MAX_PATH);
@@ -24,7 +24,8 @@ int WINAPI wWinMain(
     PathRemoveFileSpecW(wszPath);
     wcscat_s(wszPath, MAX_PATH, L"\\" _T(SETUP_UTILITY_NAME));
 
-    HANDLE hFile = CreateFileW(wszPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    HANDLE hFile = CreateFileW(wszPath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                               FILE_ATTRIBUTE_NORMAL, 0);
     if (hFile == INVALID_HANDLE_VALUE)
     {
         return 1;
@@ -53,7 +54,7 @@ int WINAPI wWinMain(
 
     if (__argc > 1)
     {
-        SHELLEXECUTEINFO ShExecInfo = { 0 };
+        SHELLEXECUTEINFO ShExecInfo = {0};
         ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
         ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
         ShExecInfo.hwnd = NULL;

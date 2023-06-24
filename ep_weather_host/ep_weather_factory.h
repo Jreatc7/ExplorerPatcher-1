@@ -21,7 +21,7 @@ HRESULT STDMETHODCALLTYPE epw_factory_CreateInstance(
 typedef interface IEPWeatherFactory IEPWeatherFactory;
 // {A25216A3-4223-4CB3-A572-11A7CC1AEE4E}
 DEFINE_GUID(IID_IEPWeatherFactory,
-    0xa25216a3, 0x4223, 0x4cb3, 0xa5, 0x72, 0x11, 0xa7, 0xcc, 0x1a, 0xee, 0x4e);
+            0xa25216a3, 0x4223, 0x4cb3, 0xa5, 0x72, 0x11, 0xa7, 0xcc, 0x1a, 0xee, 0x4e);
 static const IClassFactoryVtbl IEPWeatherFactoryVtbl = {
     epw_factory_QueryInterface,
     epw_factory_AddRef,
@@ -29,6 +29,6 @@ static const IClassFactoryVtbl IEPWeatherFactoryVtbl = {
     epw_factory_CreateInstance,
     epw_factory_LockServer
 };
-static IClassFactory IClassFactoryInstance = { &IEPWeatherFactoryVtbl };
+static IClassFactory IClassFactoryInstance = {&IEPWeatherFactoryVtbl};
 static IClassFactory* ClassFactory = &IClassFactoryInstance;
 #endif

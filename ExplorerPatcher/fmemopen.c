@@ -18,32 +18,33 @@
 
 FILE* fmemopen(void* buf, size_t len, const char* type)
 {
-	int fd;
-	FILE* fp;
-	char tp[MAX_PATH - 13];
-	char fn[MAX_PATH + 1];
+    int fd;
+    FILE* fp;
+    char tp[MAX_PATH - 13];
+    char fn[MAX_PATH + 1];
 
-	if (!GetTempPathA(sizeof(tp), tp))
-		return NULL;
+    if (!GetTempPathA(sizeof(tp), tp))
+        return NULL;
 
-	if (!GetTempFileNameA(tp, "eptmp", 0, fn))
-		return NULL;
+    if (!GetTempFileNameA(tp, "eptmp", 0, fn))
+        return NULL;
 
-	_sopen_s(&fd, fn,
-		_O_CREAT | _O_RDWR | _O_SHORT_LIVED | _O_TEMPORARY | _O_BINARY,
-		_SH_DENYRW,
-		_S_IREAD | _S_IWRITE);
-	if (fd == -1)
-		return NULL;
+    _sopen_s(&fd, fn,
+             _O_CREAT | _O_RDWR | _O_SHORT_LIVED | _O_TEMPORARY | _O_BINARY,
+             _SH_DENYRW,
+             _S_IREAD | _S_IWRITE);
+    if (fd == -1)
+        return NULL;
 
-	fp = _fdopen(fd, "w+");
-	if (!fp) {
-		_close(fd);
-		return NULL;
-	}
+    fp = _fdopen(fd, "w+");
+    if (!fp)
+    {
+        _close(fd);
+        return NULL;
+    }
 
-	fwrite(buf, len, 1, fp);
-	rewind(fp);
+    fwrite(buf, len, 1, fp);
+    rewind(fp);
 
-	return fp;
+    return fp;
 }

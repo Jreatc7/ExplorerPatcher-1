@@ -3,12 +3,12 @@
 
 ULONG STDMETHODCALLTYPE epw_factory_AddRef(IClassFactory* _this)
 {
-    return(1);
+    return (1);
 }
 
 ULONG STDMETHODCALLTYPE epw_factory_Release(IClassFactory* _this)
 {
-    return(1);
+    return (1);
 }
 
 HRESULT STDMETHODCALLTYPE epw_factory_QueryInterface(
@@ -21,11 +21,11 @@ HRESULT STDMETHODCALLTYPE epw_factory_QueryInterface(
         !IsEqualIID(riid, &IID_IClassFactory))
     {
         *ppv = 0;
-        return(E_NOINTERFACE);
+        return (E_NOINTERFACE);
     }
     *ppv = _this;
     _this->lpVtbl->AddRef(_this);
-    return(NOERROR);
+    return (NOERROR);
 }
 
 HRESULT STDMETHODCALLTYPE epw_factory_LockServer(
@@ -33,7 +33,8 @@ HRESULT STDMETHODCALLTYPE epw_factory_LockServer(
     BOOL flock
 )
 {
-    if (flock) InterlockedIncrement(&epw_LockCount);
+    if (flock)
+        InterlockedIncrement(&epw_LockCount);
     else
     {
         LONG dwOutstandingLocks = InterlockedDecrement(&epw_LockCount);
@@ -42,7 +43,7 @@ HRESULT STDMETHODCALLTYPE epw_factory_LockServer(
         {
         }
     }
-    return(NOERROR);
+    return (NOERROR);
 }
 
 HRESULT STDMETHODCALLTYPE epw_factory_CreateInstance(
@@ -81,7 +82,8 @@ HRESULT STDMETHODCALLTYPE epw_factory_CreateInstance(
             thisobj->cbCount = 1;
             hr = thisobj->lpVtbl->QueryInterface(thisobj, vTableGuid, ppv);
             thisobj->lpVtbl->Release(thisobj);
-            if (SUCCEEDED(hr)) InterlockedIncrement(&epw_OutstandingObjects);
+            if (SUCCEEDED(hr))
+                InterlockedIncrement(&epw_OutstandingObjects);
         }
         else
         {
@@ -89,5 +91,5 @@ HRESULT STDMETHODCALLTYPE epw_factory_CreateInstance(
         }
     }
 
-    return(hr);
+    return (hr);
 }

@@ -168,6 +168,7 @@ int (*SHWindowsPolicy)(REFIID);
 #define ORB_STYLE_WINDOWS10 0
 #define ORB_STYLE_WINDOWS11 1
 #define ORB_STYLE_TRANSPARENT 2
+
 typedef struct _OrbInfo
 {
     HTHEME hTheme;
@@ -222,7 +223,7 @@ HRESULT WINAPI _DllUnregisterServer();
 HRESULT WINAPI _DllCanUnloadNow();
 HRESULT WINAPI _DllGetClassObject(
     REFCLSID rclsid,
-    REFIID   riid,
+    REFIID riid,
     LPVOID* ppv
 );
 
@@ -267,7 +268,7 @@ DWORD CheckForUpdatesThread(LPVOID timeout)
     {
         hr = WindowsCreateStringReference(
             APPID,
-            (UINT32)(sizeof(APPID) / sizeof(TCHAR) - 1),
+            sizeof APPID / sizeof(TCHAR) - 1,
             &header_AppIdHString,
             &AppIdHString
         );
@@ -276,7 +277,7 @@ DWORD CheckForUpdatesThread(LPVOID timeout)
     {
         hr = WindowsCreateStringReference(
             RuntimeClass_Windows_UI_Notifications_ToastNotificationManager,
-            (UINT32)(sizeof(RuntimeClass_Windows_UI_Notifications_ToastNotificationManager) / sizeof(wchar_t) - 1),
+            sizeof RuntimeClass_Windows_UI_Notifications_ToastNotificationManager / sizeof(wchar_t) - 1,
             &header_ToastNotificationManagerHString,
             &ToastNotificationManagerHString
         );
@@ -301,7 +302,7 @@ DWORD CheckForUpdatesThread(LPVOID timeout)
     {
         hr = WindowsCreateStringReference(
             RuntimeClass_Windows_UI_Notifications_ToastNotification,
-            (UINT32)(sizeof(RuntimeClass_Windows_UI_Notifications_ToastNotification) / sizeof(wchar_t) - 1),
+            sizeof RuntimeClass_Windows_UI_Notifications_ToastNotification / sizeof(wchar_t) - 1,
             &header_ToastNotificationHString,
             &ToastNotificationHString
         );
@@ -357,7 +358,8 @@ DWORD CheckForUpdatesThread(LPVOID timeout)
         }
         if (dwUpdatePolicy != UPDATE_POLICY_MANUAL)
         {
-            InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_DEFAULT, bAllocConsole, dwUpdatePolicy);
+            InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_DEFAULT, bAllocConsole,
+                                      dwUpdatePolicy);
         }
         DWORD dwRet = 0;
         while (TRUE)
@@ -365,19 +367,21 @@ DWORD CheckForUpdatesThread(LPVOID timeout)
             switch (WaitForMultipleObjects(2, hEvents, FALSE, INFINITE))
             {
             case WAIT_OBJECT_0:
-            {
-                InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_CHECK, bAllocConsole, dwUpdatePolicy);
-                break;
-            }
+                {
+                    InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_CHECK, bAllocConsole,
+                                              dwUpdatePolicy);
+                    break;
+                }
             case WAIT_OBJECT_0 + 1:
-            {
-                InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_INSTALL, bAllocConsole, dwUpdatePolicy);
-                break;
-            }
+                {
+                    InstallUpdatesIfAvailable(hModule, notifier, notifFactory, &toast, UPDATES_OP_INSTALL,
+                                              bAllocConsole, dwUpdatePolicy);
+                    break;
+                }
             default:
-            {
-                break;
-            }
+                {
+                    break;
+                }
             }
         }
         CloseHandle(hEvents[0]);
@@ -445,7 +449,8 @@ HWND GetMonitorInfoFromPointForTaskbarFlyoutActivation(POINT ptCursor, DWORD dwF
             }
             break;
         }
-    } while (hWnd);
+    }
+    while (hWnd);
     if (!hWnd)
     {
         hWnd = FindWindowEx(
@@ -636,7 +641,8 @@ BOOL TerminateShellExperienceHost()
                     hProcess = NULL;
                 }
             }
-        } while (Process32Next(hSnapshot, &pe32) == TRUE);
+        }
+        while (Process32Next(hSnapshot, &pe32) == TRUE);
         if (hSnapshot)
         {
             CloseHandle(hSnapshot);
@@ -647,6 +653,7 @@ BOOL TerminateShellExperienceHost()
 
 long long elapsedCheckForeground = 0;
 HANDLE hCheckForegroundThread = NULL;
+
 DWORD CheckForegroundThread(DWORD dwMode)
 {
     printf("Started \"Check foreground window\" thread.\n");
@@ -732,7 +739,7 @@ void LaunchNetworkTargets(DWORD dwTarget)
         HMODULE hVan = LoadLibraryW(L"van.dll");
         if (hVan)
         {
-            long(*ShowVAN)(BOOL, BOOL, void*) = GetProcAddress(hVan, "ShowVAN");
+            long (*ShowVAN)(BOOL, BOOL, void*) = GetProcAddress(hVan, "ShowVAN");
             if (ShowVAN)
             {
                 ShowVAN(0, 0, 0);
@@ -777,6 +784,7 @@ void FixUpCenteredTaskbar()
 }
 
 #define EP_SERVICE_WINDOW_CLASS_NAME L"EP_Service_Window_" _T(EP_CLSID)
+
 LRESULT CALLBACK EP_Service_Window_WndProc(
     HWND hWnd,
     UINT uMsg,
@@ -809,7 +817,8 @@ LRESULT CALLBACK EP_Service_Window_WndProc(
         if (GetClassWord(GetForegroundWindow(), GCW_ATOM) != RegisterWindowMessageW(L"Windows.UI.Core.CoreWindow"))
         {
             DWORD dwVal = 1;
-            RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"TaskbarAl", REG_DWORD, &dwVal, sizeof(DWORD));
+            RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                            L"TaskbarAl", REG_DWORD, &dwVal, sizeof(DWORD));
             KillTimer(hWnd, 10);
         }
         return 0;
@@ -821,9 +830,10 @@ LRESULT CALLBACK EP_Service_Window_WndProc(
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
+
 DWORD EP_ServiceWindowThread(DWORD unused)
 {
-    WNDCLASS wc = { 0 };
+    WNDCLASS wc = {0};
     wc.style = CS_DBLCLKS;
     wc.lpfnWndProc = EP_Service_Window_WndProc;
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
@@ -848,7 +858,9 @@ DWORD EP_ServiceWindowThread(DWORD unused)
     );
     if (hWndServiceWindow)
     {
-        if (IsSpotlightEnabled() && dwSpotlightUpdateSchedule) SetTimer(hWndServiceWindow, 100, dwSpotlightUpdateSchedule * 1000, NULL);
+        if (IsSpotlightEnabled() && dwSpotlightUpdateSchedule)
+            SetTimer(
+                hWndServiceWindow, 100, dwSpotlightUpdateSchedule * 1000, NULL);
         if (bClockFlyoutOnWinC)
         {
             RegisterHotKey(hWndServiceWindow, 1, MOD_WIN | MOD_NOREPEAT, 'C');
@@ -862,7 +874,7 @@ DWORD EP_ServiceWindowThread(DWORD unused)
             {
                 break;
             }
-            else if (!msg.hwnd)
+            if (!msg.hwnd)
             {
                 if (msg.message == WM_USER + 1)
                 {
@@ -960,17 +972,23 @@ void ToggleSearch()
 
 void ToggleTaskView()
 {
-    EnumThreadWindows(GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL), ToggleImmersiveCallback, 11);
+    EnumThreadWindows(
+        GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL),
+        ToggleImmersiveCallback, 11);
 }
 
 void ToggleWidgetsPanel()
 {
-    EnumThreadWindows(GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL), ToggleImmersiveCallback, 0x66);
+    EnumThreadWindows(
+        GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL),
+        ToggleImmersiveCallback, 0x66);
 }
 
 void ToggleMainClockFlyout()
 {
-    EnumThreadWindows(GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL), ToggleImmersiveCallback, 0x6B);
+    EnumThreadWindows(
+        GetWindowThreadProcessId(FindWindowExW(NULL, NULL, L"ApplicationManager_ImmersiveShellWindow", NULL), NULL),
+        ToggleImmersiveCallback, 0x6B);
 }
 
 void ToggleNotificationsFlyout()
@@ -1064,7 +1082,7 @@ void ToggleLauncherTipContextMenu()
 
 #pragma region "windowsudk.shellcommon Hooks"
 
-static HRESULT(WINAPI *SLGetWindowsInformationDWORDFunc)(PCWSTR pwszValueName, DWORD* pdwValue) = NULL;
+static HRESULT (WINAPI *SLGetWindowsInformationDWORDFunc)(PCWSTR pwszValueName, DWORD* pdwValue) = NULL;
 
 HRESULT WINAPI windowsudkshellcommon_SLGetWindowsInformationDWORDHook(PCWSTR pwszValueName, DWORD* pdwValue)
 {
@@ -1082,51 +1100,51 @@ HRESULT WINAPI windowsudkshellcommon_SLGetWindowsInformationDWORDHook(PCWSTR pws
 #pragma region "twinui.pcshell.dll hooks"
 #ifdef _WIN64
 #define LAUNCHERTIP_CLASS_NAME L"LauncherTipWnd"
-static INT64(*winrt_Windows_Internal_Shell_implementation_MeetAndChatManager_OnMessageFunc)(
+static INT64 (*winrt_Windows_Internal_Shell_implementation_MeetAndChatManager_OnMessageFunc)(
     void* _this,
     INT64 a2,
     INT a3
-    ) = NULL;
-static INT64(*CLauncherTipContextMenu_ShowLauncherTipContextMenuFunc)(
+) = NULL;
+static INT64 (*CLauncherTipContextMenu_ShowLauncherTipContextMenuFunc)(
     void* _this,
     POINT* pt
-    ) = NULL;
-static void(*CLauncherTipContextMenu_ExecuteCommandFunc)(
+) = NULL;
+static void (*CLauncherTipContextMenu_ExecuteCommandFunc)(
     void* _this,
     int a2
-    ) = NULL;
-static void(*CLauncherTipContextMenu_ExecuteShutdownCommandFunc)(
+) = NULL;
+static void (*CLauncherTipContextMenu_ExecuteShutdownCommandFunc)(
     void* _this,
     void* a2
-    ) = NULL;
-static INT64(*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
+) = NULL;
+static INT64 (*ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc)(
     HMENU h1,
     HMENU h2,
     HWND a3,
     unsigned int a4,
     void* data
-    ) = NULL;
-static void(*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
+) = NULL;
+static void (*ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc)(
     HMENU _this,
     HMENU hWnd,
     HWND a3
-    ) = NULL;
-static INT64(*CLauncherTipContextMenu_GetMenuItemsAsyncFunc)(
+) = NULL;
+static INT64 (*CLauncherTipContextMenu_GetMenuItemsAsyncFunc)(
     void* _this,
     void* rect,
     void** iunk
-    ) = NULL;
-static INT64(*CImmersiveContextMenuOwnerDrawHelper_s_ContextMenuWndProcFunc)(
+) = NULL;
+static INT64 (*CImmersiveContextMenuOwnerDrawHelper_s_ContextMenuWndProcFunc)(
     HWND hWnd,
     int a2,
     HWND a3,
     int a4,
     BOOL* a5
-    ) = NULL;
+) = NULL;
 
 LRESULT CALLBACK CLauncherTipContextMenu_WndProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam
 )
@@ -1134,9 +1152,9 @@ LRESULT CALLBACK CLauncherTipContextMenu_WndProc(
     LRESULT result;
 
     if (hWnd == archivehWnd && !ArchiveMenuWndProc(
-        hWnd, 
-        uMsg, 
-        wParam, 
+        hWnd,
+        uMsg,
+        wParam,
         lParam,
         ImmersiveContextMenuHelper_ApplyOwnerDrawToMenuFunc,
         ImmersiveContextMenuHelper_RemoveOwnerDrawFromMenuFunc
@@ -1152,7 +1170,7 @@ LRESULT CALLBACK CLauncherTipContextMenu_WndProc(
         {
             *((HWND*)((char*)pCs->lpCreateParams + 0x78)) = hWnd;
             SetWindowLongPtr(
-                hWnd, 
+                hWnd,
                 GWLP_USERDATA,
                 pCs->lpCreateParams
             );
@@ -1204,7 +1222,7 @@ LRESULT CALLBACK CLauncherTipContextMenu_WndProc(
             if (uMsg == WM_NCDESTROY)
             {
                 SetWindowLongPtrW(
-                    hWnd, 
+                    hWnd,
                     GWLP_USERDATA,
                     0
                 );
@@ -1222,6 +1240,7 @@ typedef struct
     IUnknown* iunk;
     BOOL bShouldCenterWinXHorizontally;
 } ShowLauncherTipContextMenuParameters;
+
 DWORD ShowLauncherTipContextMenu(
     ShowLauncherTipContextMenuParameters* params
 )
@@ -1244,7 +1263,7 @@ DWORD ShowLauncherTipContextMenu(
         offset_in_class = 8;
     }
 
-    WNDCLASS wc = { 0 };
+    WNDCLASS wc = {0};
     wc.style = CS_DBLCLKS;
     wc.lpfnWndProc = CLauncherTipContextMenu_WndProc;
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
@@ -1284,7 +1303,7 @@ DWORD ShowLauncherTipContextMenu(
     {
         goto finalize;
     }
-   
+
     TCHAR buffer[260];
     LoadStringW(GetModuleHandleW(L"ExplorerFrame.dll"), 50222, buffer + (bNoMenuAccelerator ? 0 : 1), 260);
     if (!bNoMenuAccelerator)
@@ -1383,7 +1402,8 @@ DWORD ShowLauncherTipContextMenu(
         }
         else if (res < 4000)
         {
-            INT64 info = *(INT64*)((char*)(*(INT64*)((char*)params->_this + 0xa8 + offset_in_class - 0x58)) + (INT64)res * 8 - 8);
+            INT64 info = *(INT64*)((char*)(*(INT64*)((char*)params->_this + 0xa8 + offset_in_class - 0x58)) + (INT64)res
+                * 8 - 8);
             if (CLauncherTipContextMenu_ExecuteCommandFunc)
             {
                 CLauncherTipContextMenu_ExecuteCommandFunc(
@@ -1394,7 +1414,8 @@ DWORD ShowLauncherTipContextMenu(
         }
         else
         {
-            INT64 info = *(INT64*)((char*)(*(INT64*)((char*)params->_this + 0xc8 + offset_in_class - 0x58)) + ((INT64)res - 4000) * 8);
+            INT64 info = *(INT64*)((char*)(*(INT64*)((char*)params->_this + 0xc8 + offset_in_class - 0x58)) + ((INT64)
+                res - 4000) * 8);
             if (CLauncherTipContextMenu_ExecuteShutdownCommandFunc)
             {
                 CLauncherTipContextMenu_ExecuteShutdownCommandFunc(
@@ -1450,7 +1471,8 @@ INT64 CLauncherTipContextMenu_ShowLauncherTipContextMenuHook(
         rcHitZone.top = pt->y - 5;
         rcHitZone.bottom = pt->y + 5;
         //printf("%d %d = %d %d %d %d\n", posCursor.x, posCursor.y, rcHitZone.left, rcHitZone.right, rcHitZone.top, rcHitZone.bottom);
-        if (bBottom && IsThemeActive() && PtInRect(&rcHitZone, posCursor) && GetClassWord(WindowFromPoint(point), GCW_ATOM) == RegisterWindowMessageW(L"Start"))
+        if (bBottom && IsThemeActive() && PtInRect(&rcHitZone, posCursor) && GetClassWord(
+            WindowFromPoint(point), GCW_ATOM) == RegisterWindowMessageW(L"Start"))
         {
             HMONITOR hMonitor = MonitorFromPoint(point, MONITOR_DEFAULTTOPRIMARY);
             MONITORINFO mi;
@@ -1569,7 +1591,7 @@ finalize:
 // credits: https://github.com/m417z/7-Taskbar-Tweaker
 
 DEFINE_GUID(IID_ITaskGroup,
-    0x3af85589, 0x678f, 0x4fb5, 0x89, 0x25, 0x5a, 0x13, 0x4e, 0xbf, 0x57, 0x2c);
+            0x3af85589, 0x678f, 0x4fb5, 0x89, 0x25, 0x5a, 0x13, 0x4e, 0xbf, 0x57, 0x2c);
 
 typedef interface ITaskGroup ITaskGroup;
 
@@ -1577,31 +1599,31 @@ typedef struct ITaskGroupVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         ITaskGroup* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         ITaskGroup* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         ITaskGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* Initialize)(
+    HRESULT (STDMETHODCALLTYPE* Initialize)(
         ITaskGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* AddTaskItem)(
+    HRESULT (STDMETHODCALLTYPE* AddTaskItem)(
         ITaskGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* RemoveTaskItem)(
+    HRESULT (STDMETHODCALLTYPE* RemoveTaskItem)(
         ITaskGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* EnumTaskItems)(
+    HRESULT (STDMETHODCALLTYPE* EnumTaskItems)(
         ITaskGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* DoesWindowMatch)(
+    HRESULT (STDMETHODCALLTYPE* DoesWindowMatch)(
         ITaskGroup* This,
         HWND hCompareWnd,
         ITEMIDLIST* pCompareItemIdList,
@@ -1618,12 +1640,14 @@ interface ITaskGroup
     CONST_VTBL struct ITaskGroupVtbl* lpVtbl;
 };
 
-HRESULT(*CTaskGroup_DoesWindowMatchFunc)(LONG_PTR* task_group, HWND hCompareWnd, ITEMIDLIST* pCompareItemIdList,
-    WCHAR* pCompareAppId, int* pnMatch, LONG_PTR** p_task_item) = NULL;
+HRESULT (*CTaskGroup_DoesWindowMatchFunc)(LONG_PTR* task_group, HWND hCompareWnd, ITEMIDLIST* pCompareItemIdList,
+                                          WCHAR* pCompareAppId, int* pnMatch, LONG_PTR** p_task_item) = NULL;
+
 HRESULT __stdcall CTaskGroup_DoesWindowMatchHook(LONG_PTR* task_group, HWND hCompareWnd, ITEMIDLIST* pCompareItemIdList,
-    WCHAR* pCompareAppId, int* pnMatch, LONG_PTR** p_task_item)
+                                                 WCHAR* pCompareAppId, int* pnMatch, LONG_PTR** p_task_item)
 {
-    HRESULT hr = CTaskGroup_DoesWindowMatchFunc(task_group, hCompareWnd, pCompareItemIdList, pCompareAppId, pnMatch, p_task_item);
+    HRESULT hr = CTaskGroup_DoesWindowMatchFunc(task_group, hCompareWnd, pCompareItemIdList, pCompareAppId, pnMatch,
+                                                p_task_item);
     BOOL bDontGroup = FALSE;
     BOOL bPinned = FALSE;
     if (bPinnedItemsActAsQuickLaunch && SUCCEEDED(hr) && *pnMatch >= 1 && *pnMatch <= 3) // itemlist or appid match
@@ -1643,7 +1667,7 @@ HRESULT __stdcall CTaskGroup_DoesWindowMatchHook(LONG_PTR* task_group, HWND hCom
 }
 
 DEFINE_GUID(IID_ITaskBtnGroup,
-    0x2e52265d, 0x1a3b, 0x4e46, 0x94, 0x17, 0x51, 0xa5, 0x9c, 0x47, 0xd6, 0x0b);
+            0x2e52265d, 0x1a3b, 0x4e46, 0x94, 0x17, 0x51, 0xa5, 0x9c, 0x47, 0xd6, 0x0b);
 
 typedef interface ITaskBtnGroup ITaskBtnGroup;
 
@@ -1651,54 +1675,54 @@ typedef struct ITaskBtnGroupVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         ITaskBtnGroup* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         ITaskBtnGroup* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* Shutdown)(
+    HRESULT (STDMETHODCALLTYPE* Shutdown)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetGroupType)(
+    HRESULT (STDMETHODCALLTYPE* GetGroupType)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* UpdateGroupType)(
+    HRESULT (STDMETHODCALLTYPE* UpdateGroupType)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetGroup)(
+    HRESULT (STDMETHODCALLTYPE* GetGroup)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* AddTaskItem)(
+    HRESULT (STDMETHODCALLTYPE* AddTaskItem)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* IndexOfTaskItem)(
+    HRESULT (STDMETHODCALLTYPE* IndexOfTaskItem)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* RemoveTaskItem)(
+    HRESULT (STDMETHODCALLTYPE* RemoveTaskItem)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* RealityCheck)(
+    HRESULT (STDMETHODCALLTYPE* RealityCheck)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* IsItemBeingRemoved)(
+    HRESULT (STDMETHODCALLTYPE* IsItemBeingRemoved)(
         ITaskBtnGroup* This);
 
-    HRESULT(STDMETHODCALLTYPE* CancelRemoveItem)(
+    HRESULT (STDMETHODCALLTYPE* CancelRemoveItem)(
         ITaskBtnGroup* This);
 
-    LONG_PTR(STDMETHODCALLTYPE* GetIdealSpan)(
+    LONG_PTR (STDMETHODCALLTYPE* GetIdealSpan)(
         ITaskBtnGroup* This,
-        LONG_PTR var2, 
+        LONG_PTR var2,
         LONG_PTR var3,
-        LONG_PTR var4, 
-        LONG_PTR var5, 
+        LONG_PTR var4,
+        LONG_PTR var5,
         LONG_PTR var6);
     // ...
 
@@ -1711,9 +1735,10 @@ interface ITaskBtnGroup
 };
 
 LONG_PTR (*CTaskBtnGroup_GetIdealSpanFunc)(ITaskBtnGroup* _this, LONG_PTR var2, LONG_PTR var3,
-    LONG_PTR var4, LONG_PTR var5, LONG_PTR var6) = NULL;
+                                           LONG_PTR var4, LONG_PTR var5, LONG_PTR var6) = NULL;
+
 LONG_PTR __stdcall CTaskBtnGroup_GetIdealSpanHook(ITaskBtnGroup* _this, LONG_PTR var2, LONG_PTR var3,
-    LONG_PTR var4, LONG_PTR var5, LONG_PTR var6)
+                                                  LONG_PTR var4, LONG_PTR var5, LONG_PTR var6)
 {
     LONG_PTR ret = NULL;
     BOOL bTypeModified = FALSE;
@@ -1827,6 +1852,7 @@ void UpdateStartMenuPositioning(LPARAM loIsShouldInitializeArray_hiIsShouldRoIni
 #pragma region "Fix Windows 11 taskbar not showing tray when auto hide is on"
 #ifdef _WIN64
 #define FIXTASKBARAUTOHIDE_CLASS_NAME L"FixTaskbarAutohide_" _T(EP_CLSID)
+
 LRESULT CALLBACK FixTaskbarAutohide_WndProc(
     HWND hWnd,
     UINT uMessage,
@@ -1849,9 +1875,10 @@ LRESULT CALLBACK FixTaskbarAutohide_WndProc(
 
     return DefWindowProcW(hWnd, uMessage, wParam, lParam);
 }
+
 DWORD FixTaskbarAutohide(DWORD unused)
 {
-    WNDCLASS wc = { 0 };
+    WNDCLASS wc = {0};
     wc.style = CS_DBLCLKS;
     wc.lpfnWndProc = FixTaskbarAutohide_WndProc;
     wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
@@ -1884,11 +1911,8 @@ DWORD FixTaskbarAutohide(DWORD unused)
             {
                 break;
             }
-            else
-            {
-                TranslateMessage(&msg);
-                DispatchMessageW(&msg);
-            }
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
         }
         DestroyWindow(hWnd);
 
@@ -1912,12 +1936,13 @@ DWORD FixTaskbarAutohide(DWORD unused)
 #pragma region "EnsureXAML on OS builds 22621+"
 #ifdef _WIN64
 DEFINE_GUID(uuidof_Windows_Internal_Shell_XamlExplorerHost_IXamlApplicationStatics,
-    0xECC13292, 0x27EF, 0x547A, 0xAC, 0x8B, 0x76, 0xCD, 0x17, 0x32, 0x21, 0x86);
+            0xECC13292, 0x27EF, 0x547A, 0xAC, 0x8B, 0x76, 0xCD, 0x17, 0x32, 0x21, 0x86);
 
 DEFINE_GUID(uuidof_Windows_UI_Core_ICoreWindow5,
-    0x28258A12, 0x7D82, 0x505B, 0xB2, 0x10, 0x71, 0x2B, 0x04, 0xA5, 0x88, 0x82);
+            0x28258A12, 0x7D82, 0x505B, 0xB2, 0x10, 0x71, 0x2B, 0x04, 0xA5, 0x88, 0x82);
 
 BOOL bIsXAMLEnsured = FALSE;
+
 void EnsureXAML()
 {
     signed int v0; // eax
@@ -1935,32 +1960,42 @@ void EnsureXAML()
         HSTRING_HEADER hstringheaderWindowsXamlManager;
         HSTRING hstringWindowsXamlManager = NULL;
 
-        if (FAILED(WindowsCreateStringReference(L"Windows.Internal.Shell.XamlExplorerHost.XamlApplication", 0x37u, &hstringheaderXamlApplication, &hstringXamlApplication)) || !hstringXamlApplication)
+        if (FAILED(
+            WindowsCreateStringReference(L"Windows.Internal.Shell.XamlExplorerHost.XamlApplication", 0x37u, &
+                hstringheaderXamlApplication, &hstringXamlApplication)) || !hstringXamlApplication)
         {
             printf("Error in sub_1800135EC on WindowsCreateStringReference.\n");
             goto cleanup;
         }
-        if (FAILED(RoGetActivationFactory(hstringXamlApplication, &uuidof_Windows_Internal_Shell_XamlExplorerHost_IXamlApplicationStatics, &pUIXamlApplicationFactory)) || !pUIXamlApplicationFactory)
+        if (FAILED(
+                RoGetActivationFactory(hstringXamlApplication, &
+                    uuidof_Windows_Internal_Shell_XamlExplorerHost_IXamlApplicationStatics, &pUIXamlApplicationFactory))
+            ||
+            !pUIXamlApplicationFactory)
         {
             printf("Error in sub_1800135EC on RoGetActivationFactory.\n");
             goto cleanup0;
         }
 
         IUnknown* pXamlApplication = NULL;
-        (*(void(__fastcall**)(__int64, __int64*))(*(INT64*)pUIXamlApplicationFactory + 48))(pUIXamlApplicationFactory, &pXamlApplication); // get_Current
+        (*(void(__fastcall**)(__int64, __int64*))(*(INT64*)pUIXamlApplicationFactory + 48))(
+            pUIXamlApplicationFactory, &pXamlApplication); // get_Current
         if (!pXamlApplication)
         {
             printf("Error in sub_1800135EC on pUIXamlApplicationFactory + 48.\n");
             goto cleanup1;
         }
-        else pXamlApplication->lpVtbl->Release(pXamlApplication);
+        pXamlApplication->lpVtbl->Release(pXamlApplication);
 
-        if (FAILED(WindowsCreateStringReference(L"Windows.UI.Xaml.Hosting.WindowsXamlManager", 0x2Au, &hstringheaderWindowsXamlManager, &hstringWindowsXamlManager)))
+        if (FAILED(
+            WindowsCreateStringReference(L"Windows.UI.Xaml.Hosting.WindowsXamlManager", 0x2Au, &
+                hstringheaderWindowsXamlManager, &hstringWindowsXamlManager)))
         {
             printf("Error in sub_1800135EC on WindowsCreateStringReference 2.\n");
             goto cleanup1;
         }
-        if (FAILED(RoGetActivationFactory(hstringWindowsXamlManager, &uuidof_Windows_UI_Core_ICoreWindow5, &pCoreWindow5)))
+        if (FAILED(
+            RoGetActivationFactory(hstringWindowsXamlManager, &uuidof_Windows_UI_Core_ICoreWindow5, &pCoreWindow5)))
         {
             printf("Error in sub_1800135EC on RoGetActivationFactory 2.\n");
             goto cleanup2;
@@ -1969,7 +2004,8 @@ void EnsureXAML()
         if (pCoreWindow5)
         {
             IUnknown* pDispatcherQueue = NULL;
-            (*(void(__fastcall**)(__int64, __int64*))(*(INT64*)pCoreWindow5 + 48))(pCoreWindow5, &pDispatcherQueue); // get_DispatcherQueue
+            (*(void(__fastcall**)(__int64, __int64*))(*(INT64*)pCoreWindow5 + 48))(pCoreWindow5, &pDispatcherQueue);
+            // get_DispatcherQueue
             if (!pDispatcherQueue)
             {
                 printf("Error in sub_1800135EC on pCoreWindow5 + 48.\n");
@@ -1994,10 +2030,12 @@ void EnsureXAML()
     }
 }
 
-HRESULT(*ICoreWindow5_get_DispatcherQueueFunc)(INT64, INT64);
+HRESULT (*ICoreWindow5_get_DispatcherQueueFunc)(INT64, INT64);
+
 HRESULT WINAPI ICoreWindow5_get_DispatcherQueueHook(void* _this, void** ppValue)
 {
-    SendMessageTimeoutW(FindWindowW(L"Shell_TrayWnd", NULL), WM_SETTINGCHANGE, 0, L"EnsureXAML", SMTO_NOTIMEOUTIFNOTHUNG, 5000, NULL);
+    SendMessageTimeoutW(FindWindowW(L"Shell_TrayWnd", NULL), WM_SETTINGCHANGE, 0, L"EnsureXAML",
+                        SMTO_NOTIMEOUTIFNOTHUNG, 5000, NULL);
     return ICoreWindow5_get_DispatcherQueueFunc(_this, ppValue);
 }
 
@@ -2016,24 +2054,30 @@ HMODULE __fastcall Windows11v22H2_combase_LoadLibraryExW(LPCWSTR lpLibFileName, 
             printf("Error in Windows11v22H2_combase_LoadLibraryExW on DllGetActivationFactory\n");
             return hModule;
         }
-        if (FAILED(WindowsCreateStringReference(L"Windows.UI.Xaml.Hosting.WindowsXamlManager", 0x2Au, &hstringHeaderWindowsXamlManager, &hstringWindowsXamlManager)))
+        if (FAILED(
+            WindowsCreateStringReference(L"Windows.UI.Xaml.Hosting.WindowsXamlManager", 0x2Au, &
+                hstringHeaderWindowsXamlManager, &hstringWindowsXamlManager)))
         {
             printf("Error in Windows11v22H2_combase_LoadLibraryExW on WindowsCreateStringReference\n");
             return hModule;
         }
-        ((void(__fastcall*)(HSTRING, __int64*))DllGetActivationFactory)(hstringWindowsXamlManager, &pWindowsXamlManagerFactory);
+        ((void(__fastcall*)(HSTRING, __int64*))DllGetActivationFactory)(hstringWindowsXamlManager,
+                                                                        &pWindowsXamlManagerFactory);
         if (pWindowsXamlManagerFactory)
         {
             IInspectable* pCoreWindow5 = NULL;
-            pWindowsXamlManagerFactory->lpVtbl->QueryInterface(pWindowsXamlManagerFactory, &uuidof_Windows_UI_Core_ICoreWindow5, &pCoreWindow5);
+            pWindowsXamlManagerFactory->lpVtbl->QueryInterface(pWindowsXamlManagerFactory,
+                                                               &uuidof_Windows_UI_Core_ICoreWindow5, &pCoreWindow5);
             if (pCoreWindow5)
             {
                 INT64* pCoreWindow5Vtbl = pCoreWindow5->lpVtbl;
-                if (VirtualProtect(pCoreWindow5->lpVtbl, sizeof(IInspectableVtbl) + sizeof(INT64), PAGE_EXECUTE_READWRITE, &flOldProtect))
+                if (VirtualProtect(pCoreWindow5->lpVtbl, sizeof(IInspectableVtbl) + sizeof(INT64),
+                                   PAGE_EXECUTE_READWRITE, &flOldProtect))
                 {
                     ICoreWindow5_get_DispatcherQueueFunc = pCoreWindow5Vtbl[6];
                     pCoreWindow5Vtbl[6] = ICoreWindow5_get_DispatcherQueueHook;
-                    VirtualProtect(pCoreWindow5->lpVtbl, sizeof(IInspectableVtbl) + sizeof(INT64), flOldProtect, &flOldProtect);
+                    VirtualProtect(pCoreWindow5->lpVtbl, sizeof(IInspectableVtbl) + sizeof(INT64), flOldProtect,
+                                   &flOldProtect);
                 }
                 pCoreWindow5->lpVtbl->Release(pCoreWindow5);
             }
@@ -2051,7 +2095,9 @@ HMODULE __fastcall Windows11v22H2_combase_LoadLibraryExW(LPCWSTR lpLibFileName, 
 #ifdef _WIN64
 int HandleTaskbarCornerInteraction(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    POINT pt; pt.x = 0; pt.y = 0;
+    POINT pt;
+    pt.x = 0;
+    pt.y = 0;
     if (uMsg == WM_RBUTTONUP || uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONDOWN || uMsg == WM_LBUTTONDOWN)
     {
         pt.x = GET_X_LPARAM(lParam);
@@ -2093,7 +2139,7 @@ int HandleTaskbarCornerInteraction(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
             ToggleLauncherTipContextMenu();
             return 1;
         }
-        else if (uMsg == WM_LBUTTONUP || uMsg == WM_NCLBUTTONUP || uMsg == WM_LBUTTONDOWN || uMsg == WM_NCLBUTTONDOWN)
+        if (uMsg == WM_LBUTTONUP || uMsg == WM_NCLBUTTONUP || uMsg == WM_LBUTTONDOWN || uMsg == WM_NCLBUTTONDOWN)
         {
             if (!dwUndeadStartCorner)
             {
@@ -2105,11 +2151,13 @@ int HandleTaskbarCornerInteraction(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                 return 1;
             }
             DWORD dwVal = 1, dwSize = sizeof(DWORD);
-            RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"TaskbarAl", RRF_RT_DWORD, NULL, &dwVal, &dwSize);
+            RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                         L"TaskbarAl", RRF_RT_DWORD, NULL, &dwVal, &dwSize);
             if (dwVal)
             {
                 dwVal = 0;
-                RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"TaskbarAl", REG_DWORD, &dwVal, sizeof(DWORD));
+                RegSetKeyValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                                L"TaskbarAl", REG_DWORD, &dwVal, sizeof(DWORD));
                 if (hWndServiceWindow) SetTimer(hWndServiceWindow, 10, 1000, NULL);
             }
             OpenStartOnMonitor(hMonitor);
@@ -2119,13 +2167,15 @@ int HandleTaskbarCornerInteraction(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     return 0;
 }
 
-INT64 ReBarWindow32SubclassProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwUnused)
+INT64 ReBarWindow32SubclassProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam,
+                                UINT_PTR uIdSubclass, DWORD_PTR dwUnused)
 {
     if (uMsg == WM_NCDESTROY)
     {
         RemoveWindowSubclass(hWnd, ReBarWindow32SubclassProc, ReBarWindow32SubclassProc);
     }
-    if (TaskbarCenter_ShouldCenter(dwOldTaskbarAl) && TaskbarCenter_ShouldStartBeCentered(dwOldTaskbarAl) && uMsg == WM_WINDOWPOSCHANGING)
+    if (TaskbarCenter_ShouldCenter(dwOldTaskbarAl) && TaskbarCenter_ShouldStartBeCentered(dwOldTaskbarAl) && uMsg ==
+        WM_WINDOWPOSCHANGING)
     {
         LPWINDOWPOS lpWP = lParam;
         lpWP->cx += lpWP->x;
@@ -2147,7 +2197,8 @@ INT64 ReBarWindow32SubclassProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wPar
             //lpRbi->fStyle &= ~RBBS_NOGRIPPER;
         }
     }
-    else if (TaskbarCenter_ShouldCenter(dwOldTaskbarAl) && TaskbarCenter_ShouldStartBeCentered(dwOldTaskbarAl) && (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP) && HandleTaskbarCornerInteraction(hWnd, uMsg, wParam, lParam))
+    else if (TaskbarCenter_ShouldCenter(dwOldTaskbarAl) && TaskbarCenter_ShouldStartBeCentered(dwOldTaskbarAl) && (uMsg
+        == WM_LBUTTONUP || uMsg == WM_RBUTTONUP) && HandleTaskbarCornerInteraction(hWnd, uMsg, wParam, lParam))
     {
         return 0;
     }
@@ -2217,7 +2268,7 @@ BOOL IsPointOnEmptyAreaOfNewTaskbar(POINT pt)
     BSTR elemName = NULL;
     BSTR elemType = NULL;
     BOOL bIsWindows11Version22H2OrHigher = IsWindows11Version22H2OrHigher();
-    
+
     if (SUCCEEDED(hr))
     {
         hr = CoCreateInstance(&CLSID_CUIAutomation8, NULL, CLSCTX_INPROC_SERVER, &IID_IUIAutomation2, &pIUIAutomation2);
@@ -2236,7 +2287,8 @@ BOOL IsPointOnEmptyAreaOfNewTaskbar(POINT pt)
     }
     if (SUCCEEDED(hr) && bIsWindows11Version22H2OrHigher)
     {
-        bRet = elemName && elemType && (!wcscmp(elemName, L"") && !wcscmp(elemType, L"Taskbar.TaskbarFrameAutomationPeer"));
+        bRet = elemName && elemType && (!wcscmp(elemName, L"") && !wcscmp(
+            elemType, L"Taskbar.TaskbarFrameAutomationPeer"));
     }
     if (SUCCEEDED(hr) && !bIsWindows11Version22H2OrHigher)
     {
@@ -2251,7 +2303,8 @@ BOOL IsPointOnEmptyAreaOfNewTaskbar(POINT pt)
             if (!wcscmp(wszClassName, L"Windows.UI.Input.InputSite.WindowClass"))
             {
                 HWND hAncestor = GetAncestor(hWnd, GA_ROOT);
-                HWND hWindow = FindWindowExW(hAncestor, NULL, L"Windows.UI.Composition.DesktopWindowContentBridge", NULL);
+                HWND hWindow = FindWindowExW(hAncestor, NULL, L"Windows.UI.Composition.DesktopWindowContentBridge",
+                                             NULL);
                 if (IsWindow(hWindow))
                 {
                     hWindow = FindWindowExW(hWindow, NULL, L"Windows.UI.Input.InputSite.WindowClass", NULL);
@@ -2276,7 +2329,8 @@ BOOL IsPointOnEmptyAreaOfNewTaskbar(POINT pt)
                 }
                 if (SUCCEEDED(hr) && pControlWalker)
                 {
-                    hr = pControlWalker->lpVtbl->GetFirstChildElement(pControlWalker, pIUIAutomationElement, &pTaskbarButton);
+                    hr = pControlWalker->lpVtbl->GetFirstChildElement(pControlWalker, pIUIAutomationElement,
+                                                                      &pTaskbarButton);
                 }
                 BOOL bValid = TRUE, bFirst = TRUE;
                 while (SUCCEEDED(hr) && pTaskbarButton)
@@ -2344,18 +2398,19 @@ BOOL IsPointOnEmptyAreaOfNewTaskbar(POINT pt)
 
 long long TaskbarLeftClickTime = 0;
 BOOL bTaskbarLeftClickEven = FALSE;
+
 LRESULT CALLBACK Shell_TrayWndMouseProc(
-    _In_ int    nCode,
+    _In_ int nCode,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam
 )
 {
     if (!bOldTaskbar &&
         !bNoPropertiesInContextMenu &&
-        nCode == HC_ACTION && 
-        wParam == WM_RBUTTONUP && 
+        nCode == HC_ACTION &&
+        wParam == WM_RBUTTONUP &&
         IsPointOnEmptyAreaOfNewTaskbar(((MOUSEHOOKSTRUCT*)lParam)->pt)
-        )
+    )
     {
         PostMessageW(
             FindWindowW(L"Shell_TrayWnd", NULL),
@@ -2366,11 +2421,11 @@ LRESULT CALLBACK Shell_TrayWndMouseProc(
         return 1;
     }
     if (!bOldTaskbar &&
-        bTaskbarAutohideOnDoubleClick && 
-        nCode == HC_ACTION && 
+        bTaskbarAutohideOnDoubleClick &&
+        nCode == HC_ACTION &&
         wParam == WM_LBUTTONUP &&
         IsPointOnEmptyAreaOfNewTaskbar(((MOUSEHOOKSTRUCT*)lParam)->pt)
-        )
+    )
     {
         /*BOOL bShouldCheck = FALSE;
         if (bOldTaskbar)
@@ -2386,35 +2441,35 @@ LRESULT CALLBACK Shell_TrayWndMouseProc(
         }
         if (bShouldCheck)
         {*/
-            if (bTaskbarLeftClickEven)
+        if (bTaskbarLeftClickEven)
+        {
+            if (TaskbarLeftClickTime != 0)
             {
-                if (TaskbarLeftClickTime != 0)
-                {
-                    TaskbarLeftClickTime = milliseconds_now() - TaskbarLeftClickTime;
-                }
-                if (TaskbarLeftClickTime != 0 && TaskbarLeftClickTime < GetDoubleClickTime())
-                {
-                    TaskbarLeftClickTime = 0;
-                    ToggleTaskbarAutohide();
-                }
-                else
-                {
-                    TaskbarLeftClickTime = milliseconds_now();
-                }
+                TaskbarLeftClickTime = milliseconds_now() - TaskbarLeftClickTime;
             }
-            bTaskbarLeftClickEven = !bTaskbarLeftClickEven;
+            if (TaskbarLeftClickTime != 0 && TaskbarLeftClickTime < GetDoubleClickTime())
+            {
+                TaskbarLeftClickTime = 0;
+                ToggleTaskbarAutohide();
+            }
+            else
+            {
+                TaskbarLeftClickTime = milliseconds_now();
+            }
+        }
+        bTaskbarLeftClickEven = !bTaskbarLeftClickEven;
         //}
     }
     return CallNextHookEx(Shell_TrayWndMouseHook, nCode, wParam, lParam);
 }
 
 INT64 Shell_TrayWndSubclassProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    UINT_PTR    uIdSubclass,
-    DWORD_PTR   bIsPrimaryTaskbar
+    UINT_PTR uIdSubclass,
+    DWORD_PTR bIsPrimaryTaskbar
 )
 {
     if (uMsg == WM_NCDESTROY)
@@ -2425,7 +2480,9 @@ INT64 Shell_TrayWndSubclassProc(
         }
         RemoveWindowSubclass(hWnd, Shell_TrayWndSubclassProc, Shell_TrayWndSubclassProc);
     }
-    else if (bOldTaskbar && !bIsPrimaryTaskbar && TaskbarCenter_ShouldCenter(dwMMOldTaskbarAl) && TaskbarCenter_ShouldStartBeCentered(dwMMOldTaskbarAl) && (uMsg == WM_NCLBUTTONDOWN || uMsg == WM_NCRBUTTONUP) && HandleTaskbarCornerInteraction(hWnd, uMsg, wParam, lParam))
+    else if (bOldTaskbar && !bIsPrimaryTaskbar && TaskbarCenter_ShouldCenter(dwMMOldTaskbarAl) &&
+        TaskbarCenter_ShouldStartBeCentered(dwMMOldTaskbarAl) && (uMsg == WM_NCLBUTTONDOWN || uMsg == WM_NCRBUTTONUP) &&
+        HandleTaskbarCornerInteraction(hWnd, uMsg, wParam, lParam))
     {
         return 0;
     }
@@ -2492,12 +2549,13 @@ INT64 Shell_TrayWndSubclassProc(
                 HWND hShellTray_Wnd = FindWindowExW(NULL, NULL, L"Shell_TrayWnd", NULL);
                 INT64* CTrayInstance = (BYTE*)(GetWindowLongPtrW(hShellTray_Wnd, 0)); // -> CTray
                 const unsigned int TRAYUI_OFFSET_IN_CTRAY = 110;
-                uintptr_t TrayUIInstance = *((INT64*)CTrayInstance + TRAYUI_OFFSET_IN_CTRAY) + 8;
+                uintptr_t TrayUIInstance = *(CTrayInstance + TRAYUI_OFFSET_IN_CTRAY) + 8;
                 if (TrayUIInstance)
                 {
                     int offset = 656;
                     if (IsWindows11Version22H2OrHigher()) offset = 640;
-                    if ((*(unsigned __int8(__fastcall**)(INT64))(**(INT64**)(TrayUIInstance + offset) + 104i64))(*(INT64*)(TrayUIInstance + offset)))
+                    if ((*(unsigned __int8(__fastcall**)(INT64))(**(INT64**)(TrayUIInstance + offset) + 104i64))(
+                        *(INT64*)(TrayUIInstance + offset)))
                     {
                         DeleteMenu(hSubMenu, 0x1A0u, 0);
                     }
@@ -2507,7 +2565,8 @@ INT64 Shell_TrayWndSubclassProc(
                         WCHAR v40[MAX_PATH];
                         WCHAR NewItem[MAX_PATH];
                         LoadStringW(GetModuleHandleW(NULL), 0x216u, Buffer, 64);
-                        UINT v22 = (*(__int64(__fastcall**)(INT64))(**(INT64**)(TrayUIInstance + offset) + 112i64))(*(INT64*)(TrayUIInstance + offset));
+                        UINT v22 = (*(__int64(__fastcall**)(INT64))(**(INT64**)(TrayUIInstance + offset) + 112i64))(
+                            *(INT64*)(TrayUIInstance + offset));
                         LoadStringW(GetModuleHandleW(NULL), v22, v40, 96);
                         swprintf_s(NewItem, 0xA0ui64, Buffer, v40);
                         ModifyMenuW(hSubMenu, 0x1A0u, 0, 0x1A0ui64, NewItem);
@@ -2626,7 +2685,8 @@ INT64 Shell_TrayWndSubclassProc(
     {
         g_bIsDesktopRaised = (lParam & 1) == 0;
     }
-    else if (uMsg == WM_SETTINGCHANGE && IsWindows11Version22H2OrHigher() && (*((WORD*)&(lParam)+1)) && !wcscmp(lParam, L"EnsureXAML"))
+    else if (uMsg == WM_SETTINGCHANGE && IsWindows11Version22H2OrHigher() && (*((WORD*)&(lParam) + 1)) && !wcscmp(
+        lParam, L"EnsureXAML"))
     {
         EnsureXAML();
         return 0;
@@ -2640,12 +2700,12 @@ INT64 Shell_TrayWndSubclassProc(
 #pragma region "Allow legacy volume applet"
 #ifdef _WIN64
 LSTATUS sndvolsso_RegGetValueW(
-    HKEY    hkey,
+    HKEY hkey,
     LPCWSTR lpSubKey,
     LPCWSTR lpValue,
-    DWORD   dwFlags,
+    DWORD dwFlags,
     LPDWORD pdwType,
-    PVOID   pvData,
+    PVOID pvData,
     LPDWORD pcbData
 )
 {
@@ -2672,14 +2732,14 @@ LSTATUS sndvolsso_RegGetValueW(
 #pragma region "Allow legacy date and time"
 #ifdef _WIN64
 DEFINE_GUID(GUID_Win32Clock,
-    0x0A323554A,
-    0x0FE1, 0x4E49, 0xae, 0xe1,
-    0x67, 0x22, 0x46, 0x5d, 0x79, 0x9f
+            0x0A323554A,
+            0x0FE1, 0x4E49, 0xae, 0xe1,
+            0x67, 0x22, 0x46, 0x5d, 0x79, 0x9f
 );
 DEFINE_GUID(IID_Win32Clock,
-    0x7A5FCA8A,
-    0x76B1, 0x44C8, 0xa9, 0x7c,
-    0xe7, 0x17, 0x3c, 0xca, 0x5f, 0x4f
+            0x7A5FCA8A,
+            0x76B1, 0x44C8, 0xa9, 0x7c,
+            0xe7, 0x17, 0x3c, 0xca, 0x5f, 0x4f
 );
 typedef interface Win32Clock Win32Clock;
 
@@ -2687,19 +2747,19 @@ typedef struct Win32ClockVtbl
 {
     BEGIN_INTERFACE
 
-        HRESULT(STDMETHODCALLTYPE* QueryInterface)(
-            Win32Clock* This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */
-            _COM_Outptr_  void** ppvObject);
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
+        Win32Clock* This,
+        /* [in] */ REFIID riid,
+        /* [annotation][iid_is][out] */
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         Win32Clock* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         Win32Clock* This);
 
-    HRESULT(STDMETHODCALLTYPE* ShowWin32Clock)(
+    HRESULT (STDMETHODCALLTYPE* ShowWin32Clock)(
         Win32Clock* This,
         /* [in] */ HWND hWnd,
         /* [in] */ LPRECT lpRect);
@@ -2711,6 +2771,7 @@ interface Win32Clock
 {
     CONST_VTBL struct Win32ClockVtbl* lpVtbl;
 };
+
 DWORD ShouldShowLegacyClockExperience()
 {
     DWORD dwVal = 0, dwSize = sizeof(DWORD);
@@ -2720,13 +2781,14 @@ DWORD ShouldShowLegacyClockExperience()
         SRRF_RT_REG_DWORD,
         NULL,
         &dwVal,
-        (LPDWORD)(&dwSize)
+        &dwSize
     ) == ERROR_SUCCESS)
     {
         return dwVal;
     }
     return 0;
 }
+
 BOOL ShowLegacyClockExperience(HWND hWnd)
 {
     if (!hWnd)
@@ -2753,12 +2815,12 @@ BOOL ShowLegacyClockExperience(HWND hWnd)
 }
 
 INT64 ClockButtonSubclassProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    UINT_PTR    uIdSubclass,
-    DWORD_PTR   dwRefData
+    UINT_PTR uIdSubclass,
+    DWORD_PTR dwRefData
 )
 {
     if (uMsg == WM_NCDESTROY)
@@ -2773,12 +2835,9 @@ INT64 ClockButtonSubclassProc(
             {
                 return ShowLegacyClockExperience(hWnd);
             }
-            else
-            {
-                return 1;
-            }
+            return 1;
         }
-        else if (ShouldShowLegacyClockExperience() == 2)
+        if (ShouldShowLegacyClockExperience() == 2)
         {
             if (FindWindowW(L"Windows.UI.Core.CoreWindow", NULL))
             {
@@ -2802,13 +2861,14 @@ INT64 ClockButtonSubclassProc(
 
 #pragma region "Popup menu hooks"
 BOOL IsImmersiveMenu = FALSE;
+
 BOOL CheckIfImmersiveContextMenu(
     HWND unnamedParam1,
     LPCSTR unnamedParam2,
     HANDLE unnamedParam3
 )
 {
-    if ((*((WORD*)&(unnamedParam2)+1)))
+    if ((*((WORD*)&(unnamedParam2) + 1)))
     {
         if (!strncmp(unnamedParam2, "ImmersiveContextMenuArray", 25))
         {
@@ -2818,6 +2878,7 @@ BOOL CheckIfImmersiveContextMenu(
     }
     return TRUE;
 }
+
 void RemoveOwnerDrawFromMenu(int level, HMENU hMenu)
 {
     if (hMenu)
@@ -2831,12 +2892,14 @@ void RemoveOwnerDrawFromMenu(int level, HMENU hMenu)
             if (GetMenuItemInfoW(hMenu, i, TRUE, &mii) && (mii.fType & MFT_OWNERDRAW))
             {
                 mii.fType &= ~MFT_OWNERDRAW;
-                printf("[ROD]: Level %d Position %d/%d Status %d\n", level, i, k, SetMenuItemInfoW(hMenu, i, TRUE, &mii));
+                printf("[ROD]: Level %d Position %d/%d Status %d\n", level, i, k,
+                       SetMenuItemInfoW(hMenu, i, TRUE, &mii));
                 RemoveOwnerDrawFromMenu(level + 1, mii.hSubMenu);
             }
         }
     }
 }
+
 BOOL CheckIfMenuContainsOwnPropertiesItem(HMENU hMenu)
 {
 #ifdef _WIN64
@@ -2858,12 +2921,13 @@ BOOL CheckIfMenuContainsOwnPropertiesItem(HMENU hMenu)
 #endif
     return FALSE;
 }
+
 BOOL TrackPopupMenuHookEx(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -2873,16 +2937,21 @@ BOOL TrackPopupMenuHookEx(
     ZeroMemory(wszClassName, 200);
     GetClassNameW(hWnd, wszClassName, 200);
 
-    BOOL bIsTaskbar = (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd")) ? !bSkinMenus : bDisableImmersiveContextMenu;
+    BOOL bIsTaskbar = (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd"))
+                          ? !bSkinMenus
+                          : bDisableImmersiveContextMenu;
     //wprintf(L">> %s %d %d\n", wszClassName, bIsTaskbar, bIsExplorerProcess);
 
     BOOL bContainsOwn = FALSE;
-    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd")))
+    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(
+        wszClassName, L"Shell_SecondaryTrayWnd")))
     {
         bContainsOwn = CheckIfMenuContainsOwnPropertiesItem(hMenu);
     }
 
-    if (bIsTaskbar && (bIsExplorerProcess ? 1 : (!wcscmp(wszClassName, L"SHELLDLL_DefView") || !wcscmp(wszClassName, L"SysTreeView32"))))
+    if (bIsTaskbar && (bIsExplorerProcess
+                           ? 1
+                           : (!wcscmp(wszClassName, L"SHELLDLL_DefView") || !wcscmp(wszClassName, L"SysTreeView32"))))
     {
         EnumPropsA(hWnd, CheckIfImmersiveContextMenu);
         if (IsImmersiveMenu)
@@ -2945,13 +3014,14 @@ BOOL TrackPopupMenuHookEx(
 #endif
     return b;
 }
+
 BOOL TrackPopupMenuHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    int         nReserved,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    int nReserved,
+    HWND hWnd,
     const RECT* prcRect
 )
 {
@@ -2961,16 +3031,21 @@ BOOL TrackPopupMenuHook(
     ZeroMemory(wszClassName, 200);
     GetClassNameW(hWnd, wszClassName, 200);
 
-    BOOL bIsTaskbar = (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd")) ? !bSkinMenus : bDisableImmersiveContextMenu;
+    BOOL bIsTaskbar = (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd"))
+                          ? !bSkinMenus
+                          : bDisableImmersiveContextMenu;
     //wprintf(L">> %s %d %d\n", wszClassName, bIsTaskbar, bIsExplorerProcess);
 
     BOOL bContainsOwn = FALSE;
-    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd")))
+    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(
+        wszClassName, L"Shell_SecondaryTrayWnd")))
     {
         bContainsOwn = CheckIfMenuContainsOwnPropertiesItem(hMenu);
     }
 
-    if (bIsTaskbar && (bIsExplorerProcess ? 1 : (!wcscmp(wszClassName, L"SHELLDLL_DefView") || !wcscmp(wszClassName, L"SysTreeView32"))))
+    if (bIsTaskbar && (bIsExplorerProcess
+                           ? 1
+                           : (!wcscmp(wszClassName, L"SHELLDLL_DefView") || !wcscmp(wszClassName, L"SysTreeView32"))))
     {
         EnumPropsA(hWnd, CheckIfImmersiveContextMenu);
         if (IsImmersiveMenu)
@@ -3042,6 +3117,7 @@ BOOL TrackPopupMenuHook(
 #define TB_POS_TOP 2
 #define TB_POS_LEFT 3
 #define TB_POS_RIGHT 4
+
 void PopupMenuAdjustCoordinatesAndFlags(int* x, int* y, UINT* uFlags)
 {
     POINT pt;
@@ -3069,6 +3145,7 @@ void PopupMenuAdjustCoordinatesAndFlags(int* x, int* y, UINT* uFlags)
         *uFlags |= TPM_VCENTERALIGN | TPM_RIGHTALIGN;
     }
 }
+
 UINT GetTaskbarLocationAndSize(POINT ptCursor, RECT* rc)
 {
     MONITORINFO mi;
@@ -3090,28 +3167,29 @@ UINT GetTaskbarLocationAndSize(POINT ptCursor, RECT* rc)
         {
             return TB_POS_BOTTOM;
         }
-        else if (rcC.left < 5 && rcC.top < 5 && rcC.right > rcC.bottom)
+        if (rcC.left < 5 && rcC.top < 5 && rcC.right > rcC.bottom)
         {
             return TB_POS_TOP;
         }
-        else if (rcC.left < 5 && rcC.top < 5 && rcC.right < rcC.bottom)
+        if (rcC.left < 5 && rcC.top < 5 && rcC.right < rcC.bottom)
         {
             return TB_POS_LEFT;
         }
-        else if (rcC.left > 5 && rcC.top < 5)
+        if (rcC.left > 5 && rcC.top < 5)
         {
             return TB_POS_RIGHT;
         }
     }
     return TB_POS_NOWHERE;
 }
+
 INT64 OwnerDrawSubclassProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    UINT_PTR    uIdSubclass,
-    DWORD_PTR   dwRefData
+    UINT_PTR uIdSubclass,
+    DWORD_PTR dwRefData
 )
 {
     BOOL v12 = FALSE;
@@ -3134,13 +3212,15 @@ INT64 OwnerDrawSubclassProc(
         lParam
     );
 }
+
 long long explorer_TrackPopupMenuExElapsed = 0;
+
 BOOL explorer_TrackPopupMenuExHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -3151,16 +3231,20 @@ BOOL explorer_TrackPopupMenuExHook(
     ZeroMemory(wszClassName, 200);
     GetClassNameW(hWnd, wszClassName, 200);
     BOOL bContainsOwn = FALSE;
-    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(wszClassName, L"Shell_SecondaryTrayWnd")))
+    if (bIsExplorerProcess && (!wcscmp(wszClassName, L"Shell_TrayWnd") || !wcscmp(
+        wszClassName, L"Shell_SecondaryTrayWnd")))
     {
         bContainsOwn = CheckIfMenuContainsOwnPropertiesItem(hMenu);
     }
-    
+
     wchar_t wszClassNameOfWindowUnderCursor[200];
     ZeroMemory(wszClassNameOfWindowUnderCursor, 200);
-    POINT p; p.x = x; p.y = y;
+    POINT p;
+    p.x = x;
+    p.y = y;
     GetClassNameW(WindowFromPoint(p), wszClassNameOfWindowUnderCursor, 200);
-    BOOL bIsSecondaryTaskbar = (!wcscmp(wszClassName, L"Shell_SecondaryTrayWnd") && !wcscmp(wszClassNameOfWindowUnderCursor, L"Shell_SecondaryTrayWnd"));
+    BOOL bIsSecondaryTaskbar = (!wcscmp(wszClassName, L"Shell_SecondaryTrayWnd") && !wcscmp(
+        wszClassNameOfWindowUnderCursor, L"Shell_SecondaryTrayWnd"));
 
     if (elapsed > POPUPMENU_EX_ELAPSED || !bFlyoutMenus || bIsSecondaryTaskbar)
     {
@@ -3212,14 +3296,16 @@ BOOL explorer_TrackPopupMenuExHook(
     }
     return b;
 }
+
 long long pnidui_TrackPopupMenuElapsed = 0;
+
 BOOL pnidui_TrackPopupMenuHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    int         nReserved,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    int nReserved,
+    HWND hWnd,
     const RECT* prcRect
 )
 {
@@ -3273,13 +3359,15 @@ BOOL pnidui_TrackPopupMenuHook(
     }
     return b;
 }
+
 long long sndvolsso_TrackPopupMenuExElapsed = 0;
+
 BOOL sndvolsso_TrackPopupMenuExHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -3364,6 +3452,7 @@ BOOL sndvolsso_TrackPopupMenuExHook(
     }
     return b;
 }
+
 void PatchSndvolsso()
 {
     HANDLE hSndvolsso = LoadLibraryW(L"sndvolsso.dll");
@@ -3377,13 +3466,15 @@ void PatchSndvolsso()
 #endif
     printf("Setup sndvolsso functions done\n");
 }
+
 long long stobject_TrackPopupMenuExElapsed = 0;
+
 BOOL stobject_TrackPopupMenuExHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -3439,14 +3530,16 @@ BOOL stobject_TrackPopupMenuExHook(
     }
     return b;
 }
+
 long long stobject_TrackPopupMenuElapsed = 0;
+
 BOOL stobject_TrackPopupMenuHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    int         nReserved,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    int nReserved,
+    HWND hWnd,
     const RECT* prcRect
 )
 {
@@ -3503,13 +3596,15 @@ BOOL stobject_TrackPopupMenuHook(
     }
     return b;
 }
+
 long long bthprops_TrackPopupMenuExElapsed = 0;
+
 BOOL bthprops_TrackPopupMenuExHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -3565,13 +3660,15 @@ BOOL bthprops_TrackPopupMenuExHook(
     }
     return b;
 }
+
 long long inputswitch_TrackPopupMenuExElapsed = 0;
+
 BOOL inputswitch_TrackPopupMenuExHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    HWND hWnd,
     LPTPMPARAMS lptpm
 )
 {
@@ -3619,14 +3716,16 @@ BOOL inputswitch_TrackPopupMenuExHook(
     }
     return b;
 }
+
 long long twinui_TrackPopupMenuElapsed = 0;
+
 BOOL twinui_TrackPopupMenuHook(
-    HMENU       hMenu,
-    UINT        uFlags,
-    int         x,
-    int         y,
-    int         nReserved,
-    HWND        hWnd,
+    HMENU hMenu,
+    UINT uFlags,
+    int x,
+    int y,
+    int nReserved,
+    HWND hWnd,
     const RECT* prcRect
 )
 {
@@ -3681,10 +3780,10 @@ BOOL twinui_TrackPopupMenuHook(
 
 #pragma region "Disable immersive menus"
 BOOL WINAPI DisableImmersiveMenus_SystemParametersInfoW(
-    UINT  uiAction,
-    UINT  uiParam,
+    UINT uiAction,
+    UINT uiParam,
     PVOID pvParam,
-    UINT  fWinIni
+    UINT fWinIni
 )
 {
     if (bDisableImmersiveContextMenu && uiAction == SPI_GETSCREENREADER)
@@ -3737,9 +3836,11 @@ HRESULT ApplyMicaToExplorerTitlebar(HWND hWnd, DWORD_PTR bMicaEffectOnTitleBarOr
     return SetMicaMaterialForThisWindow(hWndRoot, bShouldApplyMica);
 }
 
-LRESULT RebarWindow32MicaTitlebarSubclassproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT RebarWindow32MicaTitlebarSubclassproc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass,
+                                              DWORD_PTR dwRefData)
 {
-    if (uMsg == RB_SETWINDOWTHEME && !wcsncmp(lParam, L"DarkMode", 8) && dwRefData != 2 && ShouldApplyMica(GetAncestor(hWnd, GA_ROOT)))
+    if (uMsg == RB_SETWINDOWTHEME && !wcsncmp(lParam, L"DarkMode", 8) && dwRefData != 2 && ShouldApplyMica(
+        GetAncestor(hWnd, GA_ROOT)))
     {
         lParam = wcsstr(lParam, L"NavbarComposited");
     }
@@ -3750,7 +3851,8 @@ LRESULT RebarWindow32MicaTitlebarSubclassproc(HWND hWnd, UINT uMsg, WPARAM wPara
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT ExplorerMicaTitlebarSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT ExplorerMicaTitlebarSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass,
+                                         DWORD_PTR dwRefData)
 {
     if (uMsg == WM_DESTROY)
     {
@@ -3760,7 +3862,8 @@ LRESULT ExplorerMicaTitlebarSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
     {
         wchar_t wszParentText[100];
         GetWindowTextW(GetParent(hWnd), wszParentText, 100);
-        if (_wcsicmp(wszParentText, L"FloatingWindow") && dwRefData != 2 && ShouldApplyMica(GetAncestor(hWnd, GA_ROOT))) return TRUE;
+        if (_wcsicmp(wszParentText, L"FloatingWindow") && dwRefData != 2 && ShouldApplyMica(GetAncestor(hWnd, GA_ROOT)))
+            return TRUE;
     }
     else if (uMsg == WM_WINDOWPOSCHANGED)
     {
@@ -3785,14 +3888,16 @@ LRESULT ExplorerMicaTitlebarSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
             ATOM atom = GetClassWord(lParam, GCW_ATOM);
             if (atom == RegisterWindowMessageW(L"ReBarWindow32"))
             {
-                SetWindowSubclass(lParam, RebarWindow32MicaTitlebarSubclassproc, RebarWindow32MicaTitlebarSubclassproc, dwRefData);
+                SetWindowSubclass(lParam, RebarWindow32MicaTitlebarSubclassproc, RebarWindow32MicaTitlebarSubclassproc,
+                                  dwRefData);
             }
         }
     }
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK HideIconAndTitleInExplorerSubClass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK HideIconAndTitleInExplorerSubClass(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+                                                    UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
     if (uMsg == WM_DESTROY)
     {
@@ -3820,28 +3925,28 @@ HRESULT uxtheme_DwmExtendFrameIntoClientAreaHook(HWND hWnd, MARGINS* m)
     return DwmExtendFrameIntoClientArea(hWnd, m);
 }
 
-static HWND(__stdcall *explorerframe_SHCreateWorkerWindowFunc)(
-    WNDPROC  	wndProc,
-    HWND  	hWndParent,
-    DWORD  	dwExStyle,
-    DWORD  	dwStyle,
-    HMENU  	hMenu,
-    LONG_PTR  	wnd_extra
-    );
+static HWND (__stdcall *explorerframe_SHCreateWorkerWindowFunc)(
+    WNDPROC wndProc,
+    HWND hWndParent,
+    DWORD dwExStyle,
+    DWORD dwStyle,
+    HMENU hMenu,
+    LONG_PTR wnd_extra
+);
 
 HWND WINAPI explorerframe_SHCreateWorkerWindowHook(
-    WNDPROC  	wndProc,
-    HWND  	hWndParent,
-    DWORD  	dwExStyle,
-    DWORD  	dwStyle,
-    HMENU  	hMenu,
-    LONG_PTR  	wnd_extra
+    WNDPROC wndProc,
+    HWND hWndParent,
+    DWORD dwExStyle,
+    DWORD dwStyle,
+    HMENU hMenu,
+    LONG_PTR wnd_extra
 )
 {
     HWND result;
     LSTATUS lRes = ERROR_FILE_NOT_FOUND;
     DWORD dwSize = 0;
-    
+
     printf("%x %x\n", dwExStyle, dwStyle);
 
     if (SHRegGetValueFromHKCUHKLMWithOpt(
@@ -3849,7 +3954,7 @@ HWND WINAPI explorerframe_SHCreateWorkerWindowHook(
         TEXT(""),
         KEY_READ | KEY_WOW64_64KEY,
         NULL,
-        (LPDWORD)(&dwSize)
+        &dwSize
     ) == ERROR_SUCCESS && (dwSize < 4) && dwExStyle == 0x10000 && dwStyle == 1174405120)
     {
         result = 0;
@@ -3873,7 +3978,8 @@ HWND WINAPI explorerframe_SHCreateWorkerWindowHook(
         }
         if (bMicaEffectOnTitlebar)
         {
-            SetWindowSubclass(result, ExplorerMicaTitlebarSubclassProc, ExplorerMicaTitlebarSubclassProc, bMicaEffectOnTitlebar);
+            SetWindowSubclass(result, ExplorerMicaTitlebarSubclassProc, ExplorerMicaTitlebarSubclassProc,
+                              bMicaEffectOnTitlebar);
         }
         if (bHideExplorerSearchBar)
         {
@@ -3888,12 +3994,12 @@ HWND WINAPI explorerframe_SHCreateWorkerWindowHook(
 #pragma region "Fix battery flyout"
 #ifdef _WIN64
 LSTATUS stobject_RegGetValueW(
-    HKEY    hkey,
+    HKEY hkey,
     LPCWSTR lpSubKey,
     LPCWSTR lpValue,
-    DWORD   dwFlags,
+    DWORD dwFlags,
     LPDWORD pdwType,
-    PVOID   pvData,
+    PVOID pvData,
     LPDWORD pcbData
 )
 {
@@ -3915,10 +4021,10 @@ LSTATUS stobject_RegGetValueW(
 }
 
 HRESULT stobject_CoCreateInstanceHook(
-    REFCLSID  rclsid,
+    REFCLSID rclsid,
     LPUNKNOWN pUnkOuter,
-    DWORD     dwClsContext,
-    REFIID    riid,
+    DWORD dwClsContext,
+    REFIID riid,
     LPVOID* ppv
 )
 {
@@ -3933,7 +4039,7 @@ HRESULT stobject_CoCreateInstanceHook(
             SRRF_RT_REG_DWORD,
             NULL,
             &dwVal,
-            (LPDWORD)(&dwSize)
+            &dwSize
         );
         if (!dwVal)
         {
@@ -3990,15 +4096,15 @@ HRESULT stobject_CoCreateInstanceHook(
 #pragma region "Show WiFi networks on network icon click"
 #ifdef _WIN64
 HRESULT pnidui_CoCreateInstanceHook(
-    REFCLSID  rclsid,
+    REFCLSID rclsid,
     LPUNKNOWN pUnkOuter,
-    DWORD     dwClsContext,
-    REFIID    riid,
+    DWORD dwClsContext,
+    REFIID riid,
     LPVOID* ppv
 )
 {
     DWORD dwVal = 0, dwSize = sizeof(DWORD);
-    if (IsEqualGUID(rclsid, &CLSID_ImmersiveShell) && 
+    if (IsEqualGUID(rclsid, &CLSID_ImmersiveShell) &&
         IsEqualGUID(riid, &IID_IServiceProvider) &&
         SHRegGetValueFromHKCUHKLMFunc)
     {
@@ -4008,7 +4114,7 @@ HRESULT pnidui_CoCreateInstanceHook(
             SRRF_RT_REG_DWORD,
             NULL,
             &dwVal,
-            (LPDWORD)(&dwSize)
+            &dwSize
         );
         if (dwVal)
         {
@@ -4039,45 +4145,42 @@ HRESULT pnidui_CoCreateInstanceHook(
             }
             return E_NOINTERFACE;
         }
-        else
+        if (hCheckForegroundThread)
         {
-            if (hCheckForegroundThread)
+            if (WaitForSingleObject(hCheckForegroundThread, 0) == WAIT_TIMEOUT)
             {
-                if (WaitForSingleObject(hCheckForegroundThread, 0) == WAIT_TIMEOUT)
-                {
-                    return E_NOINTERFACE;
-                }
-                WaitForSingleObject(hCheckForegroundThread, INFINITE);
-                CloseHandle(hCheckForegroundThread);
-                hCheckForegroundThread = NULL;
+                return E_NOINTERFACE;
             }
-            HKEY hKey = NULL;
-            if (RegCreateKeyExW(
-                HKEY_CURRENT_USER,
-                _T(SEH_REGPATH),
-                0,
-                NULL,
-                REG_OPTION_NON_VOLATILE,
-                KEY_READ,
-                NULL,
-                &hKey,
-                NULL
-            ) == ERROR_SUCCESS)
-            {
-                RegCloseKey(hKey);
-            }
-            TerminateShellExperienceHost();
-            InvokeFlyout(0, INVOKE_FLYOUT_NETWORK);
-            Sleep(100);
-            hCheckForegroundThread = CreateThread(
-                0,
-                0,
-                CheckForegroundThread,
-                dwVal,
-                0,
-                0
-            );
+            WaitForSingleObject(hCheckForegroundThread, INFINITE);
+            CloseHandle(hCheckForegroundThread);
+            hCheckForegroundThread = NULL;
         }
+        HKEY hKey = NULL;
+        if (RegCreateKeyExW(
+            HKEY_CURRENT_USER,
+            _T(SEH_REGPATH),
+            0,
+            NULL,
+            REG_OPTION_NON_VOLATILE,
+            KEY_READ,
+            NULL,
+            &hKey,
+            NULL
+        ) == ERROR_SUCCESS)
+        {
+            RegCloseKey(hKey);
+        }
+        TerminateShellExperienceHost();
+        InvokeFlyout(0, INVOKE_FLYOUT_NETWORK);
+        Sleep(100);
+        hCheckForegroundThread = CreateThread(
+            0,
+            0,
+            CheckForegroundThread,
+            dwVal,
+            0,
+            0
+        );
     }
     return CoCreateInstance(
         rclsid,
@@ -4099,6 +4202,7 @@ typedef struct _ClockButton_ToggleFlyoutCallback_Params
     unsigned int CLOCKBUTTON_OFFSET_IN_TRAYUI;
     void* oldClockButtonInstance;
 } ClockButton_ToggleFlyoutCallback_Params;
+
 void ClockButton_ToggleFlyoutCallback(
     HWND hWnd,
     UINT uMsg,
@@ -4109,6 +4213,7 @@ void ClockButton_ToggleFlyoutCallback(
     *((INT64*)params->TrayUIInstance + params->CLOCKBUTTON_OFFSET_IN_TRAYUI) = params->oldClockButtonInstance;
     free(params);
 }
+
 void InvokeClockFlyout()
 {
     POINT ptCursor;
@@ -4129,28 +4234,23 @@ void InvokeClockFlyout()
             {
                 if (bOldTaskbar)
                 {
-                    return ShowLegacyClockExperience(FindWindowExW(FindWindowExW(hShellTray_Wnd, NULL, L"TrayNotifyWnd", NULL), NULL, L"TrayClockWClass", NULL));
+                    return ShowLegacyClockExperience(FindWindowExW(
+                        FindWindowExW(hShellTray_Wnd, NULL, L"TrayNotifyWnd", NULL), NULL, L"TrayClockWClass", NULL));
                 }
-                else
-                {
-                    POINT pt;
-                    pt.x = 0;
-                    pt.y = 0;
-                    GetCursorPos(&pt);
-                    BOOL bBottom, bRight;
-                    POINT dPt = GetDefaultWinXPosition(FALSE, NULL, NULL, FALSE, TRUE);
-                    SetCursorPos(dPt.x - 1, dPt.y);
-                    BOOL bRet = ShowLegacyClockExperience(hShellTray_Wnd);
-                    SetCursorPos(pt.x, pt.y);
-                    return bRet;
-                }
+                POINT pt;
+                pt.x = 0;
+                pt.y = 0;
+                GetCursorPos(&pt);
+                BOOL bBottom, bRight;
+                POINT dPt = GetDefaultWinXPosition(FALSE, NULL, NULL, FALSE, TRUE);
+                SetCursorPos(dPt.x - 1, dPt.y);
+                BOOL bRet = ShowLegacyClockExperience(hShellTray_Wnd);
+                SetCursorPos(pt.x, pt.y);
+                return bRet;
             }
-            else
-            {
-                return PostMessageW(FindWindowW(L"ClockFlyoutWindow", NULL), WM_CLOSE, 0, 0);
-            }
+            return PostMessageW(FindWindowW(L"ClockFlyoutWindow", NULL), WM_CLOSE, 0, 0);
         }
-        else if (ShouldShowLegacyClockExperience() == 2)
+        if (ShouldShowLegacyClockExperience() == 2)
         {
             ToggleNotificationsFlyout();
             return 0;
@@ -4184,26 +4284,20 @@ void InvokeClockFlyout()
                     {
                         return ShowLegacyClockExperience(hWnd);
                     }
-                    else
-                    {
-                        POINT pt;
-                        pt.x = 0;
-                        pt.y = 0;
-                        GetCursorPos(&pt);
-                        BOOL bBottom, bRight;
-                        POINT dPt = GetDefaultWinXPosition(FALSE, NULL, NULL, FALSE, TRUE);
-                        SetCursorPos(dPt.x, dPt.y);
-                        BOOL bRet = ShowLegacyClockExperience(hWnd);
-                        SetCursorPos(pt.x, pt.y);
-                        return bRet;
-                    }
+                    POINT pt;
+                    pt.x = 0;
+                    pt.y = 0;
+                    GetCursorPos(&pt);
+                    BOOL bBottom, bRight;
+                    POINT dPt = GetDefaultWinXPosition(FALSE, NULL, NULL, FALSE, TRUE);
+                    SetCursorPos(dPt.x, dPt.y);
+                    BOOL bRet = ShowLegacyClockExperience(hWnd);
+                    SetCursorPos(pt.x, pt.y);
+                    return bRet;
                 }
-                else
-                {
-                    return PostMessageW(FindWindowW(L"ClockFlyoutWindow", NULL), WM_CLOSE, 0, 0);
-                }
+                return PostMessageW(FindWindowW(L"ClockFlyoutWindow", NULL), WM_CLOSE, 0, 0);
             }
-            else if (ShouldShowLegacyClockExperience() == 2)
+            if (ShouldShowLegacyClockExperience() == 2)
             {
                 ToggleNotificationsFlyout();
                 return 0;
@@ -4228,16 +4322,18 @@ void InvokeClockFlyout()
                           ClockButton::ToggleFlyout(v80);
                 */
                 const unsigned int CLOCKBUTTON_OFFSET_IN_TRAYUI = 100;
-                void* TrayUIInstance = *((INT64*)CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
+                void* TrayUIInstance = *(CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
                 void* oldClockButtonInstance = *((INT64*)TrayUIInstance + CLOCKBUTTON_OFFSET_IN_TRAYUI);
-                ClockButton_ToggleFlyoutCallback_Params* params = malloc(sizeof(ClockButton_ToggleFlyoutCallback_Params));
+                ClockButton_ToggleFlyoutCallback_Params* params = malloc(
+                    sizeof(ClockButton_ToggleFlyoutCallback_Params));
                 if (params)
                 {
                     *((INT64*)TrayUIInstance + CLOCKBUTTON_OFFSET_IN_TRAYUI) = ClockButtonInstance;
                     params->TrayUIInstance = TrayUIInstance;
                     params->CLOCKBUTTON_OFFSET_IN_TRAYUI = CLOCKBUTTON_OFFSET_IN_TRAYUI;
                     params->oldClockButtonInstance = oldClockButtonInstance;
-                    SendMessageCallbackW(hShellTray_Wnd, WM_TOGGLE_CLOCK_FLYOUT, 0, 0, ClockButton_ToggleFlyoutCallback, params);
+                    SendMessageCallbackW(hShellTray_Wnd, WM_TOGGLE_CLOCK_FLYOUT, 0, 0, ClockButton_ToggleFlyoutCallback,
+                                         params);
                 }
             }
             else
@@ -4247,6 +4343,7 @@ void InvokeClockFlyout()
         }
     }
 }
+
 INT64 winrt_Windows_Internal_Shell_implementation_MeetAndChatManager_OnMessageHook(
     void* _this,
     INT64 a2,
@@ -4274,14 +4371,16 @@ INT64 winrt_Windows_Internal_Shell_implementation_MeetAndChatManager_OnMessageHo
 #pragma region "Enable old taskbar"
 #ifdef _WIN64
 DEFINE_GUID(GUID_18C02F2E_2754_5A20_8BD5_0B34CE79DA2B,
-    0x18C02F2E,
-    0x2754, 0x5A20, 0x8b, 0xd5,
-    0x0b, 0x34, 0xce, 0x79, 0xda, 0x2b
+            0x18C02F2E,
+            0x2754, 0x5A20, 0x8b, 0xd5,
+            0x0b, 0x34, 0xce, 0x79, 0xda, 0x2b
 );
+
 HRESULT explorer_RoGetActivationFactoryHook(HSTRING activatableClassId, GUID* iid, void** factory)
 {
     PCWSTR StringRawBuffer = WindowsGetStringRawBuffer(activatableClassId, 0);
-    if (!wcscmp(StringRawBuffer, L"WindowsUdk.ApplicationModel.AppExtensions.XamlExtensions") && IsEqualGUID(iid, &GUID_18C02F2E_2754_5A20_8BD5_0B34CE79DA2B))
+    if (!wcscmp(StringRawBuffer, L"WindowsUdk.ApplicationModel.AppExtensions.XamlExtensions") && IsEqualGUID(
+        iid, &GUID_18C02F2E_2754_5A20_8BD5_0B34CE79DA2B))
     {
         *factory = &XamlExtensionsFactory;
         return S_OK;
@@ -4291,10 +4390,9 @@ HRESULT explorer_RoGetActivationFactoryHook(HSTRING activatableClassId, GUID* ii
 
 FARPROC explorer_GetProcAddressHook(HMODULE hModule, const CHAR* lpProcName)
 {
-    if ((*((WORD*)&(lpProcName)+1)) && !strncmp(lpProcName, "RoGetActivationFactory", 22))
-        return (FARPROC)explorer_RoGetActivationFactoryHook;
-    else
-        return GetProcAddress(hModule, lpProcName);
+    if ((*((WORD*)&(lpProcName) + 1)) && !strncmp(lpProcName, "RoGetActivationFactory", 22))
+        return explorer_RoGetActivationFactoryHook;
+    return GetProcAddress(hModule, lpProcName);
 }
 #endif
 #pragma endregion
@@ -4354,7 +4452,7 @@ DWORD ShouldShowWidgetsInsteadOfCortana()
         SRRF_RT_REG_DWORD,
         NULL,
         &dwVal,
-        (LPDWORD)(&dwSize)
+        &dwSize
     ) == ERROR_SUCCESS)
     {
         return dwVal;
@@ -4363,6 +4461,7 @@ DWORD ShouldShowWidgetsInsteadOfCortana()
 }
 
 __int64 (*Widgets_OnClickFunc)(__int64 a1, __int64 a2) = 0;
+
 __int64 Widgets_OnClickHook(__int64 a1, __int64 a2)
 {
     if (ShouldShowWidgetsInsteadOfCortana() == 1)
@@ -4370,17 +4469,15 @@ __int64 Widgets_OnClickHook(__int64 a1, __int64 a2)
         ToggleWidgetsPanel();
         return 0;
     }
-    else
+    if (Widgets_OnClickFunc)
     {
-        if (Widgets_OnClickFunc)
-        {
-            return Widgets_OnClickFunc(a1, a2);
-        }
-        return 0;
+        return Widgets_OnClickFunc(a1, a2);
     }
+    return 0;
 }
 
 HRESULT (*Widgets_GetTooltipTextFunc)(__int64 a1, __int64 a2, __int64 a3, WCHAR* a4, UINT a5) = 0;
+
 HRESULT WINAPI Widgets_GetTooltipTextHook(__int64 a1, __int64 a2, __int64 a3, WCHAR* a4, UINT a5)
 {
     if (ShouldShowWidgetsInsteadOfCortana() == 1)
@@ -4392,14 +4489,11 @@ HRESULT WINAPI Widgets_GetTooltipTextHook(__int64 a1, __int64 a2, __int64 a3, WC
             0
         );
     }
-    else
+    if (Widgets_GetTooltipTextFunc)
     {
-        if (Widgets_GetTooltipTextFunc)
-        {
-            return Widgets_GetTooltipTextFunc(a1, a2, a3, a4, a5);
-        }
-        return 0;
+        return Widgets_GetTooltipTextFunc(a1, a2, a3, a4, a5);
     }
+    return 0;
 }
 
 /*int WINAPI explorer_LoadStringWHook(HINSTANCE hInstance, UINT uID, WCHAR* lpBuffer, UINT cchBufferMax)
@@ -4423,6 +4517,7 @@ void stub1(void* i)
 }
 
 #define WEATHER_FIXEDSIZE2_MAXWIDTH 192
+
 BOOL explorer_DeleteMenu(HMENU hMenu, UINT uPosition, UINT uFlags)
 {
     if (uPosition == 621 && uFlags == 0) // when removing News and interests
@@ -4438,6 +4533,7 @@ BOOL explorer_DeleteMenu(HMENU hMenu, UINT uPosition, UINT uFlags)
 }
 
 HWND hWndWeatherFlyout;
+
 void RecomputeWeatherFlyoutLocation(HWND hWnd)
 {
     RECT rcButton;
@@ -4472,7 +4568,8 @@ void RecomputeWeatherFlyoutLocation(HWND hWnd)
 
     if (tbPos == TB_POS_BOTTOM || tbPos == TB_POS_TOP)
     {
-        pNewWindow.x = rcButton.left + ((rcButton.right - rcButton.left) / 2) - ((rcWeatherFlyoutWindow.right - rcWeatherFlyoutWindow.left) / 2);
+        pNewWindow.x = rcButton.left + ((rcButton.right - rcButton.left) / 2) - ((rcWeatherFlyoutWindow.right -
+            rcWeatherFlyoutWindow.left) / 2);
 
         HMONITOR hMonitor = MonitorFromPoint(pButton, MONITOR_DEFAULTTOPRIMARY);
         if (hMonitor)
@@ -4494,7 +4591,8 @@ void RecomputeWeatherFlyoutLocation(HWND hWnd)
     }
     else if (tbPos == TB_POS_LEFT || tbPos == TB_POS_RIGHT)
     {
-        pNewWindow.y = rcButton.top + ((rcButton.bottom - rcButton.top) / 2) - ((rcWeatherFlyoutWindow.bottom - rcWeatherFlyoutWindow.top) / 2);
+        pNewWindow.y = rcButton.top + ((rcButton.bottom - rcButton.top) / 2) - ((rcWeatherFlyoutWindow.bottom -
+            rcWeatherFlyoutWindow.top) / 2);
 
         HMONITOR hMonitor = MonitorFromPoint(pButton, MONITOR_DEFAULTTOPRIMARY);
         if (hMonitor)
@@ -4520,6 +4618,7 @@ void RecomputeWeatherFlyoutLocation(HWND hWnd)
 
 BOOL people_has_ellipsed = FALSE;
 SIZE (*PeopleButton_CalculateMinimumSizeFunc)(void*, SIZE*);
+
 SIZE WINAPI PeopleButton_CalculateMinimumSizeHook(void* _this, SIZE* pSz)
 {
     SIZE ret = PeopleButton_CalculateMinimumSizeFunc(_this, pSz);
@@ -4587,7 +4686,7 @@ SIZE WINAPI PeopleButton_CalculateMinimumSizeHook(void* _this, SIZE* pSz)
                             SRRF_RT_REG_DWORD,
                             NULL,
                             &dwTextScaleFactor,
-                            (LPDWORD)(&dwSize)
+                            &dwSize
                         ) != ERROR_SUCCESS)
                         {
                             dwTextScaleFactor = 100;
@@ -4596,10 +4695,18 @@ SIZE WINAPI PeopleButton_CalculateMinimumSizeHook(void* _this, SIZE* pSz)
                         RECT rcWeatherFlyoutWindow;
                         rcWeatherFlyoutWindow.left = mi.rcWork.left;
                         rcWeatherFlyoutWindow.top = mi.rcWork.top;
-                        rcWeatherFlyoutWindow.right = rcWeatherFlyoutWindow.left + MulDiv(MulDiv(MulDiv(EP_WEATHER_WIDTH, dpiX, 96), dwTextScaleFactor, 100), dwWeatherZoomFactor, 100);
-                        rcWeatherFlyoutWindow.bottom = rcWeatherFlyoutWindow.top + MulDiv(MulDiv(MulDiv(EP_WEATHER_HEIGHT, dpiX, 96), dwTextScaleFactor, 100), dwWeatherZoomFactor, 100);
+                        rcWeatherFlyoutWindow.right = rcWeatherFlyoutWindow.left + MulDiv(
+                            MulDiv(MulDiv(EP_WEATHER_WIDTH, dpiX, 96), dwTextScaleFactor, 100), dwWeatherZoomFactor,
+                            100);
+                        rcWeatherFlyoutWindow.bottom = rcWeatherFlyoutWindow.top + MulDiv(
+                            MulDiv(MulDiv(EP_WEATHER_HEIGHT, dpiX, 96), dwTextScaleFactor, 100), dwWeatherZoomFactor,
+                            100);
                         int k = 0;
-                        while (FAILED(hr = epw->lpVtbl->Initialize(epw, wszEPWeatherKillswitch, bAllocConsole, EP_WEATHER_PROVIDER_GOOGLE, rt, rt, dwWeatherTemperatureUnit, dwWeatherUpdateSchedule * 1000, rcWeatherFlyoutWindow, dwWeatherTheme, dwWeatherGeolocationMode, &hWndWeatherFlyout, dwWeatherZoomFactor ? dwWeatherZoomFactor : 100, dpiX, dpiY)))
+                        while (FAILED(
+                            hr = epw->lpVtbl->Initialize(epw, wszEPWeatherKillswitch, bAllocConsole,
+                                EP_WEATHER_PROVIDER_GOOGLE, rt, rt, dwWeatherTemperatureUnit, dwWeatherUpdateSchedule *
+                                1000, rcWeatherFlyoutWindow, dwWeatherTheme, dwWeatherGeolocationMode, &
+                                hWndWeatherFlyout, dwWeatherZoomFactor ? dwWeatherZoomFactor : 100, dpiX, dpiY)))
                         {
                             BOOL bFailed = FALSE;
                             if (k == 0 && hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
@@ -4622,7 +4729,9 @@ SIZE WINAPI PeopleButton_CalculateMinimumSizeHook(void* _this, SIZE* pSz)
                                 prev_total_h = 0;
                                 PostMessageW(FindWindowW(L"Shell_TrayWnd", NULL), WM_COMMAND, 435, 0);
                                 //PostMessageW(FindWindowW(L"ExplorerPatcher_GUI_" _T(EP_CLSID), NULL), WM_USER + 1, 0, 0);
-                                if (hServiceWindowThread) PostThreadMessageW(GetThreadId(hServiceWindowThread), WM_USER + 1, NULL, NULL);
+                                if (hServiceWindowThread)
+                                    PostThreadMessageW(
+                                        GetThreadId(hServiceWindowThread), WM_USER + 1, NULL, NULL);
                                 break;
                             }
                         }
@@ -4647,7 +4756,9 @@ SIZE WINAPI PeopleButton_CalculateMinimumSizeHook(void* _this, SIZE* pSz)
                     prev_total_h = 0;
                     InvalidateRect(PeopleButton_LastHWND, NULL, TRUE);
                     ReleaseSRWLockExclusive(&lock_epw);*/
-                    if (hServiceWindowThread) PostThreadMessageW(GetThreadId(hServiceWindowThread), WM_USER + 1, NULL, NULL);
+                    if (hServiceWindowThread)
+                        PostThreadMessageW(GetThreadId(hServiceWindowThread), WM_USER + 1, NULL,
+                                           NULL);
                     //AcquireSRWLockShared(&lock_epw);
                 }
             }
@@ -4694,28 +4805,19 @@ int PeopleBand_MulDivHook(int nNumber, int nNumerator, int nDenominator)
                 LeaveCriticalSection(&lock_epw);
                 return MulDiv(nNumber * mul, nNumerator, nDenominator);
             }
-            else
-            {
-                if (prev_total_h)
-                {
-                    LeaveCriticalSection(&lock_epw);
-                    return prev_total_h;
-                }
-                else
-                {
-                    prev_total_h = MulDiv(nNumber, nNumerator, nDenominator);
-                    LeaveCriticalSection(&lock_epw);
-                    return prev_total_h;
-                }
-            }
-            LeaveCriticalSection(&lock_epw);
-        }
-        else
-        {
-            if (bHasLocked)
+            if (prev_total_h)
             {
                 LeaveCriticalSection(&lock_epw);
+                return prev_total_h;
             }
+            prev_total_h = MulDiv(nNumber, nNumerator, nDenominator);
+            LeaveCriticalSection(&lock_epw);
+            return prev_total_h;
+            LeaveCriticalSection(&lock_epw);
+        }
+        if (bHasLocked)
+        {
+            LeaveCriticalSection(&lock_epw);
         }
     }
     return MulDiv(nNumber, nNumerator, nDenominator);
@@ -4740,8 +4842,9 @@ __int64 (*PeopleBand_DrawTextWithGlowFunc)(
     unsigned int dy,
     unsigned int a9,
     int a10,
-    int(__stdcall* a11)(HDC, unsigned __int16*, int, struct tagRECT*, unsigned int, __int64),
+    int (__stdcall* a11)(HDC, unsigned __int16*, int, struct tagRECT*, unsigned int, __int64),
     __int64 a12);
+
 __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
     HDC hdc,
     const unsigned __int16* a2,
@@ -4753,7 +4856,7 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
     unsigned int dy,
     unsigned int a9,
     int a10,
-    int(__stdcall* a11)(HDC, unsigned __int16*, int, struct tagRECT*, unsigned int, __int64),
+    int (__stdcall* a11)(HDC, unsigned __int16*, int, struct tagRECT*, unsigned int, __int64),
     __int64 a12)
 {
     BOOL bHasLocked = FALSE;
@@ -4771,14 +4874,17 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
         if (bUseCachedData ? TRUE : SUCCEEDED(hr = epw->lpVtbl->LockData(epw)))
         {
             UINT dpiX = 0, dpiY = 0;
-            HRESULT hr = GetDpiForMonitor(MonitorFromWindow(PeopleButton_LastHWND, MONITOR_DEFAULTTOPRIMARY), MDT_DEFAULT, &dpiX, &dpiY);
+            HRESULT hr = GetDpiForMonitor(MonitorFromWindow(PeopleButton_LastHWND, MONITOR_DEFAULTTOPRIMARY),
+                                          MDT_DEFAULT, &dpiX, &dpiY);
             BOOL bShouldUnlockData = TRUE;
             DWORD cbTemperature = 0;
             DWORD cbUnit = 0;
             DWORD cbCondition = 0;
             DWORD cbImage = 0;
             BOOL bEmptyData = FALSE;
-            if (bUseCachedData ? TRUE : SUCCEEDED(hr = epw->lpVtbl->GetDataSizes(epw, &cbTemperature, &cbUnit, &cbCondition, &cbImage)))
+            if (bUseCachedData
+                    ? TRUE
+                    : SUCCEEDED(hr = epw->lpVtbl->GetDataSizes(epw, &cbTemperature, &cbUnit, &cbCondition, &cbImage)))
             {
                 if (cbTemperature && cbUnit && cbCondition && cbImage)
                 {
@@ -4827,15 +4933,21 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                     }
                     epw_pImage = calloc(1, epw_cbImage);
                 }
-                if (bUseCachedData ? TRUE : SUCCEEDED(hr = epw->lpVtbl->GetData(epw, epw_cbTemperature, epw_wszTemperature, epw_cbUnit, epw_wszUnit, epw_cbCondition, epw_wszCondition, epw_cbImage, epw_pImage)))
+                if (bUseCachedData
+                        ? TRUE
+                        : SUCCEEDED(
+                            hr = epw->lpVtbl->GetData(epw, epw_cbTemperature, epw_wszTemperature, epw_cbUnit,
+                                epw_wszUnit, epw_cbCondition, epw_wszCondition, epw_cbImage, epw_pImage)))
                 {
                     if (!bUseCachedData)
                     {
                         WCHAR wszBuffer[MAX_PATH];
                         ZeroMemory(wszBuffer, sizeof(WCHAR) * MAX_PATH);
-                        swprintf_s(wszBuffer, MAX_PATH, L"%s %s, %s, ", epw_wszTemperature, epw_wszUnit, epw_wszCondition);
+                        swprintf_s(wszBuffer, MAX_PATH, L"%s %s, %s, ", epw_wszTemperature, epw_wszUnit,
+                                   epw_wszCondition);
                         int len = wcslen(wszBuffer);
-                        epw->lpVtbl->GetTitle(epw, sizeof(WCHAR) * (MAX_PATH - len), wszBuffer + len, dwWeatherViewMode);
+                        epw->lpVtbl->GetTitle(epw, sizeof(WCHAR) * (MAX_PATH - len), wszBuffer + len,
+                                              dwWeatherViewMode);
                         SetWindowTextW(PeopleButton_LastHWND, wszBuffer);
 
                         epw->lpVtbl->UnlockData(epw);
@@ -4879,7 +4991,8 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                             COLORREF rgbColor = RGB(0, 0, 0);
                             if (bIsThemeActive)
                             {
-                                if ((global_rovi.dwBuildNumber < 18985) || (ShouldSystemUseDarkMode && ShouldSystemUseDarkMode()))
+                                if ((global_rovi.dwBuildNumber < 18985) || (ShouldSystemUseDarkMode &&
+                                    ShouldSystemUseDarkMode()))
                                 {
                                     rgbColor = RGB(255, 255, 255);
                                 }
@@ -4897,7 +5010,8 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                 size.cx = rcText.right - rcText.left;
                                 size.cy = rcText.bottom - rcText.top;
                                 DWORD dwTextFlags = DT_SINGLELINE | DT_VCENTER | DT_HIDEPREFIX | DT_CENTER;
-                                HBITMAP hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(L"\U0001f4f0", hFont, dwTextFlags, size, rgbColor);
+                                HBITMAP hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(
+                                    L"\U0001f4f0", hFont, dwTextFlags, size, rgbColor);
                                 if (hBitmap)
                                 {
                                     HBITMAP hOldBMP = SelectBitmap(hDC, hBitmap);
@@ -4909,7 +5023,8 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                     bf.BlendFlags = 0;
                                     bf.SourceConstantAlpha = 0xFF;
                                     bf.AlphaFormat = AC_SRC_ALPHA;
-                                    GdiAlphaBlend(hdc, 0, 0, BMInf.bmWidth, BMInf.bmHeight, hDC, 0, 0, BMInf.bmWidth, BMInf.bmHeight, bf);
+                                    GdiAlphaBlend(hdc, 0, 0, BMInf.bmWidth, BMInf.bmHeight, hDC, 0, 0, BMInf.bmWidth,
+                                                  BMInf.bmHeight, bf);
 
                                     SelectBitmap(hDC, hOldBMP);
                                     DeleteBitmap(hBitmap);
@@ -4917,21 +5032,29 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                             }
                             else
                             {
-                                DWORD dwWeatherSplit = (dwWeatherContentsMode && (dwWeatherViewMode == EP_WEATHER_VIEW_ICONTEXT || dwWeatherViewMode == EP_WEATHER_VIEW_TEXTONLY) && !dwTaskbarSmallIcons);
+                                DWORD dwWeatherSplit = (dwWeatherContentsMode && (dwWeatherViewMode ==
+                                        EP_WEATHER_VIEW_ICONTEXT || dwWeatherViewMode == EP_WEATHER_VIEW_TEXTONLY) && !
+                                    dwTaskbarSmallIcons);
 
                                 DWORD dwTextFlags = DT_SINGLELINE | DT_HIDEPREFIX;
 
                                 WCHAR wszText1[MAX_PATH];
-                                swprintf_s(wszText1, MAX_PATH, L"%s%s %s", bIsThemeActive ? L"" : L" ", epw_wszTemperature, dwWeatherTemperatureUnit == EP_WEATHER_TUNIT_FAHRENHEIT ? L"\u00B0F" : L"\u00B0C");// epw_wszUnit);
+                                swprintf_s(wszText1, MAX_PATH, L"%s%s %s", bIsThemeActive ? L"" : L" ",
+                                           epw_wszTemperature,
+                                           dwWeatherTemperatureUnit == EP_WEATHER_TUNIT_FAHRENHEIT
+                                               ? L"\u00B0F"
+                                               : L"\u00B0C"); // epw_wszUnit);
                                 RECT rcText1;
                                 SetRect(&rcText1, 0, 0, a4->right, dwWeatherSplit ? (a4->bottom / 2) : a4->bottom);
-                                DrawTextW(hDC, wszText1, -1, &rcText1, dwTextFlags | DT_CALCRECT | (dwWeatherSplit ? DT_BOTTOM : DT_VCENTER));
+                                DrawTextW(hDC, wszText1, -1, &rcText1,
+                                          dwTextFlags | DT_CALCRECT | (dwWeatherSplit ? DT_BOTTOM : DT_VCENTER));
                                 rcText1.bottom = dwWeatherSplit ? (a4->bottom / 2) : a4->bottom;
                                 WCHAR wszText2[MAX_PATH];
                                 swprintf_s(wszText2, MAX_PATH, L"%s%s", bIsThemeActive ? L"" : L" ", epw_wszCondition);
                                 RECT rcText2;
                                 SetRect(&rcText2, 0, 0, a4->right, dwWeatherSplit ? (a4->bottom / 2) : a4->bottom);
-                                DrawTextW(hDC, wszText2, -1, &rcText2, dwTextFlags | DT_CALCRECT | (dwWeatherSplit ? DT_TOP : DT_VCENTER));
+                                DrawTextW(hDC, wszText2, -1, &rcText2,
+                                          dwTextFlags | DT_CALCRECT | (dwWeatherSplit ? DT_TOP : DT_VCENTER));
                                 rcText2.bottom = dwWeatherSplit ? (a4->bottom / 2) : a4->bottom;
 
                                 if (bWeatherFixedSize)
@@ -4942,7 +5065,7 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                 int addend = 0;
                                 //int rt = MulDiv(48, a4->bottom, 60);
                                 int rt = sqrt(epw_cbImage / 4);
-                                int p = 0;// MulDiv(rt, 4, 64);
+                                int p = 0; // MulDiv(rt, 4, 64);
                                 int margin_h = MulDiv(12, dpiX, 144);
 
                                 BOOL bIsIconMode = (
@@ -4954,9 +5077,11 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                 case EP_WEATHER_VIEW_ICONTEXT:
                                 case EP_WEATHER_VIEW_TEXTONLY:
                                     if (dwWeatherSplit)
-                                        addend = MAX((rcText1.right - rcText1.left), (rcText2.right - rcText2.left)) + margin_h;
+                                        addend = MAX((rcText1.right - rcText1.left), (rcText2.right - rcText2.left)) +
+                                            margin_h;
                                     else
-                                        addend = (rcText1.right - rcText1.left) + margin_h + (rcText2.right - rcText2.left) + margin_h;
+                                        addend = (rcText1.right - rcText1.left) + margin_h + (rcText2.right - rcText2.
+                                            left) + margin_h;
                                     break;
                                 case EP_WEATHER_VIEW_ICONTEMP:
                                 case EP_WEATHER_VIEW_TEMPONLY:
@@ -4967,7 +5092,8 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                     break;
                                 }
                                 int margin_v = (a4->bottom - rt) / 2;
-                                int total_h = (bIsIconMode ? ((margin_h - p) + rt + (margin_h - p)) : margin_h) + addend;
+                                int total_h = (bIsIconMode ? ((margin_h - p) + rt + (margin_h - p)) : margin_h) +
+                                    addend;
                                 if (bWeatherFixedSize == 1)
                                 {
                                     if (total_h > a4->right)
@@ -4980,9 +5106,11 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                         case EP_WEATHER_VIEW_ICONTEXT:
                                         case EP_WEATHER_VIEW_TEXTONLY:
                                             if (dwWeatherSplit)
-                                                addend = MAX((rcText1.right - rcText1.left), (rcText2.right - rcText2.left)) + margin_h;
+                                                addend = MAX((rcText1.right - rcText1.left),
+                                                             (rcText2.right - rcText2.left)) + margin_h;
                                             else
-                                                addend = (rcText1.right - rcText1.left) + margin_h + (rcText2.right - rcText2.left) + margin_h;
+                                                addend = (rcText1.right - rcText1.left) + margin_h + (rcText2.right -
+                                                    rcText2.left) + margin_h;
                                             break;
                                         case EP_WEATHER_VIEW_ICONTEMP:
                                         case EP_WEATHER_VIEW_TEMPONLY: // should be impossible
@@ -5033,22 +5161,25 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                         bf.BlendFlags = 0;
                                         bf.SourceConstantAlpha = 0xFF;
                                         bf.AlphaFormat = AC_SRC_ALPHA;
-                                        GdiAlphaBlend(hdc, start_x + (margin_h - p), margin_v, rt, rt, hDC, 0, 0, rt, rt, bf);
+                                        GdiAlphaBlend(hdc, start_x + (margin_h - p), margin_v, rt, rt, hDC, 0, 0, rt,
+                                                      rt, bf);
 
                                         SelectBitmap(hDC, hOldBitmap);
                                         DeleteBitmap(hBitmap);
                                     }
                                 }
 
-                                if (dwWeatherViewMode == EP_WEATHER_VIEW_ICONTEMP || 
+                                if (dwWeatherViewMode == EP_WEATHER_VIEW_ICONTEMP ||
                                     dwWeatherViewMode == EP_WEATHER_VIEW_ICONTEXT ||
                                     dwWeatherViewMode == EP_WEATHER_VIEW_TEMPONLY ||
                                     dwWeatherViewMode == EP_WEATHER_VIEW_TEXTONLY
-                                    )
+                                )
                                 {
                                     size.cx = rcText1.right - rcText1.left;
                                     size.cy = rcText1.bottom - rcText1.top;
-                                    hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(wszText1, hFont, dwTextFlags | (dwWeatherSplit ? DT_BOTTOM : DT_VCENTER), size, rgbColor);
+                                    hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(
+                                        wszText1, hFont, dwTextFlags | (dwWeatherSplit ? DT_BOTTOM : DT_VCENTER), size,
+                                        rgbColor);
                                     if (hBitmap)
                                     {
                                         HBITMAP hOldBMP = SelectBitmap(hDC, hBitmap);
@@ -5060,7 +5191,11 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                         bf.BlendFlags = 0;
                                         bf.SourceConstantAlpha = 0xFF;
                                         bf.AlphaFormat = AC_SRC_ALPHA;
-                                        GdiAlphaBlend(hdc, start_x + (bIsIconMode ? ((margin_h - p) + rt + (margin_h - p)) : margin_h), 0, BMInf.bmWidth, BMInf.bmHeight, hDC, 0, 0, BMInf.bmWidth, BMInf.bmHeight, bf);
+                                        GdiAlphaBlend(
+                                            hdc, start_x + (bIsIconMode
+                                                                ? ((margin_h - p) + rt + (margin_h - p))
+                                                                : margin_h), 0, BMInf.bmWidth, BMInf.bmHeight, hDC, 0,
+                                            0, BMInf.bmWidth, BMInf.bmHeight, bf);
 
                                         SelectBitmap(hDC, hOldBMP);
                                         DeleteBitmap(hBitmap);
@@ -5069,11 +5204,13 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
 
                                 if (dwWeatherViewMode == EP_WEATHER_VIEW_ICONTEXT ||
                                     dwWeatherViewMode == EP_WEATHER_VIEW_TEXTONLY
-                                    )
+                                )
                                 {
                                     size.cx = rcText2.right - rcText2.left;
                                     size.cy = rcText2.bottom - rcText2.top;
-                                    hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(wszText2, (dwWeatherSplit && hFont2 ? hFont2 : hFont), dwTextFlags | (dwWeatherSplit ? DT_TOP : DT_VCENTER), size, rgbColor);
+                                    hBitmap = sws_WindowHelpers_CreateAlphaTextBitmap(
+                                        wszText2, (dwWeatherSplit && hFont2 ? hFont2 : hFont),
+                                        dwTextFlags | (dwWeatherSplit ? DT_TOP : DT_VCENTER), size, rgbColor);
                                     if (hBitmap)
                                     {
                                         HBITMAP hOldBMP = SelectBitmap(hDC, hBitmap);
@@ -5085,7 +5222,12 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                                         bf.BlendFlags = 0;
                                         bf.SourceConstantAlpha = 0xFF;
                                         bf.AlphaFormat = AC_SRC_ALPHA;
-                                        GdiAlphaBlend(hdc, start_x + (bIsIconMode ? ((margin_h - p) + rt + (margin_h - p)) : margin_h) + (dwWeatherSplit ? -1 : (rcText1.right - rcText1.left) + margin_h), dwWeatherSplit ? (a4->bottom / 2 - 1) : 0, BMInf.bmWidth, BMInf.bmHeight, hDC, 0, 0, BMInf.bmWidth, BMInf.bmHeight, bf);
+                                        GdiAlphaBlend(
+                                            hdc, start_x + (
+                                                bIsIconMode ? ((margin_h - p) + rt + (margin_h - p)) : margin_h) + (
+                                                dwWeatherSplit ? -1 : (rcText1.right - rcText1.left) + margin_h),
+                                            dwWeatherSplit ? (a4->bottom / 2 - 1) : 0, BMInf.bmWidth, BMInf.bmHeight,
+                                            hDC, 0, 0, BMInf.bmWidth, BMInf.bmHeight, bf);
 
                                         SelectBitmap(hDC, hOldBMP);
                                         DeleteBitmap(hBitmap);
@@ -5094,14 +5236,13 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
 
                                 if (bWeatherFixedSize == 1)
                                 {
-
                                 }
                                 else
                                 {
                                     if (total_h != prev_total_h)
                                     {
                                         prev_total_h = total_h;
-                                        SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, (LPARAM)L"TraySettings");
+                                        SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, L"TraySettings");
                                     }
                                 }
 
@@ -5161,7 +5302,8 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
                 prev_total_h = 0;
                 InvalidateRect(PeopleButton_LastHWND, NULL, TRUE); 
                 ReleaseSRWLockExclusive(&lock_epw);*/
-                if (hServiceWindowThread) PostThreadMessageW(GetThreadId(hServiceWindowThread), WM_USER + 1, NULL, NULL);
+                if (hServiceWindowThread)
+                    PostThreadMessageW(GetThreadId(hServiceWindowThread), WM_USER + 1, NULL, NULL);
                 //AcquireSRWLockShared(&lock_epw);
             }
         }
@@ -5171,17 +5313,15 @@ __int64 __fastcall PeopleBand_DrawTextWithGlowHook(
         LeaveCriticalSection(&lock_epw);
         return S_OK;
     }
-    else
+    if (bHasLocked)
     {
-        if (bHasLocked)
-        {
-            LeaveCriticalSection(&lock_epw);
-        }
-        return PeopleBand_DrawTextWithGlowFunc(hdc, a2, a3, a4, a5, a6, a7, dy, a9, a10, a11, a12);
+        LeaveCriticalSection(&lock_epw);
     }
+    return PeopleBand_DrawTextWithGlowFunc(hdc, a2, a3, a4, a5, a6, a7, dy, a9, a10, a11, a12);
 }
 
-void(*PeopleButton_ShowTooltipFunc)(__int64 a1, unsigned __int8 bShow) = 0;
+void (*PeopleButton_ShowTooltipFunc)(__int64 a1, unsigned __int8 bShow) = 0;
+
 void WINAPI PeopleButton_ShowTooltipHook(__int64 _this, unsigned __int8 bShow)
 {
     BOOL bHasLocked = TryEnterCriticalSection(&lock_epw);
@@ -5214,7 +5354,7 @@ void WINAPI PeopleButton_ShowTooltipHook(__int64 _this, unsigned __int8 bShow)
                 ti.hwnd = *((INT64*)_this + 1);
                 ti.uId = *((INT64*)_this + 1);
                 ti.lpszText = wszBuffer;
-                SendMessageW((HWND) * ((INT64*)_this + 10), TTM_UPDATETIPTEXTW, 0, (LPARAM)&ti);
+                SendMessageW((HWND)*((INT64*)_this + 10), TTM_UPDATETIPTEXTW, 0, (LPARAM)&ti);
                 epw->lpVtbl->UnlockData(epw);
             }
         }
@@ -5237,7 +5377,7 @@ void WINAPI PeopleButton_ShowTooltipHook(__int64 _this, unsigned __int8 bShow)
             ti.hwnd = *((INT64*)_this + 1);
             ti.uId = *((INT64*)_this + 1);
             ti.lpszText = wszBuffer;
-            SendMessageW((HWND) * ((INT64*)_this + 10), TTM_UPDATETIPTEXTW, 0, (LPARAM)&ti);
+            SendMessageW((HWND)*((INT64*)_this + 10), TTM_UPDATETIPTEXTW, 0, (LPARAM)&ti);
         }
     }
     if (PeopleButton_ShowTooltipFunc)
@@ -5248,6 +5388,7 @@ void WINAPI PeopleButton_ShowTooltipHook(__int64 _this, unsigned __int8 bShow)
 }
 
 __int64 (*PeopleButton_OnClickFunc)(__int64 a1, __int64 a2) = 0;
+
 __int64 PeopleButton_OnClickHook(__int64 a1, __int64 a2)
 {
     BOOL bHasLocked = TryEnterCriticalSection(&lock_epw);
@@ -5283,27 +5424,24 @@ __int64 PeopleButton_OnClickHook(__int64 a1, __int64 a2)
         LeaveCriticalSection(&lock_epw);
         return 0;
     }
-    else
+    if (bHasLocked)
     {
-        if (bHasLocked)
-        {
-            LeaveCriticalSection(&lock_epw);
-        }
-        if (PeopleButton_OnClickFunc)
-        {
-            return PeopleButton_OnClickFunc(a1, a2);
-        }
-        return 0;
+        LeaveCriticalSection(&lock_epw);
     }
+    if (PeopleButton_OnClickFunc)
+    {
+        return PeopleButton_OnClickFunc(a1, a2);
+    }
+    return 0;
 }
 
 INT64 PeopleButton_SubclassProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    UINT_PTR    uIdSubclass,
-    DWORD_PTR   dwRefData
+    UINT_PTR uIdSubclass,
+    DWORD_PTR dwRefData
 )
 {
     if (uMsg == WM_NCDESTROY)
@@ -5323,7 +5461,8 @@ INT64 PeopleButton_SubclassProc(
     return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }
 
-static BOOL(*SetChildWindowNoActivateFunc)(HWND);
+static BOOL (*SetChildWindowNoActivateFunc)(HWND);
+
 BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
 {
     TCHAR className[100];
@@ -5343,7 +5482,8 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
         uintptr_t Instance = *(uintptr_t*)GetWindowLongPtrW(hWnd, 0);
         if (Instance)
         {
-            uintptr_t TrayButton_GetComponentName = *(INT_PTR(WINAPI**)())(Instance + 304); // 280 in versions of Windows 10 where this method exists
+            uintptr_t TrayButton_GetComponentName = *(INT_PTR(WINAPI**)())(Instance + 304);
+            // 280 in versions of Windows 10 where this method exists
             wchar_t* wszComponentName = NULL;
             if (IsWindows11() && !IsBadCodePtr(TrayButton_GetComponentName))
             {
@@ -5372,7 +5512,7 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                     DWORD dwOldProtect;
                     VirtualProtect(Instance + 160, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
                     if (!Widgets_OnClickFunc) Widgets_OnClickFunc = *(uintptr_t*)(Instance + 160);
-                    *(uintptr_t*)(Instance + 160) = Widgets_OnClickHook;    // OnClick
+                    *(uintptr_t*)(Instance + 160) = Widgets_OnClickHook; // OnClick
                     VirtualProtect(Instance + 160, sizeof(uintptr_t), dwOldProtect, &dwOldProtect);
                     VirtualProtect(Instance + 216, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
                     if (!Widgets_GetTooltipTextFunc) Widgets_GetTooltipTextFunc = *(uintptr_t*)(Instance + 216);
@@ -5383,7 +5523,7 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                 {
                     DWORD dwOldProtect;
                     VirtualProtect(Instance + 160, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
-                    *(uintptr_t*)(Instance + 160) = ToggleTaskView;    // OnClick
+                    *(uintptr_t*)(Instance + 160) = ToggleTaskView; // OnClick
                     VirtualProtect(Instance + 160, sizeof(uintptr_t), dwOldProtect, &dwOldProtect);
                 }
                 else if (!wcscmp(wszComponentName, L"PeopleButton"))
@@ -5393,8 +5533,11 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                     uintptr_t PeopleButton_Instance = *((uintptr_t*)GetWindowLongPtrW(hWnd, 0) + 17);
 
                     VirtualProtect(PeopleButton_Instance + 32, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
-                    if (!PeopleButton_CalculateMinimumSizeFunc) PeopleButton_CalculateMinimumSizeFunc = *(uintptr_t*)(PeopleButton_Instance + 32);
-                    *(uintptr_t*)(PeopleButton_Instance + 32) = PeopleButton_CalculateMinimumSizeHook; // CalculateMinimumSize
+                    if (!PeopleButton_CalculateMinimumSizeFunc)
+                        PeopleButton_CalculateMinimumSizeFunc = *(uintptr_t*)(
+                            PeopleButton_Instance + 32);
+                    *(uintptr_t*)(PeopleButton_Instance + 32) = PeopleButton_CalculateMinimumSizeHook;
+                    // CalculateMinimumSize
                     VirtualProtect(PeopleButton_Instance + 32, sizeof(uintptr_t), dwOldProtect, &dwOldProtect);
 
                     uintptr_t off_PeopleButton_ShowTooltip = 0;
@@ -5406,10 +5549,15 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                     {
                         off_PeopleButton_ShowTooltip = 200;
                     }
-                    VirtualProtect(Instance + off_PeopleButton_ShowTooltip, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
-                    if (!PeopleButton_ShowTooltipFunc) PeopleButton_ShowTooltipFunc = *(uintptr_t*)(Instance + off_PeopleButton_ShowTooltip);
-                    *(uintptr_t*)(Instance + off_PeopleButton_ShowTooltip) = PeopleButton_ShowTooltipHook; // OnTooltipShow
-                    VirtualProtect(Instance + off_PeopleButton_ShowTooltip, sizeof(uintptr_t), dwOldProtect, &dwOldProtect);
+                    VirtualProtect(Instance + off_PeopleButton_ShowTooltip, sizeof(uintptr_t), PAGE_READWRITE,
+                                   &dwOldProtect);
+                    if (!PeopleButton_ShowTooltipFunc)
+                        PeopleButton_ShowTooltipFunc = *(uintptr_t*)(Instance +
+                            off_PeopleButton_ShowTooltip);
+                    *(uintptr_t*)(Instance + off_PeopleButton_ShowTooltip) = PeopleButton_ShowTooltipHook;
+                    // OnTooltipShow
+                    VirtualProtect(Instance + off_PeopleButton_ShowTooltip, sizeof(uintptr_t), dwOldProtect,
+                                   &dwOldProtect);
 
                     uintptr_t off_PeopleButton_OnClick = 0;
                     if (IsWindows11())
@@ -5420,9 +5568,12 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                     {
                         off_PeopleButton_OnClick = 136;
                     }
-                    VirtualProtect(Instance + off_PeopleButton_OnClick, sizeof(uintptr_t), PAGE_READWRITE, &dwOldProtect);
-                    if (!PeopleButton_OnClickFunc) PeopleButton_OnClickFunc = *(uintptr_t*)(Instance + off_PeopleButton_OnClick);
-                    *(uintptr_t*)(Instance + off_PeopleButton_OnClick) = PeopleButton_OnClickHook;    // OnClick
+                    VirtualProtect(Instance + off_PeopleButton_OnClick, sizeof(uintptr_t), PAGE_READWRITE,
+                                   &dwOldProtect);
+                    if (!PeopleButton_OnClickFunc)
+                        PeopleButton_OnClickFunc = *(uintptr_t*)(Instance +
+                            off_PeopleButton_OnClick);
+                    *(uintptr_t*)(Instance + off_PeopleButton_OnClick) = PeopleButton_OnClickHook; // OnClick
                     VirtualProtect(Instance + off_PeopleButton_OnClick, sizeof(uintptr_t), dwOldProtect, &dwOldProtect);
 
                     PeopleButton_LastHWND = hWnd;
@@ -5431,7 +5582,9 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
                     EnterCriticalSection(&lock_epw);
                     if (!epw)
                     {
-                        if (SUCCEEDED(CoCreateInstance(&CLSID_EPWeather, NULL, CLSCTX_LOCAL_SERVER, &IID_IEPWeather, &epw)) && epw)
+                        if (SUCCEEDED(
+                                CoCreateInstance(&CLSID_EPWeather, NULL, CLSCTX_LOCAL_SERVER, &IID_IEPWeather, &epw)) &&
+                            epw)
                         {
                             epw->lpVtbl->SetNotifyWindow(epw, hWnd);
 
@@ -5459,12 +5612,12 @@ BOOL explorer_SetChildWindowNoActivateHook(HWND hWnd)
 #pragma region "Hide Show desktop button"
 #ifdef _WIN64
 INT64 ShowDesktopSubclassProc(
-    _In_ HWND   hWnd,
-    _In_ UINT   uMsg,
+    _In_ HWND hWnd,
+    _In_ UINT uMsg,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam,
-    UINT_PTR    uIdSubclass,
-    DWORD_PTR   dwRefData
+    UINT_PTR uIdSubclass,
+    DWORD_PTR dwRefData
 )
 {
     if (uMsg == WM_NCDESTROY)
@@ -5483,7 +5636,7 @@ INT64 ShowDesktopSubclassProc(
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal,
-                (LPDWORD)(&dwSize)
+                &dwSize
             ) == ERROR_SUCCESS && !dwVal)
             {
                 lRes = 0;
@@ -5867,7 +6020,8 @@ DWORD WindowSwitcher(DWORD unused)
                     else if (dwRes == WAIT_OBJECT_0 + 3)
                     {
                         MSG msg;
-                        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+                        {
                             TranslateMessage(&msg);
                             DispatchMessage(&msg);
                         }
@@ -5907,6 +6061,7 @@ DWORD WindowSwitcher(DWORD unused)
 #define REFRESHUI_TASKBAR      0b001000
 #define REFRESHUI_CENTER       0b010000
 #define REFRESHUI_SPOTLIGHT    0b100000
+
 void WINAPI LoadSettings(LPARAM lParam)
 {
     BOOL bIsExplorer = LOWORD(lParam);
@@ -6168,8 +6323,12 @@ void WINAPI LoadSettings(LPARAM lParam)
         {
             if (IsWindows11())
             {
-                DWORD bIsWindows11CommandBarDisabled = (RegGetValueW(HKEY_CURRENT_USER, L"SOFTWARE\\Classes\\CLSID\\{d93ed569-3b3e-4bff-8355-3c44f6a52bb5}\\InProcServer32", L"", RRF_RT_REG_SZ, NULL, NULL, NULL) == ERROR_SUCCESS);
-                RegSetValueExW(hKey, L"FileExplorerCommandUI", 0, REG_DWORD, &bIsWindows11CommandBarDisabled, sizeof(DWORD));
+                DWORD bIsWindows11CommandBarDisabled = (RegGetValueW(
+                    HKEY_CURRENT_USER,
+                    L"SOFTWARE\\Classes\\CLSID\\{d93ed569-3b3e-4bff-8355-3c44f6a52bb5}\\InProcServer32", L"",
+                    RRF_RT_REG_SZ, NULL, NULL, NULL) == ERROR_SUCCESS);
+                RegSetValueExW(hKey, L"FileExplorerCommandUI", 0, REG_DWORD, &bIsWindows11CommandBarDisabled,
+                               sizeof(DWORD));
                 dwFileExplorerCommandUI = bIsWindows11CommandBarDisabled;
             }
             else
@@ -6273,7 +6432,8 @@ void WINAPI LoadSettings(LPARAM lParam)
             {
                 if (bMicaEffectOnTitlebar)
                 {
-                    VnPatchDelayIAT(hUxtheme, "dwmapi.dll", "DwmExtendFrameIntoClientArea", uxtheme_DwmExtendFrameIntoClientAreaHook);
+                    VnPatchDelayIAT(hUxtheme, "dwmapi.dll", "DwmExtendFrameIntoClientArea",
+                                    uxtheme_DwmExtendFrameIntoClientAreaHook);
                 }
                 else
                 {
@@ -6737,7 +6897,7 @@ void WINAPI LoadSettings(LPARAM lParam)
         ))
         {
             wcscpy_s(wszWeatherTerm, MAX_PATH, L"");
-        }        
+        }
         else
         {
             if (wszWeatherTerm[0] == 0)
@@ -6768,7 +6928,8 @@ void WINAPI LoadSettings(LPARAM lParam)
             {
                 if (wszLanguagesBuffer = malloc(cchLanguagesBuffer * sizeof(WCHAR)))
                 {
-                    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ulNumLanguages, wszLanguagesBuffer, &cchLanguagesBuffer))
+                    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ulNumLanguages, wszLanguagesBuffer,
+                                                    &cchLanguagesBuffer))
                     {
                         wcscpy_s(wszWeatherLanguage, MAX_PATH, wszLanguagesBuffer);
                         bOk = TRUE;
@@ -6793,7 +6954,8 @@ void WINAPI LoadSettings(LPARAM lParam)
                 {
                     if (wszLanguagesBuffer = malloc(cchLanguagesBuffer * sizeof(WCHAR)))
                     {
-                        if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &ulNumLanguages, wszLanguagesBuffer, &cchLanguagesBuffer))
+                        if (GetUserPreferredUILanguages(
+                            MUI_LANGUAGE_NAME, &ulNumLanguages, wszLanguagesBuffer, &cchLanguagesBuffer))
                         {
                             wcscpy_s(wszWeatherLanguage, MAX_PATH, wszLanguagesBuffer);
                             bOk = TRUE;
@@ -7205,7 +7367,7 @@ void WINAPI LoadSettings(LPARAM lParam)
         }
         if ((dwRefreshUIMask & REFRESHUI_ORB) || (dwRefreshUIMask & REFRESHUI_PEOPLE))
         {
-            SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, (LPARAM)L"TraySettings");
+            SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, L"TraySettings");
             if (dwRefreshUIMask & REFRESHUI_ORB)
             {
                 InvalidateRect(FindWindowW(L"ExplorerPatcher_GUI_" _T(EP_CLSID), NULL), NULL, FALSE);
@@ -7247,11 +7409,16 @@ void WINAPI LoadSettings(LPARAM lParam)
         }
         if (dwRefreshUIMask & REFRESHUI_SPOTLIGHT)
         {
-            DWORD dwAttributes = 0; dwTemp = sizeof(DWORD);
-            RegGetValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}\\ShellFolder", L"Attributes", RRF_RT_DWORD, NULL, &dwAttributes, &dwTemp);
+            DWORD dwAttributes = 0;
+            dwTemp = sizeof(DWORD);
+            RegGetValueW(
+                HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}\\ShellFolder",
+                L"Attributes", RRF_RT_DWORD, NULL, &dwAttributes, &dwTemp);
             if (bDisableSpotlightIcon) dwAttributes |= SFGAO_NONENUMERATED;
             else dwAttributes &= ~SFGAO_NONENUMERATED;
-            RegSetKeyValueW(HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}\\ShellFolder", L"Attributes", REG_DWORD, &dwAttributes, sizeof(DWORD));
+            RegSetKeyValueW(
+                HKEY_CURRENT_USER, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}\\ShellFolder",
+                L"Attributes", REG_DWORD, &dwAttributes, sizeof(DWORD));
             SHFlushSFCache();
             SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
         }
@@ -7266,7 +7433,8 @@ void Explorer_RefreshClockHelper(HWND hClockButton)
     // to get the offset, simply inspect the vtable of ClockButton
     if (ClockButtonInstance)
     {
-        ((void(*)(void*))(*(INT64*)((*(INT64*)ClockButtonInstance) + 6 * sizeof(uintptr_t))))(ClockButtonInstance); // v_Initialize
+        ((void(*)(void*))(*(INT64*)((*ClockButtonInstance) + 6 * sizeof(uintptr_t))))(ClockButtonInstance);
+        // v_Initialize
         // we need to refresh the button; for the text to actually change, we need to set this:
         // inspect ClockButton::v_OnTimer
         *((BYTE*)ClockButtonInstance + 547) = 1;
@@ -7308,10 +7476,12 @@ void Explorer_RefreshClock(int unused)
                 Explorer_RefreshClockHelper(hClockButton);
             }
         }
-    } while (hWnd);
+    }
+    while (hWnd);
 }
 
 int numTBButtons = 0;
+
 void WINAPI Explorer_RefreshUI(int src)
 {
     HKEY hKey = NULL;
@@ -7415,7 +7585,7 @@ void WINAPI Explorer_RefreshUI(int src)
         }
     }
     if (src == 99) return;
-    SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, (LPARAM)L"TraySettings");
+    SendNotifyMessageW(HWND_BROADCAST, WM_WININICHANGE, 0, L"TraySettings");
     Explorer_RefreshClock(0);
     if (dwRefreshMask & REFRESHUI_CENTER)
     {
@@ -7434,10 +7604,10 @@ void Explorer_TogglePeopleButton(int unused)
         if (CTrayInstance)
         {
             const unsigned int TRAYUI_OFFSET_IN_CTRAY = 110;
-            INT64* TrayUIInstance = *((INT64*)CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
+            INT64* TrayUIInstance = *(CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
             if (TrayUIInstance)
             {
-                ((void(*)(void*))(*(INT64*)((*(INT64*)TrayUIInstance) + 57 * sizeof(uintptr_t))))(TrayUIInstance);
+                ((void(*)(void*))(*(INT64*)((*TrayUIInstance) + 57 * sizeof(uintptr_t))))(TrayUIInstance);
             }
         }
     }
@@ -7452,10 +7622,10 @@ void Explorer_ToggleTouchpad(int unused)
         if (CTrayInstance)
         {
             const unsigned int TRAYUI_OFFSET_IN_CTRAY = 110;
-            INT64* TrayUIInstance = *((INT64*)CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
+            INT64* TrayUIInstance = *(CTrayInstance + TRAYUI_OFFSET_IN_CTRAY);
             if (TrayUIInstance)
             {
-                ((void(*)(void*))(*(INT64*)((*(INT64*)TrayUIInstance) + 60 * sizeof(uintptr_t))))(TrayUIInstance);
+                ((void(*)(void*))(*(INT64*)((*TrayUIInstance) + 60 * sizeof(uintptr_t))))(TrayUIInstance);
             }
         }
     }
@@ -7464,44 +7634,46 @@ void Explorer_ToggleTouchpad(int unused)
 
 
 #pragma region "Fix taskbar for classic theme and set Explorer window hooks"
-HWND(*CreateWindowExWFunc)(
-    DWORD     dwExStyle,
-    LPCWSTR   lpClassName,
-    LPCWSTR   lpWindowName,
-    DWORD     dwStyle,
-    int       X,
-    int       Y,
-    int       nWidth,
-    int       nHeight,
-    HWND      hWndParent,
-    HMENU     hMenu,
+HWND (*CreateWindowExWFunc)(
+    DWORD dwExStyle,
+    LPCWSTR lpClassName,
+    LPCWSTR lpWindowName,
+    DWORD dwStyle,
+    int X,
+    int Y,
+    int nWidth,
+    int nHeight,
+    HWND hWndParent,
+    HMENU hMenu,
     HINSTANCE hInstance,
-    LPVOID    lpParam
-    );
+    LPVOID lpParam
+);
+
 HWND CreateWindowExWHook(
-    DWORD     dwExStyle,
-    LPCWSTR   lpClassName,
-    LPCWSTR   lpWindowName,
-    DWORD     dwStyle,
-    int       X,
-    int       Y,
-    int       nWidth,
-    int       nHeight,
-    HWND      hWndParent,
-    HMENU     hMenu,
+    DWORD dwExStyle,
+    LPCWSTR lpClassName,
+    LPCWSTR lpWindowName,
+    DWORD dwStyle,
+    int X,
+    int Y,
+    int nWidth,
+    int nHeight,
+    HWND hWndParent,
+    HMENU hMenu,
     HINSTANCE hInstance,
-    LPVOID    lpParam
+    LPVOID lpParam
 )
 {
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"TrayNotifyWnd"))
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"TrayNotifyWnd"))
     {
         dwExStyle |= WS_EX_STATICEDGE;
     }
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"NotifyIconOverflowWindow"))
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"NotifyIconOverflowWindow"))
     {
         dwExStyle |= WS_EX_STATICEDGE;
     }
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && (!wcscmp(lpClassName, L"SysListView32") || !wcscmp(lpClassName, L"SysTreeView32"))) // !wcscmp(lpClassName, L"FolderView")
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && (!wcscmp(lpClassName, L"SysListView32") || !
+        wcscmp(lpClassName, L"SysTreeView32"))) // !wcscmp(lpClassName, L"FolderView")
     {
         wchar_t wszClassName[200];
         ZeroMemory(wszClassName, 200);
@@ -7511,7 +7683,8 @@ HWND CreateWindowExWHook(
             dwExStyle |= WS_EX_CLIENTEDGE;
         }
     }
-    if (bIsExplorerProcess && bToolbarSeparators && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"ReBarWindow32"))
+    if (bIsExplorerProcess && bToolbarSeparators && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(
+        lpClassName, L"ReBarWindow32"))
     {
         wchar_t wszClassName[200];
         ZeroMemory(wszClassName, 200);
@@ -7536,24 +7709,27 @@ HWND CreateWindowExWHook(
         lpParam
     );
 #ifdef _WIN64
-    if (bIsExplorerProcess && (*((WORD*)&(lpClassName)+1)) && (!wcscmp(lpClassName, L"TrayClockWClass") || !wcscmp(lpClassName, L"ClockButton")))
+    if (bIsExplorerProcess && (*((WORD*)&(lpClassName) + 1)) && (!wcscmp(lpClassName, L"TrayClockWClass") || !wcscmp(
+        lpClassName, L"ClockButton")))
     {
         SetWindowSubclass(hWnd, ClockButtonSubclassProc, ClockButtonSubclassProc, 0);
     }
-    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"TrayShowDesktopButtonWClass"))
+    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(
+        lpClassName, L"TrayShowDesktopButtonWClass"))
     {
         SetWindowSubclass(hWnd, ShowDesktopSubclassProc, ShowDesktopSubclassProc, 0);
     }
-    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"Shell_TrayWnd"))
+    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"Shell_TrayWnd"))
     {
         SetWindowSubclass(hWnd, Shell_TrayWndSubclassProc, Shell_TrayWndSubclassProc, TRUE);
         Shell_TrayWndMouseHook = SetWindowsHookExW(WH_MOUSE, Shell_TrayWndMouseProc, NULL, GetCurrentThreadId());
     }
-    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"Shell_SecondaryTrayWnd"))
+    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"Shell_SecondaryTrayWnd"))
     {
         SetWindowSubclass(hWnd, Shell_TrayWndSubclassProc, Shell_TrayWndSubclassProc, FALSE);
     }
-    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName)+1)) && !_wcsicmp(lpClassName, L"ReBarWindow32") && hWndParent == FindWindowW(L"Shell_TrayWnd", NULL))
+    else if (bIsExplorerProcess && (*((WORD*)&(lpClassName) + 1)) && !_wcsicmp(lpClassName, L"ReBarWindow32") &&
+        hWndParent == FindWindowW(L"Shell_TrayWnd", NULL))
     {
         SetWindowSubclass(hWnd, ReBarWindow32SubclassProc, ReBarWindow32SubclassProc, FALSE);
     }
@@ -7573,14 +7749,15 @@ HWND CreateWindowExWHook(
     return hWnd;
 }
 
-LONG_PTR(*SetWindowLongPtrWFunc)(
-    HWND     hWnd,
-    int      nIndex,
+LONG_PTR (*SetWindowLongPtrWFunc)(
+    HWND hWnd,
+    int nIndex,
     LONG_PTR dwNewLong
-    );
+);
+
 LONG_PTR SetWindowLongPtrWHook(
-    HWND     hWnd,
-    int      nIndex,
+    HWND hWnd,
+    int nIndex,
     LONG_PTR dwNewLong
 )
 {
@@ -7589,21 +7766,22 @@ LONG_PTR SetWindowLongPtrWHook(
     GetClassNameW(hWnd, lpClassName, 200);
     HWND hWndParent = GetParent(hWnd);
 
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"TrayNotifyWnd"))
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"TrayNotifyWnd"))
     {
         if (nIndex == GWL_EXSTYLE)
         {
             dwNewLong |= WS_EX_STATICEDGE;
         }
     }
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"NotifyIconOverflowWindow"))
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"NotifyIconOverflowWindow"))
     {
         if (nIndex == GWL_EXSTYLE)
         {
             dwNewLong |= WS_EX_STATICEDGE;
         }
     }
-    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName)+1)) && (!wcscmp(lpClassName, L"SysListView32") || !wcscmp(lpClassName, L"SysTreeView32"))) // !wcscmp(lpClassName, L"FolderView")
+    if (bClassicThemeMitigations && (*((WORD*)&(lpClassName) + 1)) && (!wcscmp(lpClassName, L"SysListView32") || !
+        wcscmp(lpClassName, L"SysTreeView32"))) // !wcscmp(lpClassName, L"FolderView")
     {
         wchar_t wszClassName[200];
         ZeroMemory(wszClassName, 200);
@@ -7616,7 +7794,8 @@ LONG_PTR SetWindowLongPtrWHook(
             }
         }
     }
-    if (bIsExplorerProcess && bToolbarSeparators && (*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"ReBarWindow32"))
+    if (bIsExplorerProcess && bToolbarSeparators && (*((WORD*)&(lpClassName) + 1)) && !wcscmp(
+        lpClassName, L"ReBarWindow32"))
     {
         wchar_t wszClassName[200];
         ZeroMemory(wszClassName, 200);
@@ -7634,12 +7813,13 @@ LONG_PTR SetWindowLongPtrWHook(
 
 #ifdef _WIN64
 HRESULT (*explorer_SetWindowThemeFunc)(
-    HWND    hwnd,
+    HWND hwnd,
     LPCWSTR pszSubAppName,
     LPCWSTR pszSubIdList
 );
+
 HRESULT explorer_SetWindowThemeHook(
-    HWND    hwnd,
+    HWND hwnd,
     LPCWSTR pszSubAppName,
     LPCWSTR pszSubIdList
 )
@@ -7653,11 +7833,12 @@ HRESULT explorer_SetWindowThemeHook(
 }
 
 HDPA hOrbCollection = NULL;
+
 HRESULT explorer_DrawThemeBackground(
-    HTHEME  hTheme,
-    HDC     hdc,
-    int     iPartId,
-    int     iStateId,
+    HTHEME hTheme,
+    HDC hdc,
+    int iPartId,
+    int iStateId,
     LPCRECT pRect,
     LPCRECT pClipRect
 )
@@ -7677,8 +7858,8 @@ HRESULT explorer_DrawThemeBackground(
                 bi.bmiHeader.biPlanes = 1;
                 bi.bmiHeader.biBitCount = 32;
                 bi.bmiHeader.biCompression = BI_RGB;
-                RGBQUAD transparent = { 0, 0, 0, 0 };
-                RGBQUAD color = { 0xFF, 0xFF, 0xFF, 0xFF };
+                RGBQUAD transparent = {0, 0, 0, 0};
+                RGBQUAD color = {0xFF, 0xFF, 0xFF, 0xFF};
 
                 if (dwOrbStyle == ORB_STYLE_WINDOWS11)
                 {
@@ -7687,38 +7868,38 @@ HRESULT explorer_DrawThemeBackground(
 
                     // Background
                     StretchDIBits(hdc,
-                        pRect->left + (separator % 2),
-                        pRect->top + (separator % 2),
-                        pRect->right - pRect->left - (separator % 2),
-                        pRect->bottom - pRect->top - (separator % 2),
-                        0, 0, 1, 1, &color, &bi,
-                        DIB_RGB_COLORS, SRCCOPY);
+                                  pRect->left + (separator % 2),
+                                  pRect->top + (separator % 2),
+                                  pRect->right - pRect->left - (separator % 2),
+                                  pRect->bottom - pRect->top - (separator % 2),
+                                  0, 0, 1, 1, &color, &bi,
+                                  DIB_RGB_COLORS, SRCCOPY);
                     // Middle vertical line
                     StretchDIBits(hdc,
-                        pRect->left + ((pRect->right - pRect->left) / 2) - (separator / 2),
-                        pRect->top,
-                        separator,
-                        pRect->bottom - pRect->top,
-                        0, 0, 1, 1, &transparent, &bi,
-                        DIB_RGB_COLORS, SRCCOPY);
+                                  pRect->left + ((pRect->right - pRect->left) / 2) - (separator / 2),
+                                  pRect->top,
+                                  separator,
+                                  pRect->bottom - pRect->top,
+                                  0, 0, 1, 1, &transparent, &bi,
+                                  DIB_RGB_COLORS, SRCCOPY);
                     // Middle horizontal line
                     StretchDIBits(hdc,
-                        pRect->left,
-                        pRect->top + ((pRect->bottom - pRect->top) / 2) - (separator / 2),
-                        pRect->right - pRect->left,
-                        separator,
-                        0, 0, 1, 1, &transparent, &bi,
-                        DIB_RGB_COLORS, SRCCOPY);
+                                  pRect->left,
+                                  pRect->top + ((pRect->bottom - pRect->top) / 2) - (separator / 2),
+                                  pRect->right - pRect->left,
+                                  separator,
+                                  0, 0, 1, 1, &transparent, &bi,
+                                  DIB_RGB_COLORS, SRCCOPY);
                 }
                 else if (dwOrbStyle == ORB_STYLE_TRANSPARENT)
                 {
                     StretchDIBits(hdc,
-                        pRect->left,
-                        pRect->top,
-                        pRect->right - pRect->left,
-                        pRect->bottom - pRect->top,
-                        0, 0, 1, 1, &transparent, &bi,
-                        DIB_RGB_COLORS, SRCCOPY);
+                                  pRect->left,
+                                  pRect->top,
+                                  pRect->right - pRect->left,
+                                  pRect->bottom - pRect->top,
+                                  0, 0, 1, 1, &transparent, &bi,
+                                  DIB_RGB_COLORS, SRCCOPY);
                 }
                 return S_OK;
             }
@@ -7756,7 +7937,7 @@ HRESULT explorer_DrawThemeBackground(
             DrawTextW(
                 hdc,
                 L"\u2026",
-                -1, 
+                -1,
                 &rc,
                 dwTextFlags
             );
@@ -7792,12 +7973,12 @@ HRESULT explorer_CloseThemeData(HTHEME hTheme)
 }
 
 HTHEME explorer_OpenThemeDataForDpi(
-    HWND    hwnd,
+    HWND hwnd,
     LPCWSTR pszClassList,
-    UINT    dpi
+    UINT dpi
 )
 {
-    if ((*((WORD*)&(pszClassList)+1)) && !wcscmp(pszClassList, L"TaskbarPearl"))
+    if ((*((WORD*)&(pszClassList) + 1)) && !wcscmp(pszClassList, L"TaskbarPearl"))
     {
         if (!hOrbCollection)
         {
@@ -7818,21 +7999,22 @@ HTHEME explorer_OpenThemeDataForDpi(
         }
         return hTheme;
     }
-    else if ((*((WORD*)&(pszClassList)+1)) && !wcscmp(pszClassList, L"TaskbarShowDesktop"))
+    if ((*((WORD*)&(pszClassList) + 1)) && !wcscmp(pszClassList, L"TaskbarShowDesktop"))
     {
         DWORD dwVal = 0, dwSize = sizeof(DWORD);
-        RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"TaskbarSD", RRF_RT_REG_DWORD, NULL, &dwVal, &dwSize);
+        RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                     L"TaskbarSD", RRF_RT_REG_DWORD, NULL, &dwVal, &dwSize);
         if (dwVal == 2) return NULL;
         return OpenThemeDataForDpi(hwnd, pszClassList, dpi);
     }
 
     // task list - Taskband2 from CTaskListWnd::_HandleThemeChanged
-    if (bClassicThemeMitigations && (*((WORD*)&(pszClassList)+1)) && !wcscmp(pszClassList, L"Taskband2"))
+    if (bClassicThemeMitigations && (*((WORD*)&(pszClassList) + 1)) && !wcscmp(pszClassList, L"Taskband2"))
     {
         return 0xDeadBeef;
     }
     // system tray notification area more icons
-    else if (bClassicThemeMitigations && (*((WORD*)&(pszClassList)+1)) && !wcscmp(pszClassList, L"TrayNotifyFlyout"))
+    if (bClassicThemeMitigations && (*((WORD*)&(pszClassList) + 1)) && !wcscmp(pszClassList, L"TrayNotifyFlyout"))
     {
         return 0xABadBabe;
     }
@@ -7846,10 +8028,10 @@ HTHEME explorer_OpenThemeDataForDpi(
 
 HRESULT explorer_GetThemeMetric(
     HTHEME hTheme,
-    HDC    hdc,
-    int    iPartId,
-    int    iStateId,
-    int    iPropId,
+    HDC hdc,
+    int iPartId,
+    int iStateId,
+    int iPropId,
     int* piVal
 )
 {
@@ -7878,11 +8060,11 @@ HRESULT explorer_GetThemeMetric(
 }
 
 HRESULT explorer_GetThemeMargins(
-    HTHEME  hTheme,
-    HDC     hdc,
-    int     iPartId,
-    int     iStateId,
-    int     iPropId,
+    HTHEME hTheme,
+    HDC hdc,
+    int iPartId,
+    int iStateId,
+    int iPropId,
     LPCRECT prc,
     MARGINS* pMargins
 )
@@ -7953,10 +8135,10 @@ HRESULT explorer_GetThemeMargins(
     }
     else if (hTheme = 0xABadBabe && iPropId == TMT_CONTENTMARGINS && iPartId == 3 && iStateId == 0)
     {
-        pMargins->cxLeftWidth = 6;// GetSystemMetrics(SM_CXICONSPACING);
-        pMargins->cyTopHeight = 6;// GetSystemMetrics(SM_CYICONSPACING);
-        pMargins->cxRightWidth = 6;//GetSystemMetrics(SM_CXICONSPACING);
-        pMargins->cyBottomHeight = 6;// GetSystemMetrics(SM_CYICONSPACING);
+        pMargins->cxLeftWidth = 6; // GetSystemMetrics(SM_CXICONSPACING);
+        pMargins->cyTopHeight = 6; // GetSystemMetrics(SM_CYICONSPACING);
+        pMargins->cxRightWidth = 6; //GetSystemMetrics(SM_CXICONSPACING);
+        pMargins->cyBottomHeight = 6; // GetSystemMetrics(SM_CYICONSPACING);
     }
     HWND hShell_TrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);
     if (hShell_TrayWnd)
@@ -7986,19 +8168,20 @@ HRESULT explorer_GetThemeMargins(
             dwStyle &= ~WS_DLGFRAME;
             SetWindowLongW(hWnd, GWL_STYLE, dwStyle);
         }
-    } while (hWnd);
+    }
+    while (hWnd);
     return S_OK;
 }
 
 HRESULT explorer_DrawThemeTextEx(
-    HTHEME        hTheme,
-    HDC           hdc,
-    int           iPartId,
-    int           iStateId,
-    LPCWSTR       pszText,
-    int           cchText,
-    DWORD         dwTextFlags,
-    LPRECT        pRect,
+    HTHEME hTheme,
+    HDC hdc,
+    int iPartId,
+    int iStateId,
+    LPCWSTR pszText,
+    int cchText,
+    DWORD dwTextFlags,
+    LPRECT pRect,
     const DTTOPTS* pOptions
 )
 {
@@ -8020,7 +8203,7 @@ HRESULT explorer_DrawThemeTextEx(
     COLORREF bc = GetBkColor(hdc);
     COLORREF fc = GetTextColor(hdc);
     int mode = SetBkMode(hdc, TRANSPARENT);
-    
+
     wchar_t text[200];
     GetWindowTextW(GetForegroundWindow(), text, 200);
 
@@ -8067,7 +8250,7 @@ HRESULT explorer_DrawThemeTextEx(
     DrawTextW(
         hdc,
         pszText,
-        cchText, 
+        cchText,
         pRect,
         dwTextFlags
     );
@@ -8095,7 +8278,7 @@ int ExplorerFrame_CompareStringOrdinal(const WCHAR* a1, int a2, const WCHAR* a3,
         L"::{17CD9488-1228-4B2F-88CE-4298E93E0966}", // Default Programs           (default: not redirected)
         L"::{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}", // Network and Sharing Center (default: not redirected)
         L"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}", // Network Connections        (default: not redirected)
-        L"Advanced",                                 // Network and Sharing Center -> Change advanced sharing options (default: not redirected)
+        L"Advanced", // Network and Sharing Center -> Change advanced sharing options (default: not redirected)
         L"::{A8A91A66-3A7D-4424-8D24-04E180695C7A}", // Devices and Printers       (default: not redirected)
         NULL
     };
@@ -8124,9 +8307,9 @@ int ExplorerFrame_CompareStringOrdinal(const WCHAR* a1, int a2, const WCHAR* a3,
 
 #ifdef _WIN64
 DEFINE_GUID(IID_EnumExplorerCommand,
-    0xA88826F8,
-    0x186F, 0x4987, 0xAA, 0xDE,
-    0xEA, 0x0C, 0xEF, 0x8F, 0xBF, 0xE8
+            0xA88826F8,
+            0x186F, 0x4987, 0xAA, 0xDE,
+            0xEA, 0x0C, 0xEF, 0x8F, 0xBF, 0xE8
 );
 
 typedef interface EnumExplorerCommand EnumExplorerCommand;
@@ -8135,19 +8318,19 @@ typedef struct EnumExplorerCommandVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         EnumExplorerCommand* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         EnumExplorerCommand* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         EnumExplorerCommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* Next)(
+    HRESULT (STDMETHODCALLTYPE* Next)(
         EnumExplorerCommand* This,
         unsigned int a2,
         void** a3,
@@ -8167,43 +8350,43 @@ typedef struct UICommandVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         UICommand* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         UICommand* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetTitle)(
+    HRESULT (STDMETHODCALLTYPE* GetTitle)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetIcon)(
+    HRESULT (STDMETHODCALLTYPE* GetIcon)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetTooltip)(
+    HRESULT (STDMETHODCALLTYPE* GetTooltip)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* GetCanonicalName)(
+    HRESULT (STDMETHODCALLTYPE* GetCanonicalName)(
         UICommand* This,
         GUID* guid);
 
-    HRESULT(STDMETHODCALLTYPE* GetState)(
+    HRESULT (STDMETHODCALLTYPE* GetState)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* Invoke)(
+    HRESULT (STDMETHODCALLTYPE* Invoke)(
         UICommand* This,
         void* a2,
         void* a3);
 
-    HRESULT(STDMETHODCALLTYPE* GetFlags)(
+    HRESULT (STDMETHODCALLTYPE* GetFlags)(
         UICommand* This);
 
-    HRESULT(STDMETHODCALLTYPE* EnumSubCommands)(
+    HRESULT (STDMETHODCALLTYPE* EnumSubCommands)(
         UICommand* This);
 
     END_INTERFACE
@@ -8215,16 +8398,17 @@ interface UICommand
 };
 
 DEFINE_GUID(GUID_UICommand_System,
-    0x4C202CF0,
-    0xC4DC, 0x4251, 0xA3, 0x71,
-    0xB6, 0x22, 0xB4, 0x3D, 0x59, 0x2B
+            0x4C202CF0,
+            0xC4DC, 0x4251, 0xA3, 0x71,
+            0xB6, 0x22, 0xB4, 0x3D, 0x59, 0x2B
 );
 DEFINE_GUID(GUID_UICommand_ProgramsAndFeatures,
-    0xA2E6D9CC,
-    0xF866, 0x40B6, 0xA4, 0xB2,
-    0xEE, 0x9E, 0x10, 0x04, 0xBD, 0xFC
+            0xA2E6D9CC,
+            0xF866, 0x40B6, 0xA4, 0xB2,
+            0xEE, 0x9E, 0x10, 0x04, 0xBD, 0xFC
 );
-HRESULT(*shell32_UICommand_InvokeFunc)(UICommand*, void*, void*);
+HRESULT (*shell32_UICommand_InvokeFunc)(UICommand*, void*, void*);
+
 HRESULT shell32_UICommand_InvokeHook(UICommand* _this, void* a2, void* a3)
 {
     // Guid = {A2E6D9CC-F866-40B6-A4B2-EE9E1004BDFC} Programs and Features
@@ -8233,7 +8417,8 @@ HRESULT shell32_UICommand_InvokeHook(UICommand* _this, void* a2, void* a3)
     ZeroMemory(&guid, sizeof(GUID));
     _this->lpVtbl->GetCanonicalName(_this, &guid);
     BOOL bIsSystem = bDoNotRedirectSystemToSettingsApp && IsEqualGUID(&guid, &GUID_UICommand_System);
-    BOOL bIsProgramsAndFeatures = bDoNotRedirectProgramsAndFeaturesToSettingsApp && IsEqualGUID(&guid, &GUID_UICommand_ProgramsAndFeatures);
+    BOOL bIsProgramsAndFeatures = bDoNotRedirectProgramsAndFeaturesToSettingsApp && IsEqualGUID(
+        &guid, &GUID_UICommand_ProgramsAndFeatures);
     if (bIsSystem || bIsProgramsAndFeatures)
     {
         IOpenControlPanel* pOpenControlPanel = NULL;
@@ -8265,7 +8450,8 @@ HRESULT shell32_UICommand_InvokeHook(UICommand* _this, void* a2, void* a3)
 
 BOOL explorer_ShellExecuteExW(SHELLEXECUTEINFOW* pExecInfo)
 {
-    if (bDoNotRedirectSystemToSettingsApp && pExecInfo && pExecInfo->lpFile && !wcscmp(pExecInfo->lpFile, L"ms-settings:about"))
+    if (bDoNotRedirectSystemToSettingsApp && pExecInfo && pExecInfo->lpFile && !wcscmp(
+        pExecInfo->lpFile, L"ms-settings:about"))
     {
         IOpenControlPanel* pOpenControlPanel = NULL;
         CoCreateInstance(
@@ -8286,12 +8472,12 @@ BOOL explorer_ShellExecuteExW(SHELLEXECUTEINFOW* pExecInfo)
 }
 
 HINSTANCE explorer_ShellExecuteW(
-    HWND    hwnd,
+    HWND hwnd,
     LPCWSTR lpOperation,
     LPCWSTR lpFile,
     LPCWSTR lpParameters,
     LPCWSTR lpDirectory,
-    INT     nShowCmd
+    INT nShowCmd
 )
 {
     if (bDoNotRedirectNotificationIconsToSettingsApp && !wcscmp(lpFile, L"ms-settings:notifications"))
@@ -8302,7 +8488,7 @@ HINSTANCE explorer_ShellExecuteW(
             lpParameters, lpDirectory, nShowCmd
         );
     }
-    else if (bDoNotRedirectDateAndTimeToSettingsApp && !wcscmp(lpFile, L"ms-settings:dateandtime"))
+    if (bDoNotRedirectDateAndTimeToSettingsApp && !wcscmp(lpFile, L"ms-settings:dateandtime"))
     {
         return ShellExecuteW(
             hwnd, lpOperation,
@@ -8323,28 +8509,33 @@ HINSTANCE explorer_ShellExecuteW(
 
 #pragma region "Classic Drive Grouping"
 #ifdef _WIN64
-const struct { DWORD dwDescriptionId; UINT uResourceId; } driveCategoryMap[] = {
-    { SHDID_FS_DIRECTORY,        9338 }, //shell32
-    { SHDID_COMPUTER_SHAREDDOCS, 9338 }, //shell32
-    { SHDID_COMPUTER_FIXED,      IDS_DRIVECATEGORY_HARDDISKDRIVES },
-    { SHDID_COMPUTER_DRIVE35,    IDS_DRIVECATEGORY_REMOVABLESTORAGE },
-    { SHDID_COMPUTER_REMOVABLE,  IDS_DRIVECATEGORY_REMOVABLESTORAGE },
-    { SHDID_COMPUTER_CDROM,      IDS_DRIVECATEGORY_REMOVABLESTORAGE },
-    { SHDID_COMPUTER_DRIVE525,   IDS_DRIVECATEGORY_REMOVABLESTORAGE },
-    { SHDID_COMPUTER_NETDRIVE,   9340 }, //shell32
-    { SHDID_COMPUTER_OTHER,      IDS_DRIVECATEGORY_OTHER },
-    { SHDID_COMPUTER_RAMDISK,    IDS_DRIVECATEGORY_OTHER },
-    { SHDID_COMPUTER_IMAGING,    IDS_DRIVECATEGORY_IMAGING },
-    { SHDID_COMPUTER_AUDIO,      IDS_DRIVECATEGORY_PORTABLEMEDIADEVICE },
-    { SHDID_MOBILE_DEVICE,       IDS_DRIVECATEGORY_PORTABLEDEVICE }
+const struct
+{
+    DWORD dwDescriptionId;
+    UINT uResourceId;
+} driveCategoryMap[] = {
+    {SHDID_FS_DIRECTORY, 9338}, //shell32
+    {SHDID_COMPUTER_SHAREDDOCS, 9338}, //shell32
+    {SHDID_COMPUTER_FIXED, IDS_DRIVECATEGORY_HARDDISKDRIVES},
+    {SHDID_COMPUTER_DRIVE35, IDS_DRIVECATEGORY_REMOVABLESTORAGE},
+    {SHDID_COMPUTER_REMOVABLE, IDS_DRIVECATEGORY_REMOVABLESTORAGE},
+    {SHDID_COMPUTER_CDROM, IDS_DRIVECATEGORY_REMOVABLESTORAGE},
+    {SHDID_COMPUTER_DRIVE525, IDS_DRIVECATEGORY_REMOVABLESTORAGE},
+    {SHDID_COMPUTER_NETDRIVE, 9340}, //shell32
+    {SHDID_COMPUTER_OTHER, IDS_DRIVECATEGORY_OTHER},
+    {SHDID_COMPUTER_RAMDISK, IDS_DRIVECATEGORY_OTHER},
+    {SHDID_COMPUTER_IMAGING, IDS_DRIVECATEGORY_IMAGING},
+    {SHDID_COMPUTER_AUDIO, IDS_DRIVECATEGORY_PORTABLEMEDIADEVICE},
+    {SHDID_MOBILE_DEVICE, IDS_DRIVECATEGORY_PORTABLEDEVICE}
 };
 
 //Represents the true data structure that is returned from shell32!DllGetClassObject
-typedef struct {
+typedef struct
+{
     const IClassFactoryVtbl* lpVtbl;
     ULONG flags;
     REFCLSID rclsid;
-    HRESULT(*pfnCreateInstance)(IUnknown*, REFIID, void**);
+    HRESULT (*pfnCreateInstance)(IUnknown*, REFIID, void**);
 } Shell32ClassFactoryEntry;
 
 //Represents a custom ICategorizer/IShellExtInit
@@ -8367,7 +8558,7 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_QueryInterface(ICategorizer
     }
     else if (IsEqualIID(riid, &IID_IShellExtInit))
     {
-        *ppvObject = &((EPCategorizer*) _this)->shellExtInit;
+        *ppvObject = &((EPCategorizer*)_this)->shellExtInit;
     }
     else
     {
@@ -8413,7 +8604,8 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetDescription(ICategorizer
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategory(ICategorizer* _this, UINT cidl, PCUITEMID_CHILD_ARRAY apidl, DWORD* rgCategoryIds)
+HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategory(ICategorizer* _this, UINT cidl,
+                                                                 PCUITEMID_CHILD_ARRAY apidl, DWORD* rgCategoryIds)
 {
     EPCategorizer* epCategorizer = (EPCategorizer*)_this;
 
@@ -8423,7 +8615,7 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategory(ICategorizer* _
     {
         rgCategoryIds[i] = IDS_DRIVECATEGORY_OTHER;
 
-        PROPERTYKEY key = { FMTID_ShellDetails, PID_DESCRIPTIONID };
+        PROPERTYKEY key = {FMTID_ShellDetails, PID_DESCRIPTIONID};
         VARIANT variant;
         VariantInit(&variant);
 
@@ -8452,7 +8644,8 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategory(ICategorizer* _
     return hr;
 }
 
-HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategoryInfo(ICategorizer* _this, DWORD dwCategoryId, CATEGORY_INFO* pci)
+HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategoryInfo(ICategorizer* _this, DWORD dwCategoryId,
+                                                                     CATEGORY_INFO* pci)
 {
     //Now retrieve the display name to use for the resource ID dwCategoryId.
     //pci is already populated with most of the information it needs, we just need to fill in the wszName
@@ -8462,7 +8655,8 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_GetCategoryInfo(ICategorize
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_CompareCategory(ICategorizer* _this, CATSORT_FLAGS csfFlags, DWORD dwCategoryId1, DWORD dwCategoryId2)
+HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_CompareCategory(ICategorizer* _this, CATSORT_FLAGS csfFlags,
+                                                                     DWORD dwCategoryId1, DWORD dwCategoryId2)
 {
     //Typically a categorizer would use the resource IDs containing the names of each category as the "category ID" as well. In our case however, we're using
     //a combination of resource/category IDs provided by shell32 and resource/category IDs we're overriding ourselves. As a result, we are forced to compare
@@ -8503,9 +8697,11 @@ HRESULT STDMETHODCALLTYPE EPCategorizer_ICategorizer_CompareCategory(ICategorize
 #pragma region "EPCategorizer: IShellExtInit"
 
 //Adjustor Thunks: https://devblogs.microsoft.com/oldnewthing/20040206-00/?p=40723
-HRESULT STDMETHODCALLTYPE EPCategorizer_IShellExtInit_QueryInterface(IShellExtInit* _this, REFIID riid, void** ppvObject)
+HRESULT STDMETHODCALLTYPE EPCategorizer_IShellExtInit_QueryInterface(IShellExtInit* _this, REFIID riid,
+                                                                     void** ppvObject)
 {
-    return EPCategorizer_ICategorizer_QueryInterface((ICategorizer*)((char*)_this - sizeof(IShellExtInitVtbl*)), riid, ppvObject);
+    return EPCategorizer_ICategorizer_QueryInterface((ICategorizer*)((char*)_this - sizeof(IShellExtInitVtbl*)), riid,
+                                                     ppvObject);
 }
 
 ULONG STDMETHODCALLTYPE EPCategorizer_IShellExtInit_AddRef(IShellExtInit* _this)
@@ -8518,7 +8714,8 @@ ULONG STDMETHODCALLTYPE EPCategorizer_IShellExtInit_Release(IShellExtInit* _this
     return EPCategorizer_ICategorizer_Release((ICategorizer*)((char*)_this - sizeof(IShellExtInitVtbl*)));
 }
 
-HRESULT STDMETHODCALLTYPE EPCategorizer_IShellExtInit_Initialize(IShellExtInit* _this, PCIDLIST_ABSOLUTE pidlFolder, IDataObject* pdtobj, HKEY hkeyProgID)
+HRESULT STDMETHODCALLTYPE EPCategorizer_IShellExtInit_Initialize(IShellExtInit* _this, PCIDLIST_ABSOLUTE pidlFolder,
+                                                                 IDataObject* pdtobj, HKEY hkeyProgID)
 {
     EPCategorizer* epCategorizer = (EPCategorizer*)((char*)_this - sizeof(IShellExtInitVtbl*));
 
@@ -8544,13 +8741,14 @@ const IShellExtInitVtbl EPCategorizer_shellExtInitVtbl = {
     EPCategorizer_IShellExtInit_Initialize
 };
 
-HRESULT(STDMETHODCALLTYPE *shell32_DriveTypeCategorizer_CreateInstanceFunc)(IUnknown* pUnkOuter, REFIID riid, void** ppvObject);
+HRESULT (STDMETHODCALLTYPE *shell32_DriveTypeCategorizer_CreateInstanceFunc)(
+    IUnknown* pUnkOuter, REFIID riid, void** ppvObject);
 
 HRESULT shell32_DriveTypeCategorizer_CreateInstanceHook(IUnknown* pUnkOuter, REFIID riid, void** ppvObject)
 {
     if (bUseClassicDriveGrouping && IsEqualIID(riid, &IID_ICategorizer))
     {
-        EPCategorizer* epCategorizer = (EPCategorizer*) malloc(sizeof(EPCategorizer));
+        EPCategorizer* epCategorizer = malloc(sizeof(EPCategorizer));
         epCategorizer->categorizer = &EPCategorizer_categorizerVtbl;
         epCategorizer->shellExtInit = &EPCategorizer_shellExtInitVtbl;
         epCategorizer->ulRefCount = 1;
@@ -8569,16 +8767,20 @@ HRESULT shell32_DriveTypeCategorizer_CreateInstanceHook(IUnknown* pUnkOuter, REF
 
 #pragma region "File Explorer command bar and ribbon support"
 DEFINE_GUID(CLSID_UIRibbonFramework,
-    0x926749FA, 0x2615, 0x4987, 0x88, 0x45, 0xC3, 0x3E, 0x65, 0xF2, 0xB9, 0x57);
+            0x926749FA, 0x2615, 0x4987, 0x88, 0x45, 0xC3, 0x3E, 0x65, 0xF2, 0xB9, 0x57);
 DEFINE_GUID(IID_UIRibbonFramework,
-    0xF4F0385D, 0x6872, 0x43A8, 0xAD, 0x09, 0x4C, 0x33, 0x9C, 0xB3, 0xF5, 0xC5);
-HRESULT ExplorerFrame_CoCreateInstanceHook(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID* ppv)
+            0xF4F0385D, 0x6872, 0x43A8, 0xAD, 0x09, 0x4C, 0x33, 0x9C, 0xB3, 0xF5, 0xC5);
+
+HRESULT ExplorerFrame_CoCreateInstanceHook(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid,
+                                           LPVOID* ppv)
 {
-    if ((dwFileExplorerCommandUI != 0) && *(INT64*)&rclsid->Data1 == 0x4D1E5A836480100B && *(INT64*)rclsid->Data4 == 0x339A8EA8E58A699F)
+    if ((dwFileExplorerCommandUI != 0) && *(INT64*)&rclsid->Data1 == 0x4D1E5A836480100B && *(INT64*)rclsid->Data4 ==
+        0x339A8EA8E58A699F)
     {
         return REGDB_E_CLASSNOTREG;
     }
-    if (dwFileExplorerCommandUI == 2 && IsEqualCLSID(rclsid, &CLSID_UIRibbonFramework) && IsEqualIID(riid, &IID_UIRibbonFramework))
+    if (dwFileExplorerCommandUI == 2 && IsEqualCLSID(rclsid, &CLSID_UIRibbonFramework) && IsEqualIID(
+        riid, &IID_UIRibbonFramework))
     {
         return REGDB_E_CLASSNOTREG;
     }
@@ -8590,15 +8792,15 @@ HRESULT ExplorerFrame_CoCreateInstanceHook(REFCLSID rclsid, LPUNKNOWN pUnkOuter,
 #pragma region "Change language UI style"
 #ifdef _WIN64
 DEFINE_GUID(CLSID_InputSwitchControl,
-    0xB9BC2A50,
-    0x43C3, 0x41AA, 0xa0, 0x86,
-    0x5D, 0xB1, 0x4e, 0x18, 0x4b, 0xae
+            0xB9BC2A50,
+            0x43C3, 0x41AA, 0xa0, 0x86,
+            0x5D, 0xB1, 0x4e, 0x18, 0x4b, 0xae
 );
 
 DEFINE_GUID(IID_InputSwitchControl,
-    0xB9BC2A50,
-    0x43C3, 0x41AA, 0xa0, 0x82,
-    0x5D, 0xB1, 0x4e, 0x18, 0x4b, 0xae
+            0xB9BC2A50,
+            0x43C3, 0x41AA, 0xa0, 0x82,
+            0x5D, 0xB1, 0x4e, 0x18, 0x4b, 0xae
 );
 
 #define LANGUAGEUI_STYLE_DESKTOP 0       // Windows 11 style
@@ -8609,7 +8811,7 @@ DEFINE_GUID(IID_InputSwitchControl,
 #define LANGUAGEUI_STYLE_OOBE 5
 #define LANGUAGEUI_STYLE_OTHER 100
 
-char mov_edx_val[6] = { 0xBA, 0x00, 0x00, 0x00, 0x00, 0xC3 };
+char mov_edx_val[6] = {0xBA, 0x00, 0x00, 0x00, 0x00, 0xC3};
 char* ep_pf = NULL;
 
 typedef interface IInputSwitchControl IInputSwitchControl;
@@ -8618,31 +8820,31 @@ typedef struct IInputSwitchControlVtbl
 {
     BEGIN_INTERFACE
 
-    HRESULT(STDMETHODCALLTYPE* QueryInterface)(
+    HRESULT (STDMETHODCALLTYPE* QueryInterface)(
         IInputSwitchControl* This,
         /* [in] */ REFIID riid,
         /* [annotation][iid_is][out] */
-        _COM_Outptr_  void** ppvObject);
+        _COM_Outptr_ void** ppvObject);
 
-    ULONG(STDMETHODCALLTYPE* AddRef)(
+    ULONG (STDMETHODCALLTYPE* AddRef)(
         IInputSwitchControl* This);
 
-    ULONG(STDMETHODCALLTYPE* Release)(
+    ULONG (STDMETHODCALLTYPE* Release)(
         IInputSwitchControl* This);
 
-    HRESULT(STDMETHODCALLTYPE* Init)(
+    HRESULT (STDMETHODCALLTYPE* Init)(
         IInputSwitchControl* This,
         /* [in] */ unsigned int clientType);
 
-    HRESULT(STDMETHODCALLTYPE* SetCallback)(
+    HRESULT (STDMETHODCALLTYPE* SetCallback)(
         IInputSwitchControl* This,
         /* [in] */ void* pInputSwitchCallback);
 
-    HRESULT(STDMETHODCALLTYPE* ShowInputSwitch)(
+    HRESULT (STDMETHODCALLTYPE* ShowInputSwitch)(
         IInputSwitchControl* This,
         /* [in] */ RECT* lpRect);
 
-    HRESULT(STDMETHODCALLTYPE* GetProfileCount)(
+    HRESULT (STDMETHODCALLTYPE* GetProfileCount)(
         IInputSwitchControl* This,
         /* [in] */ unsigned int* pOutNumberOfProfiles,
         /* [in] */ int* a3);
@@ -8657,13 +8859,15 @@ interface IInputSwitchControl
     CONST_VTBL struct IInputSwitchControlVtbl* lpVtbl;
 };
 
-HRESULT(*CInputSwitchControl_InitFunc)(IInputSwitchControl*, unsigned int);
+HRESULT (*CInputSwitchControl_InitFunc)(IInputSwitchControl*, unsigned int);
+
 HRESULT CInputSwitchControl_InitHook(IInputSwitchControl* _this, unsigned int dwOriginalIMEStyle)
 {
     return CInputSwitchControl_InitFunc(_this, dwIMEStyle ? dwIMEStyle : dwOriginalIMEStyle);
 }
 
 HRESULT (*CInputSwitchControl_ShowInputSwitchFunc)(IInputSwitchControl*, RECT*);
+
 HRESULT CInputSwitchControl_ShowInputSwitchHook(IInputSwitchControl* _this, RECT* lpRect)
 {
     if (!dwIMEStyle) // impossible case (this is not called for the Windows 11 language switcher), but just in case
@@ -8702,18 +8906,21 @@ HRESULT CInputSwitchControl_ShowInputSwitchHook(IInputSwitchControl* _this, RECT
     {
         if (dwIMEStyle == 1) // Windows 10 (with Language preferences link)
         {
-            lpRect->top = rc.top + (rc.bottom - rc.top) + (UINT)(((double)dwNumberOfProfiles * (60.0 * dpiy)) + (5.0 * dpiy * 4.0) + (dpiy) + (48.0 * dpiy));
+            lpRect->top = rc.top + (rc.bottom - rc.top) + (UINT)(((double)dwNumberOfProfiles * (60.0 * dpiy)) + (5.0 *
+                dpiy * 4.0) + (dpiy) + (48.0 * dpiy));
         }
-        else if (dwIMEStyle == 2 || dwIMEStyle == 3 || dwIMEStyle == 4 || dwIMEStyle == 5) // LOGONUI, UAC, Windows 10, OOBE
+        else if (dwIMEStyle == 2 || dwIMEStyle == 3 || dwIMEStyle == 4 || dwIMEStyle == 5)
+        // LOGONUI, UAC, Windows 10, OOBE
         {
-            lpRect->top = rc.top + (rc.bottom - rc.top) + (UINT)(((double)dwNumberOfProfiles * (60.0 * dpiy)) + (5.0 * dpiy * 2.0));
+            lpRect->top = rc.top + (rc.bottom - rc.top) + (UINT)(((double)dwNumberOfProfiles * (60.0 * dpiy)) + (5.0 *
+                dpiy * 2.0));
         }
     }
     else if (tbPos == TB_POS_LEFT)
     {
         if (dwIMEStyle == 1 || dwIMEStyle == 2 || dwIMEStyle == 3 || dwIMEStyle == 4 || dwIMEStyle == 5)
         {
-            lpRect->right = rc.left + (rc.right - rc.left) + (UINT)((double)(300.0 * dpix));
+            lpRect->right = rc.left + (rc.right - rc.left) + (UINT)(300.0 * dpix);
             lpRect->top += (lpRect->bottom - lpRect->top);
         }
     }
@@ -8728,17 +8935,17 @@ HRESULT CInputSwitchControl_ShowInputSwitchHook(IInputSwitchControl* _this, RECT
 
     if (dwIMEStyle == 4)
     {
-        lpRect->right -= (UINT)((double)(300.0 * dpix)) - (lpRect->right - lpRect->left);
+        lpRect->right -= (UINT)(300.0 * dpix) - (lpRect->right - lpRect->left);
     }
 
     return CInputSwitchControl_ShowInputSwitchFunc(_this, lpRect);
 }
 
 HRESULT explorer_CoCreateInstanceHook(
-    REFCLSID   rclsid,
-    LPUNKNOWN  pUnkOuter,
-    DWORD      dwClsContext,
-    REFIID     riid,
+    REFCLSID rclsid,
+    LPUNKNOWN pUnkOuter,
+    DWORD dwClsContext,
+    REFIID riid,
     IUnknown** ppv
 )
 {
@@ -8753,13 +8960,15 @@ HRESULT explorer_CoCreateInstanceHook(
             // how this worked.
             IInputSwitchControl* pInputSwitchControl = *ppv;
             DWORD flOldProtect = 0;
-            if (VirtualProtect(pInputSwitchControl->lpVtbl, sizeof(IInputSwitchControlVtbl), PAGE_EXECUTE_READWRITE, &flOldProtect))
+            if (VirtualProtect(pInputSwitchControl->lpVtbl, sizeof(IInputSwitchControlVtbl), PAGE_EXECUTE_READWRITE,
+                               &flOldProtect))
             {
                 CInputSwitchControl_ShowInputSwitchFunc = pInputSwitchControl->lpVtbl->ShowInputSwitch;
                 pInputSwitchControl->lpVtbl->ShowInputSwitch = CInputSwitchControl_ShowInputSwitchHook;
                 CInputSwitchControl_InitFunc = pInputSwitchControl->lpVtbl->Init;
                 pInputSwitchControl->lpVtbl->Init = CInputSwitchControl_InitHook;
-                VirtualProtect(pInputSwitchControl->lpVtbl, sizeof(IInputSwitchControlVtbl), flOldProtect, &flOldProtect);
+                VirtualProtect(pInputSwitchControl->lpVtbl, sizeof(IInputSwitchControlVtbl), flOldProtect,
+                               &flOldProtect);
             }
             // Pff... how this works:
             // 
@@ -8823,7 +9032,8 @@ HRESULT explorer_CoCreateInstanceHook(
 
 
 #pragma region "Explorer Registry Hooks"
-LSTATUS explorer_RegCreateKeyExW(HKEY a1, const WCHAR* a2,  DWORD a3, WCHAR* a4, DWORD a5, REGSAM a6, struct _SECURITY_ATTRIBUTES* a7, HKEY* a8, DWORD* a9)
+LSTATUS explorer_RegCreateKeyExW(HKEY a1, const WCHAR* a2, DWORD a3, WCHAR* a4, DWORD a5, REGSAM a6,
+                                 struct _SECURITY_ATTRIBUTES* a7, HKEY* a8, DWORD* a9)
 {
     const wchar_t* v13; // rdx
     int v14; // eax
@@ -8894,12 +9104,12 @@ LSTATUS explorer_RegOpenKeyExW(HKEY a1, WCHAR* a2, DWORD a3, REGSAM a4, HKEY* a5
 }
 
 LSTATUS explorer_RegSetValueExW(
-    HKEY       hKey,
-    LPCWSTR    lpValueName,
-    DWORD      Reserved,
-    DWORD      dwType,
+    HKEY hKey,
+    LPCWSTR lpValueName,
+    DWORD Reserved,
+    DWORD dwType,
     const BYTE* lpData,
-    DWORD      cbData
+    DWORD cbData
 )
 {
     if (IsWindows11() && !lstrcmpW(lpValueName, L"ShowCortanaButton"))
@@ -8916,12 +9126,12 @@ LSTATUS explorer_RegSetValueExW(
 }
 
 LSTATUS explorer_RegGetValueW(
-    HKEY    hkey,
+    HKEY hkey,
     LPCWSTR lpSubKey,
     LPCWSTR lpValue,
-    DWORD   dwFlags,
+    DWORD dwFlags,
     LPDWORD pdwType,
-    PVOID   pvData,
+    PVOID pvData,
     LPDWORD pcbData
 )
 {
@@ -8943,7 +9153,7 @@ LSTATUS explorer_RegGetValueW(
         if (lRes != ERROR_SUCCESS)
         {
             *(DWORD*)pvData = (lpValue[0] == L'T' ? TASKBARGLOMLEVEL_DEFAULT : MMTASKBARGLOMLEVEL_DEFAULT);
-            *(DWORD*)pcbData = sizeof(DWORD32);
+            *pcbData = sizeof(DWORD32);
             lRes = ERROR_SUCCESS;
         }
     }
@@ -8970,12 +9180,12 @@ LSTATUS explorer_RegGetValueW(
 }
 
 LSTATUS twinuipcshell_RegGetValueW(
-    HKEY    hkey,
+    HKEY hkey,
     LPCWSTR lpSubKey,
     LPCWSTR lpValue,
-    DWORD   dwFlags,
+    DWORD dwFlags,
     LPDWORD pdwType,
-    PVOID   pvData,
+    PVOID pvData,
     LPDWORD pcbData
 )
 {
@@ -9024,7 +9234,7 @@ HRESULT WINAPI explorer_SHCreateStreamOnModuleResourceWHook(
 {
     wchar_t path[MAX_PATH];
     GetModuleFileNameW(hModule, path, MAX_PATH);
-    if ((*((WORD*)&(pwszName)+1)))
+    if ((*((WORD*)&(pwszName) + 1)))
     {
         wprintf(L"%s - %s %s\n", path, pwszName, pwszType);
     }
@@ -9158,7 +9368,7 @@ BOOL explorer_SetRect(LPRECT lprc, int xLeft, int yTop, int xRight, int yBottom)
     }
 
     bTaskbarSet = TRUE;
-    
+
     StuckRectsData srd;
     DWORD pcbData = sizeof(StuckRectsData);
     RegGetValueW(
@@ -9206,7 +9416,8 @@ BOOL explorer_SetRect(LPRECT lprc, int xLeft, int yTop, int xRight, int yBottom)
 
 
 #pragma region "Disable Office Hotkeys"
-const UINT office_hotkeys[10] = { 0x57, 0x54, 0x59, 0x4F, 0x50, 0x44, 0x4C, 0x58, 0x4E, 0x20 };
+const UINT office_hotkeys[10] = {0x57, 0x54, 0x59, 0x4F, 0x50, 0x44, 0x4C, 0x58, 0x4E, 0x20};
+
 BOOL explorer_RegisterHotkeyHook(HWND hWnd, int id, UINT fsModifiers, UINT vk)
 {
     if (fsModifiers == (MOD_ALT | MOD_CONTROL | MOD_SHIFT | MOD_WIN | MOD_NOREPEAT) && (
@@ -9249,7 +9460,8 @@ HMODULE patched_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlag
     if (!_wcsicmp(path, lpLibFileName))
     {
         GetWindowsDirectoryW(path, MAX_PATH);
-        wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartTileDataLegacy.dll");
+        wcscat_s(path, MAX_PATH,
+                 L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartTileDataLegacy.dll");
         return LoadLibraryExW(path, hFile, dwFlags);
     }
     GetSystemDirectoryW(path, MAX_PATH);
@@ -9257,7 +9469,8 @@ HMODULE patched_LoadLibraryExW(LPCWSTR lpLibFileName, HANDLE hFile, DWORD dwFlag
     if (!_wcsicmp(path, lpLibFileName))
     {
         GetWindowsDirectoryW(path, MAX_PATH);
-        wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\AppResolverLegacy.dll");
+        wcscat_s(path, MAX_PATH,
+                 L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\AppResolverLegacy.dll");
         return LoadLibraryExW(path, hFile, dwFlags);
     }
     return LoadLibraryExW(lpLibFileName, hFile, dwFlags);
@@ -9286,9 +9499,9 @@ BOOL WINAPI explorer_SetWindowCompositionAttribute(HWND hWnd, WINCOMPATTRDATA* p
     {
         return TRUE;
     }
-    if (bOldTaskbar && global_rovi.dwBuildNumber >= 22581 && GetTaskbarColor && GetTaskbarTheme && 
-        (GetClassWord(hWnd, GCW_ATOM) == RegisterWindowMessageW(L"Shell_TrayWnd") || 
-         GetClassWord(hWnd, GCW_ATOM) == RegisterWindowMessageW(L"Shell_SecondaryTrayWnd")) && 
+    if (bOldTaskbar && global_rovi.dwBuildNumber >= 22581 && GetTaskbarColor && GetTaskbarTheme &&
+        (GetClassWord(hWnd, GCW_ATOM) == RegisterWindowMessageW(L"Shell_TrayWnd") ||
+            GetClassWord(hWnd, GCW_ATOM) == RegisterWindowMessageW(L"Shell_SecondaryTrayWnd")) &&
         pData->nAttribute == 19 && pData->pData && pData->ulDataSize == sizeof(ACCENTPOLICY))
     {
         ACCENTPOLICY* pAccentPolicy = pData->pData;
@@ -9311,8 +9524,8 @@ void PatchExplorer_UpdateWindowAccentProperties()
             {
                 char* pPatchArea = NULL;
                 // test al, al; jz rip+0x11; and ...
-                char p1[] = { 0x84, 0xC0, 0x74, 0x11, 0x83, 0x65 };
-                char p2[] = { 0xF3, 0xF3, 0xF3, 0xFF };
+                char p1[] = {0x84, 0xC0, 0x74, 0x11, 0x83, 0x65};
+                char p2[] = {0xF3, 0xF3, 0xF3, 0xFF};
                 char* pattern1 = p1;
                 int sizeof_pattern1 = 6;
                 if (global_rovi.dwBuildNumber >= 22581)
@@ -9333,7 +9546,10 @@ void PatchExplorer_UpdateWindowAccentProperties()
                             {
                                 pCandidate = memmem(
                                     !pCandidate ? hExplorer + section->VirtualAddress : pCandidate,
-                                    !pCandidate ? section->SizeOfRawData : (uintptr_t)section->SizeOfRawData - (uintptr_t)(pCandidate - (hExplorer + section->VirtualAddress)),
+                                    !pCandidate
+                                        ? section->SizeOfRawData
+                                        : (uintptr_t)section->SizeOfRawData - (uintptr_t)(pCandidate - (hExplorer +
+                                            section->VirtualAddress)),
                                     pattern1,
                                     sizeof_pattern1
                                 );
@@ -9364,7 +9580,9 @@ void PatchExplorer_UpdateWindowAccentProperties()
                         if (decodedInstructions)
                         {
                             unsigned int decodedInstructionsCount = 0;
-                            _DecodeResult res = distorm_decode(0, (const unsigned char*)(pPatchArea - dec_size), dec_size + 20, Decode64Bits, decodedInstructions, 100, &decodedInstructionsCount);
+                            _DecodeResult res = distorm_decode(0, (const unsigned char*)(pPatchArea - dec_size),
+                                                               dec_size + 20, Decode64Bits, decodedInstructions, 100,
+                                                               &decodedInstructionsCount);
                             int status = 0;
                             for (int i = decodedInstructionsCount - 1; i >= 0; i--)
                             {
@@ -9388,7 +9606,8 @@ void PatchExplorer_UpdateWindowAccentProperties()
                                 else if (status == 4 && !strncmp(decodedInstructions[i].instructionHex.p, "e8", 2))
                                 {
                                     uint32_t* off = pPatchArea - dec_size + decodedInstructions[i].offset + 1;
-                                    GetTaskbarTheme = pPatchArea - dec_size + decodedInstructions[i].offset + decodedInstructions[i].size + (*off);
+                                    GetTaskbarTheme = pPatchArea - dec_size + decodedInstructions[i].offset +
+                                        decodedInstructions[i].size + (*off);
                                     break;
                                 }
                                 if (status >= 2)
@@ -9402,7 +9621,8 @@ void PatchExplorer_UpdateWindowAccentProperties()
                             }
                             if (SetWindowCompositionAttribute && GetTaskbarColor && GetTaskbarTheme)
                             {
-                                VnPatchIAT(GetModuleHandleW(NULL), "user32.dll", "SetWindowCompositionAttribute", explorer_SetWindowCompositionAttribute);
+                                VnPatchIAT(GetModuleHandleW(NULL), "user32.dll", "SetWindowCompositionAttribute",
+                                           explorer_SetWindowCompositionAttribute);
                                 printf("Patched taskbar transparency in newer OS builds\n");
                             }
                             free(decodedInstructions);
@@ -9425,7 +9645,8 @@ void PatchExplorer_UpdateWindowAccentProperties()
 
 
 #pragma region "Revert legacy copy dialog"
-BOOL(*SHELL32_CanDisplayWin8CopyDialogFunc)();
+BOOL (*SHELL32_CanDisplayWin8CopyDialogFunc)();
+
 BOOL SHELL32_CanDisplayWin8CopyDialogHook()
 {
     if (bLegacyFileTransferDialog) return FALSE;
@@ -9441,24 +9662,31 @@ HKEY hKeySpotlight1 = NULL;
 HKEY hKeySpotlight2 = NULL;
 BOOL bSpotlightIsDesktopContextMenu = FALSE;
 
-LSTATUS shell32_RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPWSTR lpClass, DWORD dwOptions, REGSAM samDesired, const LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult, LPDWORD lpdwDisposition)
+LSTATUS shell32_RegCreateKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD Reserved, LPWSTR lpClass, DWORD dwOptions,
+                                REGSAM samDesired, const LPSECURITY_ATTRIBUTES lpSecurityAttributes, PHKEY phkResult,
+                                LPDWORD lpdwDisposition)
 {
-    if (bDisableSpotlightIcon && hKey == HKEY_CURRENT_USER && !_wcsicmp(lpSubKey, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}"))
+    if (bDisableSpotlightIcon && hKey == HKEY_CURRENT_USER && !_wcsicmp(
+        lpSubKey, L"Software\\Classes\\CLSID\\{2cc5ca98-6485-489a-920e-b3e88a6ccce3}"))
     {
-        LSTATUS lRes = RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
+        LSTATUS lRes = RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes,
+                                       phkResult, lpdwDisposition);
         if (lRes == ERROR_SUCCESS) hKeySpotlight1 = *phkResult;
         return lRes;
     }
-    else if (hKeySpotlight1 && hKey == hKeySpotlight1 && !_wcsicmp(lpSubKey, L"ShellFolder"))
+    if (hKeySpotlight1 && hKey == hKeySpotlight1 && !_wcsicmp(lpSubKey, L"ShellFolder"))
     {
-        LSTATUS lRes = RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
+        LSTATUS lRes = RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes,
+                                       phkResult, lpdwDisposition);
         if (lRes == ERROR_SUCCESS) hKeySpotlight2 = *phkResult;
         return lRes;
     }
-    return RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition);
+    return RegCreateKeyExW(hKey, lpSubKey, Reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult,
+                           lpdwDisposition);
 }
 
-LSTATUS shell32_RegSetValueExW(HKEY hKey, LPCWSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE* lpData, DWORD cbData)
+LSTATUS shell32_RegSetValueExW(HKEY hKey, LPCWSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE* lpData,
+                               DWORD cbData)
 {
     if (hKeySpotlight1 && hKeySpotlight2 && hKey == hKeySpotlight2 && !_wcsicmp(lpValueName, L"Attributes"))
     {
@@ -9473,13 +9701,18 @@ LSTATUS shell32_RegSetValueExW(HKEY hKey, LPCWSTR lpValueName, DWORD Reserved, D
 
 BOOL shell32_DeleteMenu(HMENU hMenu, UINT uPosition, UINT uFlags)
 {
-    if (uPosition == 0x7053 && IsSpotlightEnabled() && dwSpotlightDesktopMenuMask) bSpotlightIsDesktopContextMenu = TRUE;
+    if (uPosition == 0x7053 && IsSpotlightEnabled() && dwSpotlightDesktopMenuMask)
+        bSpotlightIsDesktopContextMenu =
+            TRUE;
     return DeleteMenu(hMenu, uPosition, uFlags);
 }
 
 BOOL shell32_TrackPopupMenu(HMENU hMenu, UINT uFlags, int x, int y, int nReserved, HWND hWnd, const RECT* prcRect)
 {
-    if (IsSpotlightEnabled() && dwSpotlightDesktopMenuMask && (GetPropW(GetParent(hWnd), L"DesktopWindow") && (RegisterWindowMessageW(L"WorkerW") == GetClassWord(GetParent(hWnd), GCW_ATOM) || RegisterWindowMessageW(L"Progman") == GetClassWord(GetParent(hWnd), GCW_ATOM))) && bSpotlightIsDesktopContextMenu)
+    if (IsSpotlightEnabled() && dwSpotlightDesktopMenuMask && (GetPropW(GetParent(hWnd), L"DesktopWindow") && (
+            RegisterWindowMessageW(L"WorkerW") == GetClassWord(GetParent(hWnd), GCW_ATOM) ||
+            RegisterWindowMessageW(L"Progman") == GetClassWord(GetParent(hWnd), GCW_ATOM))) &&
+        bSpotlightIsDesktopContextMenu)
     {
         SpotlightHelper(dwSpotlightDesktopMenuMask, hWnd, hMenu, NULL);
     }
@@ -9490,7 +9723,8 @@ BOOL shell32_TrackPopupMenu(HMENU hMenu, UINT uFlags, int x, int y, int nReserve
         MENUITEMINFOW mii;
         mii.cbSize = sizeof(MENUITEMINFOW);
         mii.fMask = MIIM_FTYPE | MIIM_DATA;
-        if (GetMenuItemInfoW(hMenu, bRet, FALSE, &mii) && mii.dwItemData >= SPOP_CLICKMENU_FIRST && mii.dwItemData <= SPOP_CLICKMENU_LAST)
+        if (GetMenuItemInfoW(hMenu, bRet, FALSE, &mii) && mii.dwItemData >= SPOP_CLICKMENU_FIRST && mii.dwItemData <=
+            SPOP_CLICKMENU_LAST)
         {
             SpotlightHelper(mii.dwItemData, hWnd, hMenu, NULL);
         }
@@ -9513,12 +9747,13 @@ int patched_GetSystemMetrics(int nIndex)
         wchar_t* pVal = L"MinWidth";
         if (nIndex == SM_CXICONSPACING) pVal = L"IconSpacing";
         else if (nIndex == SM_CYICONSPACING) pVal = L"IconVerticalSpacing";
-        RegGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop\\WindowMetrics", pVal, SRRF_RT_REG_SZ, NULL, wszDim, &dwSize);
+        RegGetValueW(HKEY_CURRENT_USER, L"Control Panel\\Desktop\\WindowMetrics", pVal, SRRF_RT_REG_SZ, NULL, wszDim,
+                     &dwSize);
         int dwDim = _wtoi(wszDim);
         if (dwDim <= 0)
         {
             if (nIndex == SM_CXMINIMIZED) return 160;
-            else if (dwDim < 0) return MulDiv(dwDim, GetDpiForSystem(), -1440);
+            if (dwDim < 0) return MulDiv(dwDim, GetDpiForSystem(), -1440);
         }
     }
     return GetSystemMetrics(nIndex);
@@ -9528,10 +9763,13 @@ int patched_GetSystemMetrics(int nIndex)
 
 
 #pragma region "Fix Windows 10 taskbar redraw problem on OS builds 22621+"
-HWND Windows11v22H2_explorer_CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle, int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu, HINSTANCE hInstance, LPVOID lpParam)
+HWND Windows11v22H2_explorer_CreateWindowExW(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
+                                             int X, int Y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu,
+                                             HINSTANCE hInstance, LPVOID lpParam)
 {
-    if ((*((WORD*)&(lpClassName)+1)) && !wcscmp(lpClassName, L"Shell_TrayWnd")) dwStyle |= WS_CLIPCHILDREN;
-    return CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+    if ((*((WORD*)&(lpClassName) + 1)) && !wcscmp(lpClassName, L"Shell_TrayWnd")) dwStyle |= WS_CLIPCHILDREN;
+    return CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hWndParent, hMenu,
+                           hInstance, lpParam);
 }
 #pragma endregion
 
@@ -9565,17 +9803,22 @@ WORD explorer_CascadeWindows(
     const HWND* lpKids
 )
 {
-    return CascadeWindows((hwndParent == GetShellWindow()) ? GetDesktopWindow() : hwndParent, wHow, lpRect, cKids, lpKids);
+    return CascadeWindows((hwndParent == GetShellWindow()) ? GetDesktopWindow() : hwndParent, wHow, lpRect, cKids,
+                          lpKids);
 }
 #pragma endregion
 
 
 #pragma region "Fix explorer crashing on Windows builds lower than 25158"
-HWND(*NtUserFindWindowEx)(HWND hWndParent, HWND hWndChildAfter, LPCWSTR lpszClass, LPCWSTR lpszWindow, DWORD dwType);
-HWND user32_NtUserFindWindowExHook(HWND hWndParent, HWND hWndChildAfter, LPCWSTR lpszClass, LPCWSTR lpszWindow, DWORD dwType) {
+HWND (*NtUserFindWindowEx)(HWND hWndParent, HWND hWndChildAfter, LPCWSTR lpszClass, LPCWSTR lpszWindow, DWORD dwType);
+
+HWND user32_NtUserFindWindowExHook(HWND hWndParent, HWND hWndChildAfter, LPCWSTR lpszClass, LPCWSTR lpszWindow,
+                                   DWORD dwType)
+{
     if (!NtUserFindWindowEx) NtUserFindWindowEx = GetProcAddress(GetModuleHandleW(L"win32u.dll"), "NtUserFindWindowEx");
     HWND hWnd = NULL;
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; ++i)
+    {
         if (hWnd) break;
         hWnd = NtUserFindWindowEx(hWndParent, hWndChildAfter, lpszClass, lpszWindow, dwType);
     }
@@ -9586,7 +9829,8 @@ HWND user32_NtUserFindWindowExHook(HWND hWndParent, HWND hWndChildAfter, LPCWSTR
 
 #pragma region "Infrastructure for reporting which OS features are enabled"
 #pragma pack(push, 1)
-struct RTL_FEATURE_CONFIGURATION {
+struct RTL_FEATURE_CONFIGURATION
+{
     unsigned int featureId;
     unsigned __int32 group : 4;
     unsigned __int32 enabledState : 2;
@@ -9599,10 +9843,15 @@ struct RTL_FEATURE_CONFIGURATION {
 };
 #pragma pack(pop)
 
-int (*RtlQueryFeatureConfigurationFunc)(UINT32 featureId, int sectionType, INT64* changeStamp, struct RTL_FEATURE_CONFIGURATION* buffer);
-int RtlQueryFeatureConfigurationHook(UINT32 featureId, int sectionType, INT64* changeStamp, struct RTL_FEATURE_CONFIGURATION* buffer) {
+int (*RtlQueryFeatureConfigurationFunc)(UINT32 featureId, int sectionType, INT64* changeStamp,
+                                        struct RTL_FEATURE_CONFIGURATION* buffer);
+
+int RtlQueryFeatureConfigurationHook(UINT32 featureId, int sectionType, INT64* changeStamp,
+                                     struct RTL_FEATURE_CONFIGURATION* buffer)
+{
     int rv = RtlQueryFeatureConfigurationFunc(featureId, sectionType, changeStamp, buffer);
-    if (IsWindows11Version22H2Build1413OrHigher() && bOldTaskbar && featureId == 26008830) {
+    if (IsWindows11Version22H2Build1413OrHigher() && bOldTaskbar && featureId == 26008830)
+    {
         // Disable tablet optimized taskbar feature when using the Windows 10 taskbar
         // 
         // For now, this fixes Task View and Win-Tab, Alt-Tab breaking after pressing Win-Tab, 
@@ -9694,8 +9943,9 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
         if (bInstall)
         {
             VnPatchIAT(hExplorerFrame, "user32.dll", "TrackPopupMenu", TrackPopupMenuHook);
-            VnPatchIAT(hExplorerFrame, "user32.dll", "SystemParametersInfoW", DisableImmersiveMenus_SystemParametersInfoW);
-            VnPatchIAT(hExplorerFrame, "shcore.dll", (LPCSTR)188, explorerframe_SHCreateWorkerWindowHook);  // <<<SAB>>>
+            VnPatchIAT(hExplorerFrame, "user32.dll", "SystemParametersInfoW",
+                       DisableImmersiveMenus_SystemParametersInfoW);
+            VnPatchIAT(hExplorerFrame, "shcore.dll", (LPCSTR)188, explorerframe_SHCreateWorkerWindowHook); // <<<SAB>>>
             if (!bIsExplorer)
             {
                 CreateWindowExWFunc = CreateWindowExW;
@@ -9703,7 +9953,8 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
                 SetWindowLongPtrWFunc = SetWindowLongPtrW;
                 VnPatchIAT(hExplorerFrame, "user32.dll", "SetWindowLongPtrW", SetWindowLongPtrWHook);
             }
-            VnPatchIAT(hExplorerFrame, "API-MS-WIN-CORE-STRING-L1-1-0.DLL", "CompareStringOrdinal", ExplorerFrame_CompareStringOrdinal);
+            VnPatchIAT(hExplorerFrame, "API-MS-WIN-CORE-STRING-L1-1-0.DLL", "CompareStringOrdinal",
+                       ExplorerFrame_CompareStringOrdinal);
             VnPatchIAT(hExplorerFrame, "user32.dll", "GetSystemMetricsForDpi", explorerframe_GetSystemMetricsForDpi);
         }
         else
@@ -9716,7 +9967,8 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
                 VnPatchIAT(hExplorerFrame, "user32.dll", "CreateWindowExW", CreateWindowExW);
                 VnPatchIAT(hExplorerFrame, "user32.dll", "SetWindowLongPtrW", SetWindowLongPtrW);
             }
-            VnPatchIAT(hExplorerFrame, "API-MS-WIN-CORE-STRING-L1-1-0.DLL", "CompareStringOrdinal", CompareStringOrdinal);
+            VnPatchIAT(hExplorerFrame, "API-MS-WIN-CORE-STRING-L1-1-0.DLL", "CompareStringOrdinal",
+                       CompareStringOrdinal);
             VnPatchIAT(hExplorerFrame, "user32.dll", "GetSystemMetricsForDpi", GetSystemMetricsForDpi);
             FreeLibrary(hExplorerFrame);
             FreeLibrary(hExplorerFrame);
@@ -9729,7 +9981,8 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
         if (bInstall)
         {
             VnPatchDelayIAT(hWindowsUIFileExplorer, "user32.dll", "TrackPopupMenu", TrackPopupMenuHook);
-            VnPatchDelayIAT(hWindowsUIFileExplorer, "user32.dll", "SystemParametersInfoW", DisableImmersiveMenus_SystemParametersInfoW);
+            VnPatchDelayIAT(hWindowsUIFileExplorer, "user32.dll", "SystemParametersInfoW",
+                            DisableImmersiveMenus_SystemParametersInfoW);
             if (!bIsExplorer)
             {
                 CreateWindowExWFunc = CreateWindowExW;
@@ -9757,9 +10010,11 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
     if (bInstall)
     {
         dwSize = sizeof(DWORD);
-        RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"Start_ShowClassicMode", RRF_RT_DWORD, NULL, &dwStartShowClassicMode, &dwSize);
+        RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                     L"Start_ShowClassicMode", RRF_RT_DWORD, NULL, &dwStartShowClassicMode, &dwSize);
         dwSize = sizeof(DWORD);
-        RegGetValueW(HKEY_CURRENT_USER, L"Software\\ExplorerPatcher", L"PermitOldStartTileDataOneShot", RRF_RT_DWORD, NULL, &dwPermitOldStartTileData, &dwSize);
+        RegGetValueW(HKEY_CURRENT_USER, L"Software\\ExplorerPatcher", L"PermitOldStartTileDataOneShot", RRF_RT_DWORD,
+                     NULL, &dwPermitOldStartTileData, &dwSize);
     }
     if (dwStartShowClassicMode && dwPermitOldStartTileData)
     {
@@ -9785,8 +10040,10 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
                     {
                         dwPermitOldStartTileData = FALSE;
                         dwSize = sizeof(DWORD);
-                        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\ExplorerPatcher", L"PermitOldStartTileDataOneShot");
-                        VnPatchIAT(hCombase, "api-ms-win-core-libraryloader-l1-2-0.dll", "LoadLibraryExW", patched_LoadLibraryExW);
+                        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\ExplorerPatcher",
+                                           L"PermitOldStartTileDataOneShot");
+                        VnPatchIAT(hCombase, "api-ms-win-core-libraryloader-l1-2-0.dll", "LoadLibraryExW",
+                                   patched_LoadLibraryExW);
                     }
                 }
                 else
@@ -9800,33 +10057,37 @@ DWORD InjectBasicFunctions(BOOL bIsExplorer, BOOL bInstall)
     }
 }
 
-INT64(*twinui_pcshell_IsUndockedAssetAvailableFunc)(INT a1, INT64 a2, INT64 a3, const char* a4);
+INT64 (*twinui_pcshell_IsUndockedAssetAvailableFunc)(INT a1, INT64 a2, INT64 a3, const char* a4);
+
 INT64 twinui_pcshell_IsUndockedAssetAvailableHook(INT a1, INT64 a2, INT64 a3, const char* a4)
 {
     // if IsAltTab and AltTabSettings == Windows 10 or sws (Precision Touchpad gesture)
-    if (a1 == 1 && (dwAltTabSettings == 3 || dwAltTabSettings == 2)) 
+    if (a1 == 1 && (dwAltTabSettings == 3 || dwAltTabSettings == 2))
     {
         return 0;
     }
     // if IsSnapAssist and SnapAssistSettings == Windows 10
-    else if (a1 == 4 && dwSnapAssistSettings == 3 && !IsWindows11Version22H2OrHigher())
+    if (a1 == 4 && dwSnapAssistSettings == 3 && !IsWindows11Version22H2OrHigher())
     {
         return 0;
     }
     // else, show Windows 11 style basically
-    else
-    {
-        if (twinui_pcshell_IsUndockedAssetAvailableFunc)
-            return twinui_pcshell_IsUndockedAssetAvailableFunc(a1, a2, a3, a4);
-        return 1;
-    }
+    if (twinui_pcshell_IsUndockedAssetAvailableFunc)
+        return twinui_pcshell_IsUndockedAssetAvailableFunc(a1, a2, a3, a4);
+    return 1;
 }
 
-INT64(*twinui_pcshell_CMultitaskingViewManager__CreateDCompMTVHostFunc)(INT64 a1, unsigned int a2, INT64 a3, INT64 a4, INT64* a5);
-INT64(*twinui_pcshell_CMultitaskingViewManager__CreateXamlMTVHostFunc)(INT64 a1, unsigned int a2, INT64 a3, INT64 a4, INT64* a5);
-INT64 twinui_pcshell_CMultitaskingViewManager__CreateXamlMTVHostHook(INT64 a1, unsigned int a2, INT64 a3, INT64 a4, INT64* a5)
+INT64 (*twinui_pcshell_CMultitaskingViewManager__CreateDCompMTVHostFunc)(
+    INT64 a1, unsigned int a2, INT64 a3, INT64 a4, INT64* a5);
+INT64 (*twinui_pcshell_CMultitaskingViewManager__CreateXamlMTVHostFunc)(INT64 a1, unsigned int a2, INT64 a3, INT64 a4,
+                                                                        INT64* a5);
+
+INT64 twinui_pcshell_CMultitaskingViewManager__CreateXamlMTVHostHook(INT64 a1, unsigned int a2, INT64 a3, INT64 a4,
+                                                                     INT64* a5)
 {
-    if (!twinui_pcshell_IsUndockedAssetAvailableHook(a2, 0, 0, 0, NULL)) return twinui_pcshell_CMultitaskingViewManager__CreateDCompMTVHostFunc(a1, a2, a3, a4, a5);
+    if (!twinui_pcshell_IsUndockedAssetAvailableHook(a2, 0, 0, 0, NULL))
+        return
+            twinui_pcshell_CMultitaskingViewManager__CreateDCompMTVHostFunc(a1, a2, a3, a4, a5);
     return twinui_pcshell_CMultitaskingViewManager__CreateXamlMTVHostFunc(a1, a2, a3, a4, a5);
 }
 
@@ -9851,7 +10112,10 @@ BOOL explorer_IsOS(DWORD dwOS)
         if (buf[0] == 0x48 && buf[1] == 0x83 && buf[2] == 0xec && buf[3] == 0x28 && buf[4] == 0xb9 &&
             buf[5] == 0x1d && buf[6] == 0x00 && buf[7] == 0x00 && buf[8] == 0x00) // sub rsp, 28h; mov ecx, 1dh
         {
-            buf[0] = 0x48; buf[1] = 0x31; buf[2] = 0xc0; buf[3] = 0xc3; // xor rax, rax; ret
+            buf[0] = 0x48;
+            buf[1] = 0x31;
+            buf[2] = 0xc0;
+            buf[3] = 0xc3; // xor rax, rax; ret
             DWORD flOldProtect = 0;
             if (VirtualProtect((uintptr_t)_ReturnAddress() - 16, 4, PAGE_EXECUTE_READWRITE, &flOldProtect))
             {
@@ -9871,9 +10135,9 @@ DWORD Inject(BOOL bIsExplorer)
     FILE* conout;
     AllocConsole();
     freopen_s(
-        &conout, 
+        &conout,
         "CONOUT$",
-        "w", 
+        "w",
         stdout
     );
 #endif
@@ -9962,7 +10226,8 @@ DWORD Inject(BOOL bIsExplorer)
             settings[cs].data = hSwsOpacityMaybeChanged;
             settings[cs].hEvent = NULL;
             settings[cs].hKey = NULL;
-            wcscpy_s(settings[cs].name, MAX_PATH, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MultitaskingView\\AltTabViewHost");
+            wcscpy_s(settings[cs].name, MAX_PATH,
+                     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\MultitaskingView\\AltTabViewHost");
             settings[cs].origin = HKEY_CURRENT_USER;
             cs++;
         }
@@ -9995,7 +10260,8 @@ DWORD Inject(BOOL bIsExplorer)
             settings[cs].data = NULL;
             settings[cs].hEvent = NULL;
             settings[cs].hKey = NULL;
-            wcscpy_s(settings[cs].name, MAX_PATH, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\People");
+            wcscpy_s(settings[cs].name, MAX_PATH,
+                     L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\People");
             settings[cs].origin = HKEY_CURRENT_USER;
             cs++;
         }
@@ -10081,7 +10347,8 @@ DWORD Inject(BOOL bIsExplorer)
     }
 
 #ifdef _WIN64
-    wprintf(L"Running on Windows %d, OS Build %d.%d.%d.%d.\n", IsWindows11() ? 11 : 10, global_rovi.dwMajorVersion, global_rovi.dwMinorVersion, global_rovi.dwBuildNumber, global_ubr);
+    wprintf(L"Running on Windows %d, OS Build %d.%d.%d.%d.\n", IsWindows11() ? 11 : 10, global_rovi.dwMajorVersion,
+            global_rovi.dwMinorVersion, global_rovi.dwBuildNumber, global_ubr);
 #endif
 
     WCHAR wszPath[MAX_PATH];
@@ -10096,7 +10363,8 @@ DWORD Inject(BOOL bIsExplorer)
     wszEPWeatherKillswitch = calloc(sizeof(WCHAR), MAX_PATH);
     srand(time(NULL));
     rand_string(wszEPWeatherKillswitch, MAX_PATH / 2 - 1);
-    swprintf_s(wszEPWeatherKillswitch, sizeof(_T(EP_Weather_Killswitch)) / sizeof(WCHAR), L"%s", _T(EP_Weather_Killswitch));
+    swprintf_s(wszEPWeatherKillswitch, sizeof(_T(EP_Weather_Killswitch)) / sizeof(WCHAR), L"%s",
+               _T(EP_Weather_Killswitch));
     wszEPWeatherKillswitch[wcslen(wszEPWeatherKillswitch)] = L'_';
     //wprintf(L"%s\n", wszEPWeatherKillswitch);
     hEPWeatherKillswitch = CreateMutexW(NULL, TRUE, wszEPWeatherKillswitch);
@@ -10161,7 +10429,8 @@ DWORD Inject(BOOL bIsExplorer)
     }
 
     RtlQueryFeatureConfigurationFunc = GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlQueryFeatureConfiguration");
-    if (RtlQueryFeatureConfigurationFunc) {
+    if (RtlQueryFeatureConfigurationFunc)
+    {
         rv = funchook_prepare(
             funchook,
             (void**)&RtlQueryFeatureConfigurationFunc,
@@ -10181,7 +10450,8 @@ DWORD Inject(BOOL bIsExplorer)
     GetWindowBand = GetProcAddress(hUser32, "GetWindowBand");
     SetWindowBand = GetProcAddress(hUser32, "SetWindowBand");
     SetWindowCompositionAttribute = GetProcAddress(hUser32, "SetWindowCompositionAttribute");
-    if (!IsWindows11BuildHigherThan25158()) {
+    if (!IsWindows11BuildHigherThan25158())
+    {
         VnPatchIAT(hUser32, "win32u.dll", "NtUserFindWindowEx", user32_NtUserFindWindowExHook);
     }
     printf("Setup user32 functions done\n");
@@ -10192,8 +10462,10 @@ DWORD Inject(BOOL bIsExplorer)
     if (bOldTaskbar)
     {
         VnPatchIAT(hExplorer, "user32.dll", (LPCSTR)2005, explorer_SetChildWindowNoActivateHook);
-        VnPatchDelayIAT(hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "SendMessageW", explorer_SendMessageW);
-        VnPatchIAT(hExplorer, "api-ms-win-core-libraryloader-l1-2-0.dll", "GetProcAddress", explorer_GetProcAddressHook);
+        VnPatchDelayIAT(hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "SendMessageW",
+                        explorer_SendMessageW);
+        VnPatchIAT(hExplorer, "api-ms-win-core-libraryloader-l1-2-0.dll", "GetProcAddress",
+                   explorer_GetProcAddressHook);
         VnPatchIAT(hExplorer, "shell32.dll", "ShellExecuteW", explorer_ShellExecuteW);
         VnPatchIAT(hExplorer, "shell32.dll", "ShellExecuteExW", explorer_ShellExecuteExW);
         VnPatchIAT(hExplorer, "API-MS-WIN-CORE-REGISTRY-L1-1-0.DLL", "RegGetValueW", explorer_RegGetValueW);
@@ -10203,7 +10475,10 @@ DWORD Inject(BOOL bIsExplorer)
         VnPatchIAT(hExplorer, "user32.dll", "LoadMenuW", explorer_LoadMenuW);
         VnPatchIAT(hExplorer, "api-ms-win-core-shlwapi-obsolete-l1-1-0.dll", "QISearch", explorer_QISearch);
         if (IsOS(OS_ANYSERVER)) VnPatchIAT(hExplorer, "api-ms-win-shcore-sysinfo-l1-1-0.dll", "IsOS", explorer_IsOS);
-        if (IsWindows11Version22H2OrHigher()) VnPatchDelayIAT(hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "CreateWindowExW", Windows11v22H2_explorer_CreateWindowExW);
+        if (IsWindows11Version22H2OrHigher())
+            VnPatchDelayIAT(
+                hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "CreateWindowExW",
+                Windows11v22H2_explorer_CreateWindowExW);
     }
     VnPatchIAT(hExplorer, "user32.dll", "TileWindows", explorer_TileWindows);
     VnPatchIAT(hExplorer, "user32.dll", "CascadeWindows", explorer_CascadeWindows);
@@ -10269,8 +10544,6 @@ DWORD Inject(BOOL bIsExplorer)
     printf("Setup explorer functions done\n");
 
 
-
-
     CreateWindowExWFunc = CreateWindowExW;
     rv = funchook_prepare(
         funchook,
@@ -10293,8 +10566,6 @@ DWORD Inject(BOOL bIsExplorer)
         FreeLibraryAndExitThread(hModule, rv);
         return rv;
     }
-
-
 
 
     HANDLE hUxtheme = LoadLibraryW(L"uxtheme.dll");
@@ -10426,7 +10697,8 @@ DWORD Inject(BOOL bIsExplorer)
     {
         HANDLE hCombase = LoadLibraryW(L"combase.dll");
         // Fixed a bug that crashed Explorer when a folder window was opened after a first one was closed on OS builds 22621+
-        VnPatchIAT(hCombase, "api-ms-win-core-libraryloader-l1-2-0.dll", "LoadLibraryExW", Windows11v22H2_combase_LoadLibraryExW);
+        VnPatchIAT(hCombase, "api-ms-win-core-libraryloader-l1-2-0.dll", "LoadLibraryExW",
+                   Windows11v22H2_combase_LoadLibraryExW);
         printf("Setup combase functions done\n");
     }
 
@@ -10465,7 +10737,6 @@ DWORD Inject(BOOL bIsExplorer)
     printf("Setup stobject functions done\n");
 
 
-
     HANDLE hBthprops = LoadLibraryW(L"bthprops.cpl");
     VnPatchIAT(hBthprops, "user32.dll", "TrackPopupMenuEx", bthprops_TrackPopupMenuExHook);
 #ifdef USE_PRIVATE_INTERFACES
@@ -10475,7 +10746,6 @@ DWORD Inject(BOOL bIsExplorer)
     }
 #endif
     printf("Setup bthprops functions done\n");
-
 
 
     HANDLE hPnidui = LoadLibraryW(L"pnidui.dll");
@@ -10502,7 +10772,8 @@ DWORD Inject(BOOL bIsExplorer)
     if (hShell32)
     {
         // Patch ribbon to handle redirects to classic CPLs
-        HRESULT(*SHELL32_Create_IEnumUICommand)(IUnknown*, int*, int, IUnknown**) = GetProcAddress(hShell32, (LPCSTR)0x2E8);
+        HRESULT (*SHELL32_Create_IEnumUICommand)(IUnknown*, int*, int, IUnknown**) = GetProcAddress(
+            hShell32, (LPCSTR)0x2E8);
         if (SHELL32_Create_IEnumUICommand)
         {
             char WVTASKITEM[80];
@@ -10522,7 +10793,8 @@ DWORD Inject(BOOL bIsExplorer)
                     if (pUICommand)
                     {
                         DWORD flOldProtect = 0;
-                        if (VirtualProtect(pUICommand->lpVtbl, sizeof(UICommandVtbl), PAGE_EXECUTE_READWRITE, &flOldProtect))
+                        if (VirtualProtect(pUICommand->lpVtbl, sizeof(UICommandVtbl), PAGE_EXECUTE_READWRITE,
+                                           &flOldProtect))
                         {
                             shell32_UICommand_InvokeFunc = pUICommand->lpVtbl->Invoke;
                             pUICommand->lpVtbl->Invoke = shell32_UICommand_InvokeHook;
@@ -10535,7 +10807,8 @@ DWORD Inject(BOOL bIsExplorer)
         }
 
         // Allow clasic drive groupings in This PC
-        HRESULT(*SHELL32_DllGetClassObject)(REFCLSID rclsid, REFIID riid, LPVOID* ppv) = GetProcAddress(hShell32, "DllGetClassObject");
+        HRESULT (*SHELL32_DllGetClassObject)(REFCLSID rclsid, REFIID riid, LPVOID* ppv) = GetProcAddress(
+            hShell32, "DllGetClassObject");
         if (SHELL32_DllGetClassObject)
         {
             IClassFactory* pClassFactory = NULL;
@@ -10552,7 +10825,8 @@ DWORD Inject(BOOL bIsExplorer)
 
                 DWORD flOldProtect = 0;
 
-                if (VirtualProtect(pClassFactoryEntry, sizeof(Shell32ClassFactoryEntry), PAGE_EXECUTE_READWRITE, &flOldProtect))
+                if (VirtualProtect(pClassFactoryEntry, sizeof(Shell32ClassFactoryEntry), PAGE_EXECUTE_READWRITE,
+                                   &flOldProtect))
                 {
                     shell32_DriveTypeCategorizer_CreateInstanceFunc = pClassFactoryEntry->pfnCreateInstance;
                     pClassFactoryEntry->pfnCreateInstance = shell32_DriveTypeCategorizer_CreateInstanceHook;
@@ -10581,13 +10855,18 @@ DWORD Inject(BOOL bIsExplorer)
 
 
     HANDLE hExplorerFrame = GetModuleHandleW(L"ExplorerFrame.dll");
-    VnPatchIAT(hExplorerFrame, "api-ms-win-core-com-l1-1-0.dll", "CoCreateInstance", ExplorerFrame_CoCreateInstanceHook);
+    VnPatchIAT(hExplorerFrame, "api-ms-win-core-com-l1-1-0.dll", "CoCreateInstance",
+               ExplorerFrame_CoCreateInstanceHook);
     printf("Setup explorerframe functions done\n");
 
 
     HANDLE hWindowsStorage = LoadLibraryW(L"windows.storage.dll");
     SHELL32_CanDisplayWin8CopyDialogFunc = GetProcAddress(hShell32, "SHELL32_CanDisplayWin8CopyDialog");
-    if (SHELL32_CanDisplayWin8CopyDialogFunc) VnPatchDelayIAT(hWindowsStorage, "ext-ms-win-shell-exports-internal-l1-1-0.dll", "SHELL32_CanDisplayWin8CopyDialog", SHELL32_CanDisplayWin8CopyDialogHook);
+    if (SHELL32_CanDisplayWin8CopyDialogFunc)
+        VnPatchDelayIAT(hWindowsStorage,
+                        "ext-ms-win-shell-exports-internal-l1-1-0.dll",
+                        "SHELL32_CanDisplayWin8CopyDialog",
+                        SHELL32_CanDisplayWin8CopyDialogHook);
     printf("Setup windows.storage functions done\n");
 
 
@@ -10609,13 +10888,13 @@ DWORD Inject(BOOL bIsExplorer)
 
             if (SLGetWindowsInformationDWORDFunc)
             {
-                VnPatchDelayIAT(hWindowsudkShellcommon, "ext-ms-win-security-slc-l1-1-0.dll", "SLGetWindowsInformationDWORD", windowsudkshellcommon_SLGetWindowsInformationDWORDHook);
+                VnPatchDelayIAT(hWindowsudkShellcommon, "ext-ms-win-security-slc-l1-1-0.dll",
+                                "SLGetWindowsInformationDWORD", windowsudkshellcommon_SLGetWindowsInformationDWORDHook);
             }
 
             printf("Setup windowsudk.shellcommon functions done\n");
         }
     }
-
 
 
     HANDLE hPeopleBand = LoadLibraryW(L"PeopleBand.dll");
@@ -10627,7 +10906,6 @@ DWORD Inject(BOOL bIsExplorer)
     }
 
 
-
     rv = funchook_install(funchook, 0);
     if (rv != 0)
     {
@@ -10635,8 +10913,6 @@ DWORD Inject(BOOL bIsExplorer)
         return rv;
     }
     printf("Installed hooks.\n");
-
-
 
 
     /*HANDLE hEvent = CreateEventEx(
@@ -10693,17 +10969,21 @@ DWORD Inject(BOOL bIsExplorer)
             0,
             0
         );
-        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"TaskbarGlomLevel");
-        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", L"MMTaskbarGlomLevel");
+        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                           L"TaskbarGlomLevel");
+        RegDeleteKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                           L"MMTaskbarGlomLevel");
     }
 
     if (IsWindows11Version22H2OrHigher() && bOldTaskbar)
     {
         DWORD dwRes = 1;
         DWORD dwSize = sizeof(DWORD);
-        if (RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Search", L"SearchboxTaskbarMode", RRF_RT_DWORD, NULL, &dwRes, &dwSize) != ERROR_SUCCESS)
+        if (RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                         L"SearchboxTaskbarMode", RRF_RT_DWORD, NULL, &dwRes, &dwSize) != ERROR_SUCCESS)
         {
-            RegSetKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Search", L"SearchboxTaskbarMode", REG_DWORD, &dwRes, sizeof(DWORD));
+            RegSetKeyValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+                            L"SearchboxTaskbarMode", REG_DWORD, &dwRes, sizeof(DWORD));
         }
     }
 
@@ -10734,7 +11014,6 @@ DWORD Inject(BOOL bIsExplorer)
     */
 
 
-
     CreateThread(
         0,
         0,
@@ -10744,7 +11023,6 @@ DWORD Inject(BOOL bIsExplorer)
         0
     );
     printf("Open Start on monitor thread\n");
-
 
 
     hServiceWindowThread = CreateThread(
@@ -10758,12 +11036,10 @@ DWORD Inject(BOOL bIsExplorer)
     printf("EP Service Window thread\n");
 
 
-
     if (bDisableOfficeHotkeys)
     {
         VnPatchIAT(hExplorer, "user32.dll", "RegisterHotKey", explorer_RegisterHotkeyHook);
     }
-
 
 
     if (bEnableArchivePlugin)
@@ -10784,9 +11060,7 @@ DWORD Inject(BOOL bIsExplorer)
     }
 
 
-
     CreateThread(NULL, 0, CheckForUpdatesThread, 5000, 0, NULL);
-
 
 
     WCHAR wszExtraLibPath[MAX_PATH];
@@ -10815,7 +11089,6 @@ DWORD Inject(BOOL bIsExplorer)
     }
 
 
-
     /*if (bHookStartMenu)
     {
         HookStartMenuParams* params2 = calloc(1, sizeof(HookStartMenuParams));
@@ -10827,13 +11100,10 @@ DWORD Inject(BOOL bIsExplorer)
     }*/
 
 
-
-
-    VnPatchDelayIAT(hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "GetClientRect", TaskbarCenter_GetClientRectHook);
+    VnPatchDelayIAT(hExplorer, "ext-ms-win-rtcore-ntuser-window-ext-l1-1-0.dll", "GetClientRect",
+                    TaskbarCenter_GetClientRectHook);
     VnPatchIAT(hExplorer, "SHCORE.dll", (LPCSTR)190, TaskbarCenter_SHWindowsPolicy);
     printf("Initialized taskbar centering module.\n");
-
-
 
 
     //CreateThread(0, 0, PositionStartMenuTimeout, 0, 0, 0);
@@ -11148,9 +11418,9 @@ void StartMenu_LoadSettings(BOOL bRestartIfChanged)
     }
 }
 
-static INT64(*StartDocked_LauncherFrame_OnVisibilityChangedFunc)(void*, INT64, void*) = NULL;
+static INT64 (*StartDocked_LauncherFrame_OnVisibilityChangedFunc)(void*, INT64, void*) = NULL;
 
-static INT64(*StartDocked_LauncherFrame_ShowAllAppsFunc)(void* _this) = NULL;
+static INT64 (*StartDocked_LauncherFrame_ShowAllAppsFunc)(void* _this) = NULL;
 
 INT64 StartDocked_LauncherFrame_OnVisibilityChangedHook(void* _this, INT64 a2, void* VisibilityChangedEventArguments)
 {
@@ -11172,21 +11442,21 @@ INT64 StartDocked_LauncherFrame_OnVisibilityChangedHook(void* _this, INT64 a2, v
     return r;
 }
 
-INT64(*StartDocked_SystemListPolicyProvider_GetMaximumFrequentAppsFunc)(void*) = NULL;
+INT64 (*StartDocked_SystemListPolicyProvider_GetMaximumFrequentAppsFunc)(void*) = NULL;
 
 INT64 StartDocked_SystemListPolicyProvider_GetMaximumFrequentAppsHook(void* _this)
 {
     return StartMenu_maximumFreqApps;
 }
 
-INT64(*StartUI_SystemListPolicyProvider_GetMaximumFrequentAppsFunc)(void*) = NULL;
+INT64 (*StartUI_SystemListPolicyProvider_GetMaximumFrequentAppsFunc)(void*) = NULL;
 
 INT64 StartUI_SystemListPolicyProvider_GetMaximumFrequentAppsHook(void* _this)
 {
     return StartMenu_maximumFreqApps;
 }
 
-INT64(*StartDocked_StartSizingFrame_StartSizingFrameFunc)(void* _this) = NULL;
+INT64 (*StartDocked_StartSizingFrame_StartSizingFrameFunc)(void* _this) = NULL;
 
 INT64 StartDocked_StartSizingFrame_StartSizingFrameHook(void* _this)
 {
@@ -11202,7 +11472,7 @@ INT64 StartDocked_StartSizingFrame_StartSizingFrameHook(void* _this)
             SRRF_RT_REG_DWORD,
             NULL,
             &dwStatus,
-            (LPDWORD)(&dwSize)
+            &dwSize
         ) != ERROR_SUCCESS)
         {
             dwStatus = 0;
@@ -11213,7 +11483,9 @@ INT64 StartDocked_StartSizingFrame_StartSizingFrameHook(void* _this)
     return rv;
 }
 
-HANDLE StartUI_CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
+HANDLE StartUI_CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
+                           LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
+                           DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
 {
     WCHAR path[MAX_PATH];
     GetWindowsDirectoryW(path, MAX_PATH);
@@ -11221,8 +11493,10 @@ HANDLE StartUI_CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwSh
     if (!_wcsicmp(path, lpFileName))
     {
         GetWindowsDirectoryW(path, MAX_PATH);
-        wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
-        return CreateFileW(path, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+        wcscat_s(path, MAX_PATH,
+                 L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
+        return CreateFileW(path, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+                           dwFlagsAndAttributes, hTemplateFile);
     }
     GetWindowsDirectoryW(path, MAX_PATH);
     wcscat_s(path, MAX_PATH, L"\\SystemResources\\Windows.UI.ShellCommon\\pris");
@@ -11232,9 +11506,11 @@ HANDLE StartUI_CreateFileW(LPCWSTR lpFileName, DWORD dwDesiredAccess, DWORD dwSh
         GetWindowsDirectoryW(path, MAX_PATH);
         wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\pris2");
         wcscat_s(path, MAX_PATH, lpFileName + len);
-        return CreateFileW(path, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+        return CreateFileW(path, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+                           dwFlagsAndAttributes, hTemplateFile);
     }
-    return CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+    return CreateFileW(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition,
+                       dwFlagsAndAttributes, hTemplateFile);
 }
 
 BOOL StartUI_GetFileAttributesExW(LPCWSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation)
@@ -11245,7 +11521,8 @@ BOOL StartUI_GetFileAttributesExW(LPCWSTR lpFileName, GET_FILEEX_INFO_LEVELS fIn
     if (!_wcsicmp(path, lpFileName))
     {
         GetWindowsDirectoryW(path, MAX_PATH);
-        wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
+        wcscat_s(path, MAX_PATH,
+                 L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
         return GetFileAttributesExW(path, fInfoLevelId, lpFileInformation);
     }
     GetWindowsDirectoryW(path, MAX_PATH);
@@ -11269,7 +11546,8 @@ HANDLE StartUI_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileD
     if (!_wcsicmp(path, lpFileName))
     {
         GetWindowsDirectoryW(path, MAX_PATH);
-        wcscat_s(path, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
+        wcscat_s(path, MAX_PATH,
+                 L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\Windows.UI.ShellCommon.pri");
         return FindFirstFileW(path, lpFindFileData);
     }
     GetWindowsDirectoryW(path, MAX_PATH);
@@ -11285,9 +11563,11 @@ HANDLE StartUI_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileD
     return FindFirstFileW(lpFileName, lpFindFileData);
 }
 
-LSTATUS StartUI_RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData, LPDWORD pcbData)
+LSTATUS StartUI_RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData,
+                             LPDWORD pcbData)
 {
-    if (hkey == HKEY_LOCAL_MACHINE && !_wcsicmp(lpSubKey, L"Software\\Microsoft\\Windows\\CurrentVersion\\Mrt\\_Merged") && !_wcsicmp(lpValue, L"ShouldMergeInProc"))
+    if (hkey == HKEY_LOCAL_MACHINE && !_wcsicmp(lpSubKey, L"Software\\Microsoft\\Windows\\CurrentVersion\\Mrt\\_Merged")
+        && !_wcsicmp(lpValue, L"ShouldMergeInProc"))
     {
         *(DWORD*)pvData = 1;
         return ERROR_SUCCESS;
@@ -11309,7 +11589,8 @@ LSTATUS StartUI_RegOpenKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGS
     return RegOpenKeyExW(hKey, lpSubKey, ulOptions, samDesired, phkResult);
 }
 
-LSTATUS StartUI_RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData)
+LSTATUS StartUI_RegQueryValueExW(HKEY hKey, LPCWSTR lpValueName, LPDWORD lpReserved, LPDWORD lpType, LPBYTE lpData,
+                                 LPDWORD lpcbData)
 {
     if (hKey == hKey_StartUI_TileGrid)
     {
@@ -11344,21 +11625,29 @@ int Start_SetWindowRgn(HWND hWnd, HRGN hRgn, BOOL bRedraw)
     {
         if (IsWindows11()) ShowWindow(hWnd, bIsWindowVisible ? SW_SHOW : SW_HIDE);
         DWORD TaskbarAl = InterlockedAdd(&dwTaskbarAl, 0);
-        if (bIsWindowVisible && (!TaskbarAl ? (dwStartShowClassicMode ? StartUI_EnableRoundedCornersApply : StartDocked_DisableRecommendedSectionApply) : 1))
+        if (bIsWindowVisible && (!TaskbarAl
+                                     ? (dwStartShowClassicMode
+                                            ? StartUI_EnableRoundedCornersApply
+                                            : StartDocked_DisableRecommendedSectionApply)
+                                     : 1))
         {
             HWND hWndTaskbar = NULL;
             if (TaskbarAl)
             {
                 HMONITOR hMonitorOfStartMenu = NULL;
-                if (bMonitorOverride == 1 || !bMonitorOverride) {
+                if (bMonitorOverride == 1 || !bMonitorOverride)
+                {
                     POINT pt;
                     if (!bMonitorOverride) GetCursorPos(&pt);
-                    else {
-                        pt.x = 0; pt.y = 0;
+                    else
+                    {
+                        pt.x = 0;
+                        pt.y = 0;
                     }
                     hMonitorOfStartMenu = MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
                 }
-                else {
+                else
+                {
                     MonitorOverrideData mod;
                     mod.cbIndex = 2;
                     mod.dwIndex = bMonitorOverride;
@@ -11366,7 +11655,9 @@ int Start_SetWindowRgn(HWND hWnd, HRGN hRgn, BOOL bRedraw)
                     EnumDisplayMonitors(NULL, NULL, ExtractMonitorByIndex, &mod);
                     if (mod.hMonitor == NULL)
                     {
-                        POINT pt; pt.x = 0; pt.y = 0;
+                        POINT pt;
+                        pt.x = 0;
+                        pt.y = 0;
                         hMonitorOfStartMenu = MonitorFromPoint(pt, MONITOR_DEFAULTTOPRIMARY);
                     }
                     else
@@ -11378,7 +11669,8 @@ int Start_SetWindowRgn(HWND hWnd, HRGN hRgn, BOOL bRedraw)
                 HWND hWndTemp = NULL;
 
                 HWND hShellTray_Wnd = FindWindowExW(NULL, NULL, L"Shell_TrayWnd", NULL);
-                if (hShellTray_Wnd && !hWndTaskbar && hMonitorOfStartMenu == MonitorFromWindow(hShellTray_Wnd, MONITOR_DEFAULTTOPRIMARY) && dwOldTaskbarAl)
+                if (hShellTray_Wnd && !hWndTaskbar && hMonitorOfStartMenu == MonitorFromWindow(
+                    hShellTray_Wnd, MONITOR_DEFAULTTOPRIMARY) && dwOldTaskbarAl)
                 {
                     hWndTaskbar = hShellTray_Wnd;
                 }
@@ -11393,15 +11685,17 @@ int Start_SetWindowRgn(HWND hWnd, HRGN hRgn, BOOL bRedraw)
                             L"Shell_SecondaryTrayWnd",
                             NULL
                         );
-                        if (hWndTemp && !hWndTaskbar && hMonitorOfStartMenu == MonitorFromWindow(hWndTemp, MONITOR_DEFAULTTOPRIMARY) && dwMMOldTaskbarAl)
+                        if (hWndTemp && !hWndTaskbar && hMonitorOfStartMenu == MonitorFromWindow(
+                            hWndTemp, MONITOR_DEFAULTTOPRIMARY) && dwMMOldTaskbarAl)
                         {
                             hWndTaskbar = hWndTemp;
                             break;
                         }
-                    } while (hWndTemp);
+                    }
+                    while (hWndTemp);
                 }
 
-                if(!hWndTaskbar)
+                if (!hWndTaskbar)
                 {
                     hWndTaskbar = hShellTray_Wnd;
                 }
@@ -11456,30 +11750,43 @@ int Start_SetWindowRgn(HWND hWnd, HRGN hRgn, BOOL bRedraw)
                 {
                     if (dwStartShowClassicMode)
                     {
-                        SetWindowPos(hWnd, NULL, mi.rcMonitor.left + (((mi.rcMonitor.right - mi.rcMonitor.left) - (rc.right - rc.left)) / 2), mi.rcMonitor.top, 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                        SetWindowPos(
+                            hWnd, NULL,
+                            mi.rcMonitor.left + (((mi.rcMonitor.right - mi.rcMonitor.left) - (rc.right - rc.left)) / 2),
+                            mi.rcMonitor.top, 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
                     }
                     else
                     {
                         // Windows 11 Start menu knows how to center itself when the taskbar is at the bottom of the screen
-                        SetWindowPos(hWnd, NULL, mi.rcMonitor.left, mi.rcMonitor.top, 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                        SetWindowPos(hWnd, NULL, mi.rcMonitor.left, mi.rcMonitor.top, 0, 0,
+                                     SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
                     }
                 }
                 else if (rcC.left < 5 && rcC.top < 5 && rcC.right > rcC.bottom)
                 {
-                    SetWindowPos(hWnd, NULL, mi.rcMonitor.left + (((mi.rcMonitor.right - mi.rcMonitor.left) - (rc.right - rc.left)) / 2), mi.rcMonitor.top + (rcC.bottom - rcC.top), 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                    SetWindowPos(
+                        hWnd, NULL,
+                        mi.rcMonitor.left + (((mi.rcMonitor.right - mi.rcMonitor.left) - (rc.right - rc.left)) / 2),
+                        mi.rcMonitor.top + (rcC.bottom - rcC.top), 0, 0,
+                        SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
                 }
                 else if (rcC.left < 5 && rcC.top < 5 && rcC.right < rcC.bottom)
                 {
-                    SetWindowPos(hWnd, NULL, mi.rcMonitor.left + (rcC.right - rcC.left), mi.rcMonitor.top + (((mi.rcMonitor.bottom - mi.rcMonitor.top) - (rc.bottom - rc.top)) / 2), 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                    SetWindowPos(hWnd, NULL, mi.rcMonitor.left + (rcC.right - rcC.left),
+                                 mi.rcMonitor.top + (((mi.rcMonitor.bottom - mi.rcMonitor.top) - (rc.bottom - rc.top)) /
+                                     2), 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
                 }
                 else if (rcC.left > 5 && rcC.top < 5)
                 {
-                    SetWindowPos(hWnd, NULL, mi.rcMonitor.left, mi.rcMonitor.top + (((mi.rcMonitor.bottom - mi.rcMonitor.top) - (rc.bottom - rc.top)) / 2), 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                    SetWindowPos(hWnd, NULL, mi.rcMonitor.left,
+                                 mi.rcMonitor.top + (((mi.rcMonitor.bottom - mi.rcMonitor.top) - (rc.bottom - rc.top)) /
+                                     2), 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
                 }
             }
             else
             {
-                SetWindowPos(hWnd, NULL, mi.rcWork.left, mi.rcWork.top, 0, 0, SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
+                SetWindowPos(hWnd, NULL, mi.rcWork.left, mi.rcWork.top, 0, 0,
+                             SWP_NOSIZE | SWP_FRAMECHANGED | SWP_ASYNCWINDOWPOS);
             }
         }
     }
@@ -11926,15 +12233,18 @@ void InjectStartMenu()
             LoadLibraryW(L"MrmCoreR.dll");
             HANDLE hMrmCoreR = GetModuleHandleW(L"MrmCoreR.dll");
             VnPatchIAT(hMrmCoreR, "api-ms-win-core-file-l1-1-0.dll", "CreateFileW", StartUI_CreateFileW);
-            VnPatchIAT(hMrmCoreR, "api-ms-win-core-file-l1-1-0.dll", "GetFileAttributesExW", StartUI_GetFileAttributesExW);
+            VnPatchIAT(hMrmCoreR, "api-ms-win-core-file-l1-1-0.dll", "GetFileAttributesExW",
+                       StartUI_GetFileAttributesExW);
             VnPatchIAT(hMrmCoreR, "api-ms-win-core-file-l1-1-0.dll", "FindFirstFileW", StartUI_FindFirstFileW);
             VnPatchIAT(hMrmCoreR, "api-ms-win-core-registry-l1-1-0.dll", "RegGetValueW", StartUI_RegGetValueW);
 
             // Enables "Show more tiles" setting
             LoadLibraryW(L"Windows.CloudStore.dll");
             HANDLE hWindowsCloudStore = GetModuleHandleW(L"Windows.CloudStore.dll");
-            VnPatchIAT(hWindowsCloudStore, "api-ms-win-core-registry-l1-1-0.dll", "RegOpenKeyExW", StartUI_RegOpenKeyExW);
-            VnPatchIAT(hWindowsCloudStore, "api-ms-win-core-registry-l1-1-0.dll", "RegQueryValueExW", StartUI_RegQueryValueExW);
+            VnPatchIAT(hWindowsCloudStore, "api-ms-win-core-registry-l1-1-0.dll", "RegOpenKeyExW",
+                       StartUI_RegOpenKeyExW);
+            VnPatchIAT(hWindowsCloudStore, "api-ms-win-core-registry-l1-1-0.dll", "RegQueryValueExW",
+                       StartUI_RegQueryValueExW);
             VnPatchIAT(hWindowsCloudStore, "api-ms-win-core-registry-l1-1-0.dll", "RegCloseKey", StartUI_RegCloseKey);
         }
     }
@@ -12014,7 +12324,7 @@ void InjectStartMenu()
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal0,
-                (LPDWORD)(&dwSize)
+                &dwSize
             );
             SHRegGetValueFromHKCUHKLMFunc(
                 TEXT(REGPATH_STARTMENU) TEXT("\\") TEXT(STARTDOCKED_SB_NAME),
@@ -12022,7 +12332,7 @@ void InjectStartMenu()
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal1,
-                (LPDWORD)(&dwSize)
+                &dwSize
             );
             SHRegGetValueFromHKCUHKLMFunc(
                 TEXT(REGPATH_STARTMENU) TEXT("\\") TEXT(STARTDOCKED_SB_NAME),
@@ -12030,7 +12340,7 @@ void InjectStartMenu()
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal2,
-                (LPDWORD)(&dwSize)
+                &dwSize
             );
             SHRegGetValueFromHKCUHKLMFunc(
                 TEXT(REGPATH_STARTMENU) TEXT("\\") TEXT(STARTDOCKED_SB_NAME),
@@ -12038,7 +12348,7 @@ void InjectStartMenu()
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal3,
-                (LPDWORD)(&dwSize)
+                &dwSize
             );
             SHRegGetValueFromHKCUHKLMFunc(
                 TEXT(REGPATH_STARTMENU) TEXT("\\") TEXT(STARTUI_SB_NAME),
@@ -12046,7 +12356,7 @@ void InjectStartMenu()
                 SRRF_RT_REG_DWORD,
                 NULL,
                 &dwVal4,
-                (LPDWORD)(&dwSize)
+                &dwSize
             );
         }
         FreeLibrary(hModule);
@@ -12173,7 +12483,10 @@ void InjectShellExperienceHost()
                             {
                                 pCandidate = memmem(
                                     !pCandidate ? hQA + section->VirtualAddress : pCandidate,
-                                    !pCandidate ? section->SizeOfRawData : (uintptr_t)section->SizeOfRawData - (uintptr_t)(pCandidate - (hQA + section->VirtualAddress)),
+                                    !pCandidate
+                                        ? section->SizeOfRawData
+                                        : (uintptr_t)section->SizeOfRawData - (uintptr_t)(pCandidate - (hQA + section->
+                                            VirtualAddress)),
                                     seh_pattern1,
                                     sizeof(seh_pattern1)
                                 );
@@ -12224,22 +12537,32 @@ void InjectShellExperienceHost()
 // and `RtlGetDeviceFamilyInfoEnum` are only called in `FlightHelper::CalculateRepaintEnabled`
 // and either seems to get the job done. YMMV
 
-LSTATUS SEH_RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData, LPDWORD pcbData) {
-    if (!lstrcmpW(lpValue, L"UseLiteLayout")) { *(DWORD*)pvData = 1; return ERROR_SUCCESS; }
+LSTATUS SEH_RegGetValueW(HKEY hkey, LPCWSTR lpSubKey, LPCWSTR lpValue, DWORD dwFlags, LPDWORD pdwType, PVOID pvData,
+                         LPDWORD pcbData)
+{
+    if (!lstrcmpW(lpValue, L"UseLiteLayout"))
+    {
+        *(DWORD*)pvData = 1;
+        return ERROR_SUCCESS;
+    }
     return RegGetValueW(hkey, lpSubKey, lpValue, dwFlags, pdwType, pvData, pcbData);
 }
 
-BOOL SEH_RtlGetDeviceFamilyInfoEnum(INT64 u0, PDWORD u1, INT64 u2) {
+BOOL SEH_RtlGetDeviceFamilyInfoEnum(INT64 u0, PDWORD u1, INT64 u2)
+{
     *u1 = 10;
     return TRUE;
 }
 
-BOOL SEH_GetProductInfo(DWORD dwOSMajorVersion, DWORD dwOSMinorVersion, DWORD dwSpMajorVersion, DWORD dwSpMinorVersion, PDWORD pdwReturnedProductType) {
+BOOL SEH_GetProductInfo(DWORD dwOSMajorVersion, DWORD dwOSMinorVersion, DWORD dwSpMajorVersion, DWORD dwSpMinorVersion,
+                        PDWORD pdwReturnedProductType)
+{
     *pdwReturnedProductType = 119;
     return TRUE;
 }
 
-void InjectShellExperienceHostFor22H2OrHigher() {
+void InjectShellExperienceHostFor22H2OrHigher()
+{
 #ifdef _WIN64
     HKEY hKey;
     if (RegOpenKeyW(HKEY_CURRENT_USER, _T(SEH_REGPATH), &hKey) != ERROR_SUCCESS) return;
@@ -12252,40 +12575,57 @@ void InjectShellExperienceHostFor22H2OrHigher() {
 }
 
 #ifdef _WIN64
-HRESULT InformUserAboutCrashCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData) {
-    if (msg == TDN_HYPERLINK_CLICKED) {
-        if (wcschr(lParam, L'\'')) {
-            for (int i = 0; i < wcslen(lParam); ++i) if (*(((wchar_t*)lParam) + i) == L'\'') *(((wchar_t*)lParam) + i) = L'"';
+HRESULT InformUserAboutCrashCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LONG_PTR lpRefData)
+{
+    if (msg == TDN_HYPERLINK_CLICKED)
+    {
+        if (wcschr(lParam, L'\''))
+        {
+            for (int i = 0; i < wcslen(lParam); ++i)
+                if (*(((wchar_t*)lParam) + i) == L'\'')
+                    *(((wchar_t*)lParam) + i) =
+                        L'"';
             STARTUPINFO si;
             PROCESS_INFORMATION pi;
             ZeroMemory(&si, sizeof(si));
             si.cb = sizeof(si);
             ZeroMemory(&pi, sizeof(pi));
-            if (CreateProcessW(NULL, lParam, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+            if (CreateProcessW(NULL, lParam, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+            {
                 CloseHandle(pi.hProcess);
                 CloseHandle(pi.hThread);
-            }            
-            for (int i = 0; i < wcslen(lParam); ++i) if (*(((wchar_t*)lParam) + i) == L'"') *(((wchar_t*)lParam) + i) = L'\'';
+            }
+            for (int i = 0; i < wcslen(lParam); ++i)
+                if (*(((wchar_t*)lParam) + i) == L'"')
+                    *(((wchar_t*)lParam) + i) =
+                        L'\'';
         }
-        else if (!wcsncmp(lParam, L"eplink://update", 15)) {
-            if (!wcsncmp(lParam, L"eplink://update/stable", 22)) {
+        else if (!wcsncmp(lParam, L"eplink://update", 15))
+        {
+            if (!wcsncmp(lParam, L"eplink://update/stable", 22))
+            {
                 DWORD no = 0;
                 RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"UpdatePreferStaging", REG_DWORD, &no, sizeof(DWORD));
-            } else if (!wcsncmp(lParam, L"eplink://update/staging", 23)) {
+            }
+            else if (!wcsncmp(lParam, L"eplink://update/staging", 23))
+            {
                 DWORD yes = 1;
                 RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"UpdatePreferStaging", REG_DWORD, &yes, sizeof(DWORD));
             }
             SetLastError(0);
             HANDLE sigInstallUpdates = CreateEventW(NULL, FALSE, FALSE, L"EP_Ev_InstallUpdates_" _T(EP_CLSID));
-            if (sigInstallUpdates && GetLastError() == ERROR_ALREADY_EXISTS) {
+            if (sigInstallUpdates && GetLastError() == ERROR_ALREADY_EXISTS)
+            {
                 SetEvent(sigInstallUpdates);
             }
-            else {
+            else
+            {
                 CreateThread(NULL, 0, CheckForUpdatesThread, 0, 0, NULL);
                 Sleep(100);
                 SetLastError(0);
                 sigInstallUpdates = CreateEventW(NULL, FALSE, FALSE, L"EP_Ev_InstallUpdates_" _T(EP_CLSID));
-                if (sigInstallUpdates && GetLastError() == ERROR_ALREADY_EXISTS) {
+                if (sigInstallUpdates && GetLastError() == ERROR_ALREADY_EXISTS)
+                {
                     SetEvent(sigInstallUpdates);
                 }
             }
@@ -12294,10 +12634,10 @@ HRESULT InformUserAboutCrashCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
         return S_FALSE;
     }
     return S_OK;
-
 }
 
-DWORD InformUserAboutCrash(LPVOID msg) {
+DWORD InformUserAboutCrash(LPVOID msg)
+{
     TASKDIALOG_BUTTON buttons[1];
     buttons[0].nButtonID = IDNO;
     buttons[0].pszButtonText = L"Dismiss";
@@ -12319,19 +12659,24 @@ DWORD InformUserAboutCrash(LPVOID msg) {
     td.pfCallback = InformUserAboutCrashCallback;
 
     HMODULE hComCtl32 = NULL;
-    HRESULT(*pfTaskDialogIndirect)(const TASKDIALOGCONFIG*, int*, int*, BOOL*) = NULL;
+    HRESULT (*pfTaskDialogIndirect)(const TASKDIALOGCONFIG*, int*, int*, BOOL*) = NULL;
     int res = td.nDefaultButton;
-    if (!(hComCtl32 = GetModuleHandleA("Comctl32.dll")) || 
+    if (!(hComCtl32 = GetModuleHandleA("Comctl32.dll")) ||
         !(pfTaskDialogIndirect = GetProcAddress(hComCtl32, "TaskDialogIndirect")) ||
-        FAILED(pfTaskDialogIndirect(&td, &res, NULL, NULL))) {
-        wcscat_s(msg, 10000, L" Would you like to open the ExplorerPatcher status web page on GitHub in your default browser?");
+        FAILED(pfTaskDialogIndirect(&td, &res, NULL, NULL)))
+    {
+        wcscat_s(msg, 10000,
+                 L" Would you like to open the ExplorerPatcher status web page on GitHub in your default browser?");
         res = MessageBoxW(NULL, msg, L"ExplorerPatcher", MB_ICONASTERISK | MB_YESNO);
     }
-    if (res == IDYES) ShellExecuteW(NULL, L"open", L"https://github.com/valinet/ExplorerPatcher/discussions/1102", L"", NULL, SW_SHOWNORMAL);
+    if (res == IDYES)
+        ShellExecuteW(NULL, L"open", L"https://github.com/valinet/ExplorerPatcher/discussions/1102", L"",
+                      NULL, SW_SHOWNORMAL);
     free(msg);
 }
 
-DWORD WINAPI ClearCrashCounter(INT64 timeout) {
+DWORD WINAPI ClearCrashCounter(INT64 timeout)
+{
     Sleep(timeout);
     DWORD zero = 0;
     RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", REG_DWORD, &zero, sizeof(DWORD));
@@ -12341,6 +12686,7 @@ DWORD WINAPI ClearCrashCounter(INT64 timeout) {
 #define DLL_INJECTION_METHOD_DXGI 0
 #define DLL_INJECTION_METHOD_COM 1
 #define DLL_INJECTION_METHOD_START_INJECTION 2
+
 HRESULT EntryPoint(DWORD dwMethod)
 {
     if (bInstanced)
@@ -12392,12 +12738,14 @@ HRESULT EntryPoint(DWORD dwMethod)
 
     TCHAR wszStartExpectedPath[MAX_PATH];
     GetWindowsDirectoryW(wszStartExpectedPath, MAX_PATH);
-    wcscat_s(wszStartExpectedPath, MAX_PATH, L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe");
+    wcscat_s(wszStartExpectedPath, MAX_PATH,
+             L"\\SystemApps\\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\\StartMenuExperienceHost.exe");
     BOOL bIsThisStartMEH = !_wcsicmp(exePath, wszStartExpectedPath);
 
     TCHAR wszShellExpectedPath[MAX_PATH];
     GetWindowsDirectoryW(wszShellExpectedPath, MAX_PATH);
-    wcscat_s(wszShellExpectedPath, MAX_PATH, L"\\SystemApps\\ShellExperienceHost_cw5n1h2txyewy\\ShellExperienceHost.exe");
+    wcscat_s(wszShellExpectedPath, MAX_PATH,
+             L"\\SystemApps\\ShellExperienceHost_cw5n1h2txyewy\\ShellExperienceHost.exe");
     BOOL bIsThisShellEH = !_wcsicmp(exePath, wszShellExpectedPath);
 
     if (dwMethod == DLL_INJECTION_METHOD_DXGI)
@@ -12427,20 +12775,32 @@ HRESULT EntryPoint(DWORD dwMethod)
     {
         BOOL desktopExists = IsDesktopWindowAlreadyPresent();
 #ifdef _WIN64
-        if (!desktopExists) {
-            DWORD crashCounterDisabled = 0, crashCounter = 0, crashThresholdTime = 10000, crashCounterThreshold = 3, dwTCSize = sizeof(DWORD);
-            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounterDisabled", RRF_RT_DWORD, NULL, &crashCounterDisabled, &dwTCSize); dwTCSize = sizeof(DWORD);
+        if (!desktopExists)
+        {
+            DWORD crashCounterDisabled = 0, crashCounter = 0, crashThresholdTime = 10000, crashCounterThreshold = 3,
+                  dwTCSize = sizeof(DWORD);
+            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounterDisabled", RRF_RT_DWORD, NULL,
+                         &crashCounterDisabled, &dwTCSize);
+            dwTCSize = sizeof(DWORD);
             if (crashCounterDisabled != 0 && crashCounterDisabled != 1) crashCounterDisabled = 0;
-            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", RRF_RT_DWORD, NULL, &crashCounter, &dwTCSize); dwTCSize = sizeof(DWORD);
+            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", RRF_RT_DWORD, NULL, &crashCounter, &dwTCSize);
+            dwTCSize = sizeof(DWORD);
             if (crashCounter < 0) crashCounter = 0;
-            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashThresholdTime", RRF_RT_DWORD, NULL, &crashThresholdTime, &dwTCSize); dwTCSize = sizeof(DWORD);
+            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashThresholdTime", RRF_RT_DWORD, NULL, &crashThresholdTime,
+                         &dwTCSize);
+            dwTCSize = sizeof(DWORD);
             if (crashThresholdTime < 100 || crashThresholdTime > 60000) crashThresholdTime = 10000;
-            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounterThreshold", RRF_RT_DWORD, NULL, &crashCounterThreshold, &dwTCSize); dwTCSize = sizeof(DWORD);
+            RegGetValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounterThreshold", RRF_RT_DWORD, NULL,
+                         &crashCounterThreshold, &dwTCSize);
+            dwTCSize = sizeof(DWORD);
             if (crashCounterThreshold <= 1 || crashCounterThreshold >= 10) crashCounterThreshold = 3;
-            if (!crashCounterDisabled) {
-                if (crashCounter >= crashCounterThreshold) {
+            if (!crashCounterDisabled)
+            {
+                if (crashCounter >= crashCounterThreshold)
+                {
                     crashCounter = 0;
-                    RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", REG_DWORD, &crashCounter, sizeof(DWORD));
+                    RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", REG_DWORD, &crashCounter,
+                                    sizeof(DWORD));
                     wchar_t times[100];
                     ZeroMemory(times, sizeof(wchar_t) * 100);
                     swprintf_s(times, 100, crashCounterThreshold == 1 ? L"once" : L"%d times", crashCounterThreshold);
@@ -12448,29 +12808,31 @@ HRESULT EntryPoint(DWORD dwMethod)
                     ZeroMemory(uninstallLink, sizeof(wchar_t) * MAX_PATH);
                     uninstallLink[0] = L'\'';
                     SHGetFolderPathW(NULL, SPECIAL_FOLDER, NULL, SHGFP_TYPE_CURRENT, uninstallLink + 1);
-                    wcscat_s(uninstallLink, MAX_PATH, _T(APP_RELATIVE_PATH) L"\\" _T(SETUP_UTILITY_NAME) L"' /uninstall");
+                    wcscat_s(uninstallLink, MAX_PATH,
+                             _T(APP_RELATIVE_PATH) L"\\" _T(SETUP_UTILITY_NAME) L"' /uninstall");
                     wchar_t* msg = calloc(sizeof(wchar_t), 10000);
                     swprintf_s(msg, 10000,
-                        L"It seems that File Explorer closed unexpectedly %s in less than %d seconds each time when starting up. "
-                        L"This might indicate a problem caused by ExplorerPatcher, which might be unaware of recent changes in Windows, for example "
-                        L"when running on a new OS build.\n"
-                        L"Here are a few recommendations:\n"
-                        L"\u2022 If an updated version is available, you can <A HREF=\"eplink://update\">update ExplorerPatcher and restart File Explorer</A>.\n"
-                        L"\u2022 On GitHub, you can <A HREF=\"https://github.com/valinet/ExplorerPatcher/releases\">view releases</A>, <A HREF=\"https://github.com/valinet/ExplorerPatcher/discussions/1102\">check the current status</A>, <A HREF=\"https://github.com/valinet/ExplorerPatcher/discussions\">discuss</A> or <A HREF=\"https://github.com/valinet/ExplorerPatcher/issues\">review the latest issues</A>.\n"
-                        L"\u2022 If you suspect this is not caused by ExplorerPatcher, please uninstall any recently installed shell extensions or similar utilities.\n"
-                        L"\u2022 If no fix is available for the time being, you can <A HREF=\"%s\">uninstall ExplorerPatcher</A>, and then later reinstall it when a fix is published on "
-                        L"GitHub. Rest assured, even if you uninstall, your program configuration will be preserved.\n"
-                        L"\n"
-                        L"I am sorry for the inconvenience this might cause; I am doing my best to try to keep this program updated and working.\n\n"
-                        L"ExplorerPatcher is disabled until the next File Explorer restart, in order to allow you to perform maintenance tasks and take the necessary actions.",
-                        times, crashThresholdTime / 1000, uninstallLink);
+                               L"It seems that File Explorer closed unexpectedly %s in less than %d seconds each time when starting up. "
+                               L"This might indicate a problem caused by ExplorerPatcher, which might be unaware of recent changes in Windows, for example "
+                               L"when running on a new OS build.\n"
+                               L"Here are a few recommendations:\n"
+                               L"\u2022 If an updated version is available, you can <A HREF=\"eplink://update\">update ExplorerPatcher and restart File Explorer</A>.\n"
+                               L"\u2022 On GitHub, you can <A HREF=\"https://github.com/valinet/ExplorerPatcher/releases\">view releases</A>, <A HREF=\"https://github.com/valinet/ExplorerPatcher/discussions/1102\">check the current status</A>, <A HREF=\"https://github.com/valinet/ExplorerPatcher/discussions\">discuss</A> or <A HREF=\"https://github.com/valinet/ExplorerPatcher/issues\">review the latest issues</A>.\n"
+                               L"\u2022 If you suspect this is not caused by ExplorerPatcher, please uninstall any recently installed shell extensions or similar utilities.\n"
+                               L"\u2022 If no fix is available for the time being, you can <A HREF=\"%s\">uninstall ExplorerPatcher</A>, and then later reinstall it when a fix is published on "
+                               L"GitHub. Rest assured, even if you uninstall, your program configuration will be preserved.\n"
+                               L"\n"
+                               L"I am sorry for the inconvenience this might cause; I am doing my best to try to keep this program updated and working.\n\n"
+                               L"ExplorerPatcher is disabled until the next File Explorer restart, in order to allow you to perform maintenance tasks and take the necessary actions.",
+                               times, crashThresholdTime / 1000, uninstallLink);
                     SHCreateThread(InformUserAboutCrash, msg, 0, NULL);
                     IncrementDLLReferenceCount(hModule);
                     bInstanced = TRUE;
                     return E_NOINTERFACE;
                 }
                 crashCounter++;
-                RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", REG_DWORD, &crashCounter, sizeof(DWORD));
+                RegSetKeyValueW(HKEY_CURRENT_USER, _T(REGPATH), L"CrashCounter", REG_DWORD, &crashCounter,
+                                sizeof(DWORD));
                 SHCreateThread(ClearCrashCounter, crashThresholdTime, 0, NULL);
             }
         }
@@ -12515,12 +12877,14 @@ __declspec(dllexport) HRESULT DXGIDeclareAdapterRemovalSupport()
     EntryPoint(DLL_INJECTION_METHOD_DXGI);
     return DXGIDeclareAdapterRemovalSupportFunc();
 }
+
 // for StartMenuExperienceHost.exe via DXGI
 __declspec(dllexport) HRESULT CreateDXGIFactory1(void* p1, void** p2)
 {
     EntryPoint(DLL_INJECTION_METHOD_DXGI);
     return CreateDXGIFactory1Func(p1, p2);
 }
+
 // for StartMenuExperienceHost.exe via injection from explorer
 HRESULT InjectStartFromExplorer()
 {
@@ -12534,7 +12898,7 @@ HRESULT InjectStartFromExplorer()
 // for everything else
 HRESULT WINAPI _DllGetClassObject(
     REFCLSID rclsid,
-    REFIID   riid,
+    REFIID riid,
     LPVOID* ppv
 )
 {
@@ -12543,8 +12907,8 @@ HRESULT WINAPI _DllGetClassObject(
 
 BOOL WINAPI DllMain(
     _In_ HINSTANCE hinstDLL,
-    _In_ DWORD     fdwReason,
-    _In_ LPVOID    lpvReserved
+    _In_ DWORD fdwReason,
+    _In_ LPVOID lpvReserved
 )
 {
     switch (fdwReason)

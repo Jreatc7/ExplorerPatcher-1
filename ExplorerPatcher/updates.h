@@ -32,22 +32,22 @@ extern HMODULE hModule;
 
 typedef struct IsUpdateAvailableParameters
 {
-	HINTERNET hInternet;
-	HANDLE hEvent;
+    HINTERNET hInternet;
+    HANDLE hEvent;
 };
 
 BOOL IsUpdatePolicy(LPCWSTR wszDataStore, DWORD dwUpdatePolicy);
 BOOL ShowUpdateSuccessNotification(
-	HMODULE hModule,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* notifier,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotificationFactory* notifFactory,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotification** toast
+    HMODULE hModule,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* notifier,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotificationFactory* notifFactory,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotification** toast
 );
 BOOL InstallUpdatesIfAvailable(
-	HMODULE hModule,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* notifier,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotificationFactory* notifFactory,
-	__x_ABI_CWindows_CUI_CNotifications_CIToastNotification** toast,
-	DWORD dwOperation, DWORD bAllocConsole, DWORD dwUpdatePolicy
+    HMODULE hModule,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* notifier,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotificationFactory* notifFactory,
+    __x_ABI_CWindows_CUI_CNotifications_CIToastNotification** toast,
+    DWORD dwOperation, DWORD bAllocConsole, DWORD dwUpdatePolicy
 );
 #endif

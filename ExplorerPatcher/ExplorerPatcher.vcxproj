@@ -1,344 +1,344 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{DB3E4319-2969-42B6-B7E8-BB57AA8C9FA9}</ProjectGuid>
-    <RootNamespace>CenterTitlebarTextLibrary</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>ExplorerPatcher</ProjectName>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
-    <TargetName>ExplorerPatcher.amd64</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
-    <TargetName>ExplorerPatcher.IA-32</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>ExplorerPatcher.amd64</TargetName>
-    <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>ExplorerPatcher.IA-32</TargetName>
-    <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CallingConvention>Cdecl</CallingConvention>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <CallingConvention>StdCall</CallingConvention>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ForcedIncludeFiles>$(SolutionDir)debug.h</ForcedIncludeFiles>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <CallingConvention>StdCall</CallingConvention>
-      <ForcedIncludeFiles>$(SolutionDir)debug.h</ForcedIncludeFiles>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_error.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_IconPainter.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_RegistryMonitor.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_tshwnd.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_vector.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_window.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowHelpers.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcher.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayout.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayoutWindow.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="ArchiveMenu.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="dllmain.c" />
-    <ClCompile Include="fmemopen.c" />
-    <ClCompile Include="getline.c" />
-    <ClCompile Include="GUI.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="HideExplorerSearchBar.c" />
-    <ClCompile Include="ImmersiveFlyouts.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="lvt.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="SettingsMonitor.c" />
-    <ClCompile Include="StartMenu.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="StartupSound.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="symbols.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="TaskbarCenter.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="updates.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="utility.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_def.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_error.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_IconPainter.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_RegistryMonitor.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_tshwnd.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_utility.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_vector.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_window.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowHelpers.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcher.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayout.h" />
-    <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayoutWindow.h" />
-    <ClInclude Include="..\version.h" />
-    <ClInclude Include="ArchiveMenu.h" />
-    <ClInclude Include="def.h" />
-    <ClInclude Include="dxgi_imp.h" />
-    <ClInclude Include="fmemopen.h" />
-    <ClInclude Include="getline.h" />
-    <ClInclude Include="GUI.h" />
-    <ClInclude Include="HideExplorerSearchBar.h" />
-    <ClInclude Include="hooking.h" />
-    <ClInclude Include="ep_private.h" />
-    <ClInclude Include="ImmersiveFlyouts.h" />
-    <ClInclude Include="lvt.h" />
-    <ClInclude Include="osutility.h" />
-    <ClInclude Include="queryversion.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="SettingsMonitor.h" />
-    <ClInclude Include="StartMenu.h" />
-    <ClInclude Include="StartupSound.h" />
-    <ClInclude Include="symbols.h" />
-    <ClInclude Include="TaskbarCenter.h" />
-    <ClInclude Include="updates.h" />
-    <ClInclude Include="utility.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ExplorerPatcher.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="settings.reg" />
-    <None Include="settings10.reg" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+    <ItemGroup Label="ProjectConfigurations">
+        <ProjectConfiguration Include="Debug|Win32">
+            <Configuration>Debug</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Debug|x64">
+            <Configuration>Debug</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|Win32">
+            <Configuration>Release</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|x64">
+            <Configuration>Release</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+    </ItemGroup>
+    <PropertyGroup Label="Globals">
+        <VCProjectVersion>16.0</VCProjectVersion>
+        <ProjectGuid>{DB3E4319-2969-42B6-B7E8-BB57AA8C9FA9}</ProjectGuid>
+        <RootNamespace>CenterTitlebarTextLibrary</RootNamespace>
+        <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+        <ProjectName>ExplorerPatcher</ProjectName>
+    </PropertyGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+        <ConfigurationType>DynamicLibrary</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <CharacterSet>Unicode</CharacterSet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+        <ConfigurationType>DynamicLibrary</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <CharacterSet>Unicode</CharacterSet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+        <ConfigurationType>DynamicLibrary</ConfigurationType>
+        <UseDebugLibraries>false</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
+        <CharacterSet>Unicode</CharacterSet>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+        <ConfigurationType>DynamicLibrary</ConfigurationType>
+        <UseDebugLibraries>false</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
+        <CharacterSet>Unicode</CharacterSet>
+    </PropertyGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+    <ImportGroup Label="ExtensionSettings">
+    </ImportGroup>
+    <ImportGroup Label="Shared">
+    </ImportGroup>
+    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+    <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+    <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+    <PropertyGroup Label="UserMacros"/>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <LinkIncremental>false</LinkIncremental>
+        <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
+        <TargetName>ExplorerPatcher.amd64</TargetName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+        <LinkIncremental>false</LinkIncremental>
+        <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
+        <TargetName>ExplorerPatcher.IA-32</TargetName>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <LinkIncremental>true</LinkIncremental>
+        <TargetName>ExplorerPatcher.amd64</TargetName>
+        <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+        <LinkIncremental>true</LinkIncremental>
+        <TargetName>ExplorerPatcher.IA-32</TargetName>
+        <OutDir>$(SolutionDir)\build\$(Configuration)</OutDir>
+    </PropertyGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <CallingConvention>Cdecl</CallingConvention>
+        </ClCompile>
+        <Link>
+            <SubSystem>Console</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <PreBuildEvent>
+            <Command>
+            </Command>
+        </PreBuildEvent>
+        <PostBuildEvent>
+            <Command>
+            </Command>
+        </PostBuildEvent>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <CallingConvention>StdCall</CallingConvention>
+        </ClCompile>
+        <Link>
+            <SubSystem>Console</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <PreBuildEvent>
+            <Command>
+            </Command>
+        </PreBuildEvent>
+        <PostBuildEvent>
+            <Command>
+            </Command>
+        </PostBuildEvent>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <CallingConvention>Cdecl</CallingConvention>
+            <ForcedIncludeFiles>$(SolutionDir)debug.h</ForcedIncludeFiles>
+        </ClCompile>
+        <Link>
+            <SubSystem>Console</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <PostBuildEvent>
+            <Command>
+            </Command>
+        </PostBuildEvent>
+        <PreBuildEvent>
+            <Command>
+            </Command>
+        </PreBuildEvent>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(SolutionDir)libs\funchook\include;$(SolutionDir)libs\libvalinet;$(SolutionDir)libs\funchook\distorm\include;$(SolutionDir)libs\Detours\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <CallingConvention>StdCall</CallingConvention>
+            <ForcedIncludeFiles>$(SolutionDir)debug.h</ForcedIncludeFiles>
+        </ClCompile>
+        <Link>
+            <SubSystem>Console</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(SolutionDir)libs\funchook\build\Release\;$(SolutionDir)libs\Detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+            <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+        </Link>
+        <PostBuildEvent>
+            <Command>
+            </Command>
+        </PostBuildEvent>
+        <PreBuildEvent>
+            <Command>
+            </Command>
+        </PreBuildEvent>
+    </ItemDefinitionGroup>
+    <ItemGroup>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_error.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_IconPainter.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_RegistryMonitor.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_tshwnd.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_vector.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_window.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+            </ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowHelpers.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcher.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayout.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayoutWindow.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="ArchiveMenu.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="dllmain.c"/>
+        <ClCompile Include="fmemopen.c"/>
+        <ClCompile Include="getline.c"/>
+        <ClCompile Include="GUI.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="HideExplorerSearchBar.c"/>
+        <ClCompile Include="ImmersiveFlyouts.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="lvt.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="SettingsMonitor.c"/>
+        <ClCompile Include="StartMenu.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="StartupSound.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="symbols.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="TaskbarCenter.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+            </ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+            </ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="updates.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+            </ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+        <ClCompile Include="utility.c">
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+            <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+        </ClCompile>
+    </ItemGroup>
+    <ItemGroup>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_def.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_error.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_IconPainter.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_RegistryMonitor.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_tshwnd.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_utility.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_vector.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_window.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowHelpers.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcher.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayout.h"/>
+        <ClInclude Include="..\libs\sws\SimpleWindowSwitcher\sws_WindowSwitcherLayoutWindow.h"/>
+        <ClInclude Include="..\version.h"/>
+        <ClInclude Include="ArchiveMenu.h"/>
+        <ClInclude Include="def.h"/>
+        <ClInclude Include="dxgi_imp.h"/>
+        <ClInclude Include="fmemopen.h"/>
+        <ClInclude Include="getline.h"/>
+        <ClInclude Include="GUI.h"/>
+        <ClInclude Include="HideExplorerSearchBar.h"/>
+        <ClInclude Include="hooking.h"/>
+        <ClInclude Include="ep_private.h"/>
+        <ClInclude Include="ImmersiveFlyouts.h"/>
+        <ClInclude Include="lvt.h"/>
+        <ClInclude Include="osutility.h"/>
+        <ClInclude Include="queryversion.h"/>
+        <ClInclude Include="resource.h"/>
+        <ClInclude Include="SettingsMonitor.h"/>
+        <ClInclude Include="StartMenu.h"/>
+        <ClInclude Include="StartupSound.h"/>
+        <ClInclude Include="symbols.h"/>
+        <ClInclude Include="TaskbarCenter.h"/>
+        <ClInclude Include="updates.h"/>
+        <ClInclude Include="utility.h"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ResourceCompile Include="ExplorerPatcher.rc"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="settings.reg"/>
+        <None Include="settings10.reg"/>
+    </ItemGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+    <ImportGroup Label="ExtensionTargets">
+    </ImportGroup>
 </Project>
